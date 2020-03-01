@@ -1,9 +1,9 @@
 <?php
 
-$container->loadFromExtension('framework', [
+$container->loadFromExtension('framework', array(
     'secret' => 's3cr3t',
-    'validation' => [
+    'validation' => array(
         'enabled' => true,
         'enable_annotations' => true,
-    ],
-]);
+    ),
+));

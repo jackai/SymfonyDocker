@@ -11,26 +11,23 @@
 
 namespace Symfony\Component\HttpFoundation\Tests\Session\Storage\Handler;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\WriteCheckSessionHandler;
 
 /**
  * @author Adrien Brault <adrien.brault@gmail.com>
- *
- * @group legacy
  */
-class WriteCheckSessionHandlerTest extends TestCase
+class WriteCheckSessionHandlerTest extends \PHPUnit_Framework_TestCase
 {
     public function test()
     {
-        $wrappedSessionHandlerMock = $this->getMockBuilder('SessionHandlerInterface')->getMock();
+        $wrappedSessionHandlerMock = $this->getMock('SessionHandlerInterface');
         $writeCheckSessionHandler = new WriteCheckSessionHandler($wrappedSessionHandlerMock);
 
         $wrappedSessionHandlerMock
             ->expects($this->once())
             ->method('close')
             ->with()
-            ->willReturn(true)
+            ->will($this->returnValue(true))
         ;
 
         $this->assertTrue($writeCheckSessionHandler->close());
@@ -38,14 +35,14 @@ class WriteCheckSessionHandlerTest extends TestCase
 
     public function testWrite()
     {
-        $wrappedSessionHandlerMock = $this->getMockBuilder('SessionHandlerInterface')->getMock();
+        $wrappedSessionHandlerMock = $this->getMock('SessionHandlerInterface');
         $writeCheckSessionHandler = new WriteCheckSessionHandler($wrappedSessionHandlerMock);
 
         $wrappedSessionHandlerMock
             ->expects($this->once())
             ->method('write')
             ->with('foo', 'bar')
-            ->willReturn(true)
+            ->will($this->returnValue(true))
         ;
 
         $this->assertTrue($writeCheckSessionHandler->write('foo', 'bar'));
@@ -53,14 +50,14 @@ class WriteCheckSessionHandlerTest extends TestCase
 
     public function testSkippedWrite()
     {
-        $wrappedSessionHandlerMock = $this->getMockBuilder('SessionHandlerInterface')->getMock();
+        $wrappedSessionHandlerMock = $this->getMock('SessionHandlerInterface');
         $writeCheckSessionHandler = new WriteCheckSessionHandler($wrappedSessionHandlerMock);
 
         $wrappedSessionHandlerMock
             ->expects($this->once())
             ->method('read')
             ->with('foo')
-            ->willReturn('bar')
+            ->will($this->returnValue('bar'))
         ;
 
         $wrappedSessionHandlerMock
@@ -74,21 +71,21 @@ class WriteCheckSessionHandlerTest extends TestCase
 
     public function testNonSkippedWrite()
     {
-        $wrappedSessionHandlerMock = $this->getMockBuilder('SessionHandlerInterface')->getMock();
+        $wrappedSessionHandlerMock = $this->getMock('SessionHandlerInterface');
         $writeCheckSessionHandler = new WriteCheckSessionHandler($wrappedSessionHandlerMock);
 
         $wrappedSessionHandlerMock
             ->expects($this->once())
             ->method('read')
             ->with('foo')
-            ->willReturn('bar')
+            ->will($this->returnValue('bar'))
         ;
 
         $wrappedSessionHandlerMock
             ->expects($this->once())
             ->method('write')
             ->with('foo', 'baZZZ')
-            ->willReturn(true)
+            ->will($this->returnValue(true))
         ;
 
         $this->assertEquals('bar', $writeCheckSessionHandler->read('foo'));

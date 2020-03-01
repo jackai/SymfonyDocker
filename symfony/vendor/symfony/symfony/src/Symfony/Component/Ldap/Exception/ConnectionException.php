@@ -12,10 +12,12 @@
 namespace Symfony\Component\Ldap\Exception;
 
 /**
- * ConnectionException is thrown if binding to ldap can not be established.
+ * ConnectionException is throw if binding to ldap can not be established.
  *
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
+ *
+ * @internal
  */
-class ConnectionException extends \RuntimeException implements ExceptionInterface
+class ConnectionException extends \RuntimeException
 {
 }

@@ -16,7 +16,6 @@ use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Id;
 use Doctrine\ORM\Mapping\ManyToMany;
 use Doctrine\ORM\Mapping\ManyToOne;
-use Doctrine\ORM\Mapping\OneToMany;
 
 /**
  * @Entity
@@ -42,14 +41,9 @@ class DoctrineDummy
     public $bar;
 
     /**
-     * @ManyToMany(targetEntity="DoctrineRelation", indexBy="rguid")
+     * @ManyToMany(targetEntity="DoctrineRelation", indexBy="guid")
      */
     protected $indexedBar;
-
-    /**
-     * @OneToMany(targetEntity="DoctrineRelation", mappedBy="foo", indexBy="foo")
-     */
-    protected $indexedFoo;
 
     /**
      * @Column(type="guid")
@@ -62,16 +56,6 @@ class DoctrineDummy
     private $time;
 
     /**
-     * @Column(type="time_immutable")
-     */
-    private $timeImmutable;
-
-    /**
-     * @Column(type="dateinterval")
-     */
-    private $dateInterval;
-
-    /**
      * @Column(type="json_array")
      */
     private $json;
@@ -80,16 +64,6 @@ class DoctrineDummy
      * @Column(type="simple_array")
      */
     private $simpleArray;
-
-    /**
-     * @Column(type="float")
-     */
-    private $float;
-
-    /**
-     * @Column(type="decimal", precision=10, scale=2)
-     */
-    private $decimal;
 
     /**
      * @Column(type="boolean")
@@ -105,11 +79,6 @@ class DoctrineDummy
      * @Column(type="custom_foo")
      */
     private $customFoo;
-
-    /**
-     * @Column(type="bigint")
-     */
-    private $bigint;
 
     public $notMapped;
 }

@@ -1,8 +1,8 @@
 {
-    "Version": "36",
+    "Version": "2.1.10.93",
     "Names": {
         "AD": "Andoro",
-        "AE": "Unuiĝintaj Arabaj Emirlandoj",
+        "AE": "Unuiĝintaj Arabaj Emirlandos",
         "AF": "Afganujo",
         "AG": "Antigvo-Barbudo",
         "AI": "Angvilo",
@@ -127,6 +127,7 @@
         "MD": "Moldavujo",
         "MG": "Madagaskaro",
         "MH": "Marŝaloj",
+        "MK": "Makedonujo",
         "ML": "Malio",
         "MM": "Mjanmao",
         "MN": "Mongolujo",

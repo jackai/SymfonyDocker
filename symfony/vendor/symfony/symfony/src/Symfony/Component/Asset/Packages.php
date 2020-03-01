@@ -23,13 +23,13 @@ use Symfony\Component\Asset\Exception\LogicException;
 class Packages
 {
     private $defaultPackage;
-    private $packages = [];
+    private $packages = array();
 
     /**
      * @param PackageInterface   $defaultPackage The default package
      * @param PackageInterface[] $packages       Additional packages indexed by name
      */
-    public function __construct(PackageInterface $defaultPackage = null, array $packages = [])
+    public function __construct(PackageInterface $defaultPackage = null, array $packages = array())
     {
         $this->defaultPackage = $defaultPackage;
 
@@ -38,6 +38,11 @@ class Packages
         }
     }
 
+    /**
+     * Sets the default package.
+     *
+     * @param PackageInterface $defaultPackage The default package
+     */
     public function setDefaultPackage(PackageInterface $defaultPackage)
     {
         $this->defaultPackage = $defaultPackage;

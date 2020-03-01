@@ -11,339 +11,92 @@
 
 namespace Symfony\Component\Security\Core\Tests\User;
 
-use PHPUnit\Framework\TestCase;
-use Symfony\Component\Ldap\Adapter\CollectionInterface;
-use Symfony\Component\Ldap\Adapter\QueryInterface;
-use Symfony\Component\Ldap\Entry;
-use Symfony\Component\Ldap\Exception\ConnectionException;
-use Symfony\Component\Ldap\LdapInterface;
 use Symfony\Component\Security\Core\User\LdapUserProvider;
+use Symfony\Component\Ldap\Exception\ConnectionException;
 
 /**
  * @requires extension ldap
  */
-class LdapUserProviderTest extends TestCase
+class LdapUserProviderTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @expectedException \Symfony\Component\Security\Core\Exception\UsernameNotFoundException
+     */
     public function testLoadUserByUsernameFailsIfCantConnectToLdap()
     {
-        $this->expectException('Symfony\Component\Security\Core\Exception\UsernameNotFoundException');
-        $ldap = $this->getMockBuilder(LdapInterface::class)->getMock();
+        $ldap = $this->getMock('Symfony\Component\Ldap\LdapClientInterface');
         $ldap
             ->expects($this->once())
             ->method('bind')
-            ->willThrowException(new ConnectionException())
+            ->will($this->throwException(new ConnectionException()))
         ;
 
         $provider = new LdapUserProvider($ldap, 'ou=MyBusiness,dc=symfony,dc=com');
         $provider->loadUserByUsername('foo');
     }
 
+    /**
+     * @expectedException \Symfony\Component\Security\Core\Exception\UsernameNotFoundException
+     */
     public function testLoadUserByUsernameFailsIfNoLdapEntries()
     {
-        $this->expectException('Symfony\Component\Security\Core\Exception\UsernameNotFoundException');
-        $result = $this->getMockBuilder(CollectionInterface::class)->getMock();
-        $query = $this->getMockBuilder(QueryInterface::class)->getMock();
-        $query
-            ->expects($this->once())
-            ->method('execute')
-            ->willReturn($result)
-        ;
-        $result
-            ->expects($this->once())
-            ->method('count')
-            ->willReturn(0)
-        ;
-        $ldap = $this->getMockBuilder(LdapInterface::class)->getMock();
+        $ldap = $this->getMock('Symfony\Component\Ldap\LdapClientInterface');
         $ldap
             ->expects($this->once())
             ->method('escape')
-            ->willReturn('foo')
-        ;
-        $ldap
-            ->expects($this->once())
-            ->method('query')
-            ->willReturn($query)
+            ->will($this->returnValue('foo'))
         ;
 
         $provider = new LdapUserProvider($ldap, 'ou=MyBusiness,dc=symfony,dc=com');
         $provider->loadUserByUsername('foo');
     }
 
+    /**
+     * @expectedException \Symfony\Component\Security\Core\Exception\UsernameNotFoundException
+     */
     public function testLoadUserByUsernameFailsIfMoreThanOneLdapEntry()
     {
-        $this->expectException('Symfony\Component\Security\Core\Exception\UsernameNotFoundException');
-        $result = $this->getMockBuilder(CollectionInterface::class)->getMock();
-        $query = $this->getMockBuilder(QueryInterface::class)->getMock();
-        $query
-            ->expects($this->once())
-            ->method('execute')
-            ->willReturn($result)
-        ;
-        $result
-            ->expects($this->once())
-            ->method('count')
-            ->willReturn(2)
-        ;
-        $ldap = $this->getMockBuilder(LdapInterface::class)->getMock();
+        $ldap = $this->getMock('Symfony\Component\Ldap\LdapClientInterface');
         $ldap
             ->expects($this->once())
             ->method('escape')
-            ->willReturn('foo')
+            ->will($this->returnValue('foo'))
         ;
         $ldap
             ->expects($this->once())
-            ->method('query')
-            ->willReturn($query)
+            ->method('find')
+            ->will($this->returnValue(array(
+                array(),
+                array(),
+                'count' => 2,
+            )))
         ;
 
         $provider = new LdapUserProvider($ldap, 'ou=MyBusiness,dc=symfony,dc=com');
         $provider->loadUserByUsername('foo');
     }
 
-    public function testLoadUserByUsernameFailsIfMoreThanOneLdapPasswordsInEntry()
+    public function testSuccessfulLoadUserByUsername()
     {
-        $this->expectException('Symfony\Component\Security\Core\Exception\InvalidArgumentException');
-        $result = $this->getMockBuilder(CollectionInterface::class)->getMock();
-        $query = $this->getMockBuilder(QueryInterface::class)->getMock();
-        $query
-            ->expects($this->once())
-            ->method('execute')
-            ->willReturn($result)
-        ;
-        $ldap = $this->getMockBuilder(LdapInterface::class)->getMock();
-        $result
-            ->expects($this->once())
-            ->method('offsetGet')
-            ->with(0)
-            ->willReturn(new Entry('foo', [
-                    'sAMAccountName' => ['foo'],
-                    'userpassword' => ['bar', 'baz'],
-                ]
-            ))
-        ;
-        $result
-            ->expects($this->once())
-            ->method('count')
-            ->willReturn(1)
-        ;
+        $ldap = $this->getMock('Symfony\Component\Ldap\LdapClientInterface');
         $ldap
             ->expects($this->once())
             ->method('escape')
-            ->willReturn('foo')
+            ->will($this->returnValue('foo'))
         ;
         $ldap
             ->expects($this->once())
-            ->method('query')
-            ->willReturn($query)
-        ;
-
-        $provider = new LdapUserProvider($ldap, 'ou=MyBusiness,dc=symfony,dc=com', null, null, [], 'sAMAccountName', '({uid_key}={username})', 'userpassword');
-        $this->assertInstanceOf(
-            'Symfony\Component\Security\Core\User\User',
-            $provider->loadUserByUsername('foo')
-        );
-    }
-
-    public function testLoadUserByUsernameShouldNotFailIfEntryHasNoUidKeyAttribute()
-    {
-        $result = $this->getMockBuilder(CollectionInterface::class)->getMock();
-        $query = $this->getMockBuilder(QueryInterface::class)->getMock();
-        $query
-            ->expects($this->once())
-            ->method('execute')
-            ->willReturn($result)
-        ;
-        $ldap = $this->getMockBuilder(LdapInterface::class)->getMock();
-        $result
-            ->expects($this->once())
-            ->method('offsetGet')
-            ->with(0)
-            ->willReturn(new Entry('foo', []))
-        ;
-        $result
-            ->expects($this->once())
-            ->method('count')
-            ->willReturn(1)
-        ;
-        $ldap
-            ->expects($this->once())
-            ->method('escape')
-            ->willReturn('foo')
-        ;
-        $ldap
-            ->expects($this->once())
-            ->method('query')
-            ->willReturn($query)
-        ;
-
-        $provider = new LdapUserProvider($ldap, 'ou=MyBusiness,dc=symfony,dc=com', null, null, [], 'sAMAccountName', '({uid_key}={username})');
-        $this->assertInstanceOf(
-            'Symfony\Component\Security\Core\User\User',
-            $provider->loadUserByUsername('foo')
-        );
-    }
-
-    public function testLoadUserByUsernameFailsIfEntryHasNoPasswordAttribute()
-    {
-        $this->expectException('Symfony\Component\Security\Core\Exception\InvalidArgumentException');
-        $result = $this->getMockBuilder(CollectionInterface::class)->getMock();
-        $query = $this->getMockBuilder(QueryInterface::class)->getMock();
-        $query
-            ->expects($this->once())
-            ->method('execute')
-            ->willReturn($result)
-        ;
-        $ldap = $this->getMockBuilder(LdapInterface::class)->getMock();
-        $result
-            ->expects($this->once())
-            ->method('offsetGet')
-            ->with(0)
-            ->willReturn(new Entry('foo', [
-                    'sAMAccountName' => ['foo'],
-                ]
-            ))
-        ;
-        $result
-            ->expects($this->once())
-            ->method('count')
-            ->willReturn(1)
-        ;
-        $ldap
-            ->expects($this->once())
-            ->method('escape')
-            ->willReturn('foo')
-        ;
-        $ldap
-            ->expects($this->once())
-            ->method('query')
-            ->willReturn($query)
-        ;
-
-        $provider = new LdapUserProvider($ldap, 'ou=MyBusiness,dc=symfony,dc=com', null, null, [], 'sAMAccountName', '({uid_key}={username})', 'userpassword');
-        $this->assertInstanceOf(
-            'Symfony\Component\Security\Core\User\User',
-            $provider->loadUserByUsername('foo')
-        );
-    }
-
-    public function testLoadUserByUsernameIsSuccessfulWithoutPasswordAttribute()
-    {
-        $result = $this->getMockBuilder(CollectionInterface::class)->getMock();
-        $query = $this->getMockBuilder(QueryInterface::class)->getMock();
-        $query
-            ->expects($this->once())
-            ->method('execute')
-            ->willReturn($result)
-        ;
-        $ldap = $this->getMockBuilder(LdapInterface::class)->getMock();
-        $result
-            ->expects($this->once())
-            ->method('offsetGet')
-            ->with(0)
-            ->willReturn(new Entry('foo', [
-                    'sAMAccountName' => ['foo'],
-                ]
-            ))
-        ;
-        $result
-            ->expects($this->once())
-            ->method('count')
-            ->willReturn(1)
-        ;
-        $ldap
-            ->expects($this->once())
-            ->method('escape')
-            ->willReturn('foo')
-        ;
-        $ldap
-            ->expects($this->once())
-            ->method('query')
-            ->willReturn($query)
+            ->method('find')
+            ->will($this->returnValue(array(
+                array(
+                    'sAMAccountName' => 'foo',
+                    'userpassword' => 'bar',
+                ),
+                'count' => 1,
+            )))
         ;
 
         $provider = new LdapUserProvider($ldap, 'ou=MyBusiness,dc=symfony,dc=com');
-        $this->assertInstanceOf(
-            'Symfony\Component\Security\Core\User\User',
-            $provider->loadUserByUsername('foo')
-        );
-    }
-
-    public function testLoadUserByUsernameIsSuccessfulWithoutPasswordAttributeAndWrongCase()
-    {
-        $result = $this->getMockBuilder(CollectionInterface::class)->getMock();
-        $query = $this->getMockBuilder(QueryInterface::class)->getMock();
-        $query
-            ->expects($this->once())
-            ->method('execute')
-            ->willReturn($result)
-        ;
-        $ldap = $this->getMockBuilder(LdapInterface::class)->getMock();
-        $result
-            ->expects($this->once())
-            ->method('offsetGet')
-            ->with(0)
-            ->willReturn(new Entry('foo', [
-                    'sAMAccountName' => ['foo'],
-                ]
-            ))
-        ;
-        $result
-            ->expects($this->once())
-            ->method('count')
-            ->willReturn(1)
-        ;
-        $ldap
-            ->expects($this->once())
-            ->method('escape')
-            ->willReturn('Foo')
-        ;
-        $ldap
-            ->expects($this->once())
-            ->method('query')
-            ->willReturn($query)
-        ;
-
-        $provider = new LdapUserProvider($ldap, 'ou=MyBusiness,dc=symfony,dc=com');
-        $this->assertSame('foo', $provider->loadUserByUsername('Foo')->getUsername());
-    }
-
-    public function testLoadUserByUsernameIsSuccessfulWithPasswordAttribute()
-    {
-        $result = $this->getMockBuilder(CollectionInterface::class)->getMock();
-        $query = $this->getMockBuilder(QueryInterface::class)->getMock();
-        $query
-            ->expects($this->once())
-            ->method('execute')
-            ->willReturn($result)
-        ;
-        $ldap = $this->getMockBuilder(LdapInterface::class)->getMock();
-        $result
-            ->expects($this->once())
-            ->method('offsetGet')
-            ->with(0)
-            ->willReturn(new Entry('foo', [
-                    'sAMAccountName' => ['foo'],
-                    'userpassword' => ['bar'],
-                ]
-            ))
-        ;
-        $result
-            ->expects($this->once())
-            ->method('count')
-            ->willReturn(1)
-        ;
-        $ldap
-            ->expects($this->once())
-            ->method('escape')
-            ->willReturn('foo')
-        ;
-        $ldap
-            ->expects($this->once())
-            ->method('query')
-            ->willReturn($query)
-        ;
-
-        $provider = new LdapUserProvider($ldap, 'ou=MyBusiness,dc=symfony,dc=com', null, null, [], 'sAMAccountName', '({uid_key}={username})', 'userpassword');
         $this->assertInstanceOf(
             'Symfony\Component\Security\Core\User\User',
             $provider->loadUserByUsername('foo')

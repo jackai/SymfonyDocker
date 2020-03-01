@@ -11,13 +11,12 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\RedirectController;
-use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\RedirectController;
+use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 
 /**
  * @author Marcin Sikon <marcin.sikon@gmail.com>
@@ -53,28 +52,37 @@ class RedirectControllerTest extends TestCase
 
         $route = 'new-route';
         $url = '/redirect-url';
-        $attributes = [
+        $attributes = array(
             'route' => $route,
             'permanent' => $permanent,
             '_route' => 'current-route',
-            '_route_params' => [
+            '_route_params' => array(
                 'route' => $route,
                 'permanent' => $permanent,
                 'additional-parameter' => 'value',
                 'ignoreAttributes' => $ignoreAttributes,
-            ],
-        ];
+            ),
+        );
 
         $request->attributes = new ParameterBag($attributes);
 
-        $router = $this->getMockBuilder(UrlGeneratorInterface::class)->getMock();
+        $router = $this->getMock('Symfony\Component\Routing\RouterInterface');
         $router
             ->expects($this->once())
             ->method('generate')
             ->with($this->equalTo($route), $this->equalTo($expectedAttributes))
-            ->willReturn($url);
+            ->will($this->returnValue($url));
 
-        $controller = new RedirectController($router);
+        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+
+        $container
+            ->expects($this->once())
+            ->method('get')
+            ->with($this->equalTo('router'))
+            ->will($this->returnValue($router));
+
+        $controller = new RedirectController();
+        $controller->setContainer($container);
 
         $returnResponse = $controller->redirectAction($request, $route, $permanent, $ignoreAttributes);
 
@@ -84,12 +92,12 @@ class RedirectControllerTest extends TestCase
 
     public function provider()
     {
-        return [
-            [true, false, 301, ['additional-parameter' => 'value']],
-            [false, false, 302, ['additional-parameter' => 'value']],
-            [false, true, 302, []],
-            [false, ['additional-parameter'], 302, []],
-        ];
+        return array(
+            array(true, false, 301, array('additional-parameter' => 'value')),
+            array(false, false, 302, array('additional-parameter' => 'value')),
+            array(false, true, 302, array()),
+            array(false, array('additional-parameter'), 302, array()),
+        );
     }
 
     public function testEmptyPath()
@@ -122,7 +130,7 @@ class RedirectControllerTest extends TestCase
         $this->assertEquals(302, $returnResponse->getStatusCode());
     }
 
-    public function testUrlRedirectDefaultPorts()
+    public function testUrlRedirectDefaultPortParameters()
     {
         $host = 'www.example.com';
         $baseUrl = '/base';
@@ -143,59 +151,35 @@ class RedirectControllerTest extends TestCase
         $this->assertRedirectUrl($returnValue, $expectedUrl);
     }
 
-    /**
-     * @group legacy
-     */
-    public function testUrlRedirectDefaultPortParameters()
-    {
-        $host = 'www.example.com';
-        $baseUrl = '/base';
-        $path = '/redirect-path';
-        $httpPort = 1080;
-        $httpsPort = 1443;
-
-        $expectedUrl = "https://$host:$httpsPort$baseUrl$path";
-        $request = $this->createRequestObject('http', $host, $httpPort, $baseUrl);
-        $controller = $this->createLegacyRedirectController(null, $httpsPort);
-        $returnValue = $controller->urlRedirectAction($request, $path, false, 'https');
-        $this->assertRedirectUrl($returnValue, $expectedUrl);
-
-        $expectedUrl = "http://$host:$httpPort$baseUrl$path";
-        $request = $this->createRequestObject('https', $host, $httpPort, $baseUrl);
-        $controller = $this->createLegacyRedirectController($httpPort);
-        $returnValue = $controller->urlRedirectAction($request, $path, false, 'http');
-        $this->assertRedirectUrl($returnValue, $expectedUrl);
-    }
-
     public function urlRedirectProvider()
     {
-        return [
+        return array(
             // Standard ports
-            ['http',  null, null,  'http',  80,   ''],
-            ['http',  80,   null,  'http',  80,   ''],
-            ['https', null, null,  'http',  80,   ''],
-            ['https', 80,   null,  'http',  80,   ''],
+            array('http',  null, null,  'http',  80,   ''),
+            array('http',  80,   null,  'http',  80,   ''),
+            array('https', null, null,  'http',  80,   ''),
+            array('https', 80,   null,  'http',  80,   ''),
 
-            ['http',  null,  null, 'https', 443,  ''],
-            ['http',  null,  443,  'https', 443,  ''],
-            ['https', null,  null, 'https', 443,  ''],
-            ['https', null,  443,  'https', 443,  ''],
+            array('http',  null,  null, 'https', 443,  ''),
+            array('http',  null,  443,  'https', 443,  ''),
+            array('https', null,  null, 'https', 443,  ''),
+            array('https', null,  443,  'https', 443,  ''),
 
             // Non-standard ports
-            ['http',  null,  null, 'http',  8080, ':8080'],
-            ['http',  4080,  null, 'http',  8080, ':4080'],
-            ['http',  80,    null, 'http',  8080, ''],
-            ['https', null,  null, 'http',  8080, ''],
-            ['https', null,  8443, 'http',  8080, ':8443'],
-            ['https', null,  443,  'http',  8080, ''],
+            array('http',  null,  null, 'http',  8080, ':8080'),
+            array('http',  4080,  null, 'http',  8080, ':4080'),
+            array('http',  80,    null, 'http',  8080, ''),
+            array('https', null,  null, 'http',  8080, ''),
+            array('https', null,  8443, 'http',  8080, ':8443'),
+            array('https', null,  443,  'http',  8080, ''),
 
-            ['https', null,  null, 'https', 8443, ':8443'],
-            ['https', null,  4443, 'https', 8443, ':4443'],
-            ['https', null,  443,  'https', 8443, ''],
-            ['http',  null,  null, 'https', 8443, ''],
-            ['http',  8080,  4443, 'https', 8443, ':8080'],
-            ['http',  80,    4443, 'https', 8443, ''],
-        ];
+            array('https', null,  null, 'https', 8443, ':8443'),
+            array('https', null,  4443, 'https', 8443, ':4443'),
+            array('https', null,  443,  'https', 8443, ''),
+            array('http',  null,  null, 'https', 8443, ''),
+            array('http',  8080,  4443, 'https', 8443, ':8080'),
+            array('http',  80,    4443, 'https', 8443, ''),
+        );
     }
 
     /**
@@ -217,13 +201,13 @@ class RedirectControllerTest extends TestCase
 
     public function pathQueryParamsProvider()
     {
-        return [
-            ['http://www.example.com/base/redirect-path', '/redirect-path',  ''],
-            ['http://www.example.com/base/redirect-path?foo=bar', '/redirect-path?foo=bar',  ''],
-            ['http://www.example.com/base/redirect-path?foo=bar', '/redirect-path', 'foo=bar'],
-            ['http://www.example.com/base/redirect-path?foo=bar&abc=example', '/redirect-path?foo=bar', 'abc=example'],
-            ['http://www.example.com/base/redirect-path?foo=bar&abc=example&baz=def', '/redirect-path?foo=bar', 'abc=example&baz=def'],
-        ];
+        return array(
+            array('http://www.example.com/base/redirect-path', '/redirect-path',  ''),
+            array('http://www.example.com/base/redirect-path?foo=bar', '/redirect-path?foo=bar',  ''),
+            array('http://www.example.com/base/redirect-path?foo=bar', '/redirect-path', 'foo=bar'),
+            array('http://www.example.com/base/redirect-path?foo=bar&abc=example', '/redirect-path?foo=bar', 'abc=example'),
+            array('http://www.example.com/base/redirect-path?foo=bar&abc=example&baz=def', '/redirect-path?foo=bar', 'abc=example&baz=def'),
+        );
     }
 
     /**
@@ -246,66 +230,58 @@ class RedirectControllerTest extends TestCase
 
     private function createRequestObject($scheme, $host, $port, $baseUrl, $queryString = '')
     {
-        $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->getMock();
+        $request = $this->getMock('Symfony\Component\HttpFoundation\Request');
         $request
             ->expects($this->any())
             ->method('getScheme')
-            ->willReturn($scheme);
+            ->will($this->returnValue($scheme));
         $request
             ->expects($this->any())
             ->method('getHost')
-            ->willReturn($host);
+            ->will($this->returnValue($host));
         $request
             ->expects($this->any())
             ->method('getPort')
-            ->willReturn($port);
+            ->will($this->returnValue($port));
         $request
             ->expects($this->any())
             ->method('getBaseUrl')
-            ->willReturn($baseUrl);
+            ->will($this->returnValue($baseUrl));
         $request
             ->expects($this->any())
             ->method('getQueryString')
-            ->willReturn($queryString);
+            ->will($this->returnValue($queryString));
 
         return $request;
     }
 
     private function createRedirectController($httpPort = null, $httpsPort = null)
     {
-        return new RedirectController(null, $httpPort, $httpsPort);
-    }
-
-    /**
-     * @deprecated
-     */
-    private function createLegacyRedirectController($httpPort = null, $httpsPort = null)
-    {
-        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')->getMock();
+        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
 
         if (null !== $httpPort) {
             $container
                 ->expects($this->once())
                 ->method('hasParameter')
                 ->with($this->equalTo('request_listener.http_port'))
-                ->willReturn(true);
+                ->will($this->returnValue(true));
             $container
                 ->expects($this->once())
                 ->method('getParameter')
                 ->with($this->equalTo('request_listener.http_port'))
-                ->willReturn($httpPort);
+                ->will($this->returnValue($httpPort));
         }
         if (null !== $httpsPort) {
             $container
                 ->expects($this->once())
                 ->method('hasParameter')
                 ->with($this->equalTo('request_listener.https_port'))
-                ->willReturn(true);
+                ->will($this->returnValue(true));
             $container
                 ->expects($this->once())
                 ->method('getParameter')
                 ->with($this->equalTo('request_listener.https_port'))
-                ->willReturn($httpsPort);
+                ->will($this->returnValue($httpsPort));
         }
 
         $controller = new RedirectController();
@@ -314,7 +290,7 @@ class RedirectControllerTest extends TestCase
         return $controller;
     }
 
-    private function assertRedirectUrl(Response $returnResponse, $expectedUrl)
+    public function assertRedirectUrl(Response $returnResponse, $expectedUrl)
     {
         $this->assertTrue($returnResponse->isRedirect($expectedUrl), "Expected: $expectedUrl\nGot:      ".$returnResponse->headers->get('Location'));
     }

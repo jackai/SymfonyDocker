@@ -11,38 +11,37 @@
 
 namespace Symfony\Component\Security\Http\Tests\RememberMe;
 
-use PHPUnit\Framework\TestCase;
+use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
+use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
+use Symfony\Component\Security\Core\Authentication\RememberMe\PersistentToken;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
-use Symfony\Component\Security\Core\Authentication\RememberMe\PersistentToken;
-use Symfony\Component\Security\Core\Exception\CookieTheftException;
-use Symfony\Component\Security\Core\Exception\TokenNotFoundException;
-use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Http\RememberMe\PersistentTokenBasedRememberMeServices;
-use Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface;
+use Symfony\Component\Security\Core\Exception\TokenNotFoundException;
+use Symfony\Component\Security\Core\Exception\CookieTheftException;
 
-class PersistentTokenBasedRememberMeServicesTest extends TestCase
+class PersistentTokenBasedRememberMeServicesTest extends \PHPUnit_Framework_TestCase
 {
     public static function setUpBeforeClass()
     {
         try {
             random_bytes(1);
         } catch (\Exception $e) {
-            self::markTestSkipped($e->getMessage());
+            throw new \PHPUnit_Framework_SkippedTestError($e->getMessage());
         }
     }
 
     public function testAutoLoginReturnsNullWhenNoCookie()
     {
-        $service = $this->getService(null, ['name' => 'foo']);
+        $service = $this->getService(null, array('name' => 'foo'));
 
         $this->assertNull($service->autoLogin(new Request()));
     }
 
     public function testAutoLoginThrowsExceptionOnInvalidCookie()
     {
-        $service = $this->getService(null, ['name' => 'foo', 'path' => null, 'domain' => null, 'always_remember_me' => false, 'remember_me_parameter' => 'foo']);
+        $service = $this->getService(null, array('name' => 'foo', 'path' => null, 'domain' => null, 'always_remember_me' => false, 'remember_me_parameter' => 'foo'));
         $request = new Request();
         $request->request->set('foo', 'true');
         $request->cookies->set('foo', 'foo');
@@ -53,19 +52,19 @@ class PersistentTokenBasedRememberMeServicesTest extends TestCase
 
     public function testAutoLoginThrowsExceptionOnNonExistentToken()
     {
-        $service = $this->getService(null, ['name' => 'foo', 'path' => null, 'domain' => null, 'always_remember_me' => false, 'remember_me_parameter' => 'foo']);
+        $service = $this->getService(null, array('name' => 'foo', 'path' => null, 'domain' => null, 'always_remember_me' => false, 'remember_me_parameter' => 'foo'));
         $request = new Request();
         $request->request->set('foo', 'true');
-        $request->cookies->set('foo', $this->encodeCookie([
+        $request->cookies->set('foo', $this->encodeCookie(array(
             $series = 'fooseries',
             $tokenValue = 'foovalue',
-        ]));
+        )));
 
-        $tokenProvider = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\RememberMe\TokenProviderInterface')->getMock();
+        $tokenProvider = $this->getMock('Symfony\Component\Security\Core\Authentication\RememberMe\TokenProviderInterface');
         $tokenProvider
             ->expects($this->once())
             ->method('loadTokenBySeries')
-            ->willThrowException(new TokenNotFoundException('Token not found.'))
+            ->will($this->throwException(new TokenNotFoundException('Token not found.')))
         ;
         $service->setTokenProvider($tokenProvider);
 
@@ -76,22 +75,22 @@ class PersistentTokenBasedRememberMeServicesTest extends TestCase
     public function testAutoLoginReturnsNullOnNonExistentUser()
     {
         $userProvider = $this->getProvider();
-        $service = $this->getService($userProvider, ['name' => 'foo', 'path' => null, 'domain' => null, 'always_remember_me' => true, 'lifetime' => 3600, 'secure' => false, 'httponly' => false]);
+        $service = $this->getService($userProvider, array('name' => 'foo', 'path' => null, 'domain' => null, 'always_remember_me' => true, 'lifetime' => 3600, 'secure' => false, 'httponly' => false));
         $request = new Request();
-        $request->cookies->set('foo', $this->encodeCookie(['fooseries', 'foovalue']));
+        $request->cookies->set('foo', $this->encodeCookie(array('fooseries', 'foovalue')));
 
-        $tokenProvider = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\RememberMe\TokenProviderInterface')->getMock();
+        $tokenProvider = $this->getMock('Symfony\Component\Security\Core\Authentication\RememberMe\TokenProviderInterface');
         $tokenProvider
             ->expects($this->once())
             ->method('loadTokenBySeries')
-            ->willReturn(new PersistentToken('fooclass', 'fooname', 'fooseries', 'foovalue', new \DateTime()))
+            ->will($this->returnValue(new PersistentToken('fooclass', 'fooname', 'fooseries', 'foovalue', new \DateTime())))
         ;
         $service->setTokenProvider($tokenProvider);
 
         $userProvider
             ->expects($this->once())
             ->method('loadUserByUsername')
-            ->willThrowException(new UsernameNotFoundException('user not found'))
+            ->will($this->throwException(new UsernameNotFoundException('user not found')))
         ;
 
         $this->assertNull($service->autoLogin($request));
@@ -101,24 +100,24 @@ class PersistentTokenBasedRememberMeServicesTest extends TestCase
     public function testAutoLoginThrowsExceptionOnStolenCookieAndRemovesItFromThePersistentBackend()
     {
         $userProvider = $this->getProvider();
-        $service = $this->getService($userProvider, ['name' => 'foo', 'path' => null, 'domain' => null, 'always_remember_me' => true]);
+        $service = $this->getService($userProvider, array('name' => 'foo', 'path' => null, 'domain' => null, 'always_remember_me' => true));
         $request = new Request();
-        $request->cookies->set('foo', $this->encodeCookie(['fooseries', 'foovalue']));
+        $request->cookies->set('foo', $this->encodeCookie(array('fooseries', 'foovalue')));
 
-        $tokenProvider = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\RememberMe\TokenProviderInterface')->getMock();
+        $tokenProvider = $this->getMock('Symfony\Component\Security\Core\Authentication\RememberMe\TokenProviderInterface');
         $service->setTokenProvider($tokenProvider);
 
         $tokenProvider
             ->expects($this->once())
             ->method('loadTokenBySeries')
-            ->willReturn(new PersistentToken('fooclass', 'foouser', 'fooseries', 'anotherFooValue', new \DateTime()))
+            ->will($this->returnValue(new PersistentToken('fooclass', 'foouser', 'fooseries', 'anotherFooValue', new \DateTime())))
         ;
 
         $tokenProvider
             ->expects($this->once())
             ->method('deleteTokenBySeries')
             ->with($this->equalTo('fooseries'))
-            ->willReturn(null)
+            ->will($this->returnValue(null))
         ;
 
         try {
@@ -132,16 +131,16 @@ class PersistentTokenBasedRememberMeServicesTest extends TestCase
 
     public function testAutoLoginDoesNotAcceptAnExpiredCookie()
     {
-        $service = $this->getService(null, ['name' => 'foo', 'path' => null, 'domain' => null, 'always_remember_me' => true, 'lifetime' => 3600]);
+        $service = $this->getService(null, array('name' => 'foo', 'path' => null, 'domain' => null, 'always_remember_me' => true, 'lifetime' => 3600));
         $request = new Request();
-        $request->cookies->set('foo', $this->encodeCookie(['fooseries', 'foovalue']));
+        $request->cookies->set('foo', $this->encodeCookie(array('fooseries', 'foovalue')));
 
-        $tokenProvider = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\RememberMe\TokenProviderInterface')->getMock();
+        $tokenProvider = $this->getMock('Symfony\Component\Security\Core\Authentication\RememberMe\TokenProviderInterface');
         $tokenProvider
             ->expects($this->once())
             ->method('loadTokenBySeries')
             ->with($this->equalTo('fooseries'))
-            ->willReturn(new PersistentToken('fooclass', 'username', 'fooseries', 'foovalue', new \DateTime('yesterday')))
+            ->will($this->returnValue(new PersistentToken('fooclass', 'username', 'fooseries', 'foovalue', new \DateTime('yesterday'))))
         ;
         $service->setTokenProvider($tokenProvider);
 
@@ -151,11 +150,11 @@ class PersistentTokenBasedRememberMeServicesTest extends TestCase
 
     public function testAutoLogin()
     {
-        $user = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock();
+        $user = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
         $user
             ->expects($this->once())
             ->method('getRoles')
-            ->willReturn(['ROLE_FOO'])
+            ->will($this->returnValue(array('ROLE_FOO')))
         ;
 
         $userProvider = $this->getProvider();
@@ -163,19 +162,19 @@ class PersistentTokenBasedRememberMeServicesTest extends TestCase
             ->expects($this->once())
             ->method('loadUserByUsername')
             ->with($this->equalTo('foouser'))
-            ->willReturn($user)
+            ->will($this->returnValue($user))
         ;
 
-        $service = $this->getService($userProvider, ['name' => 'foo', 'path' => null, 'domain' => null, 'secure' => false, 'httponly' => false, 'always_remember_me' => true, 'lifetime' => 3600]);
+        $service = $this->getService($userProvider, array('name' => 'foo', 'path' => null, 'domain' => null, 'secure' => false, 'httponly' => false, 'always_remember_me' => true, 'lifetime' => 3600));
         $request = new Request();
-        $request->cookies->set('foo', $this->encodeCookie(['fooseries', 'foovalue']));
+        $request->cookies->set('foo', $this->encodeCookie(array('fooseries', 'foovalue')));
 
-        $tokenProvider = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\RememberMe\TokenProviderInterface')->getMock();
+        $tokenProvider = $this->getMock('Symfony\Component\Security\Core\Authentication\RememberMe\TokenProviderInterface');
         $tokenProvider
             ->expects($this->once())
             ->method('loadTokenBySeries')
             ->with($this->equalTo('fooseries'))
-            ->willReturn(new PersistentToken('fooclass', 'foouser', 'fooseries', 'foovalue', new \DateTime()))
+            ->will($this->returnValue(new PersistentToken('fooclass', 'foouser', 'fooseries', 'foovalue', new \DateTime())))
         ;
         $service->setTokenProvider($tokenProvider);
 
@@ -189,18 +188,18 @@ class PersistentTokenBasedRememberMeServicesTest extends TestCase
 
     public function testLogout()
     {
-        $service = $this->getService(null, ['name' => 'foo', 'path' => '/foo', 'domain' => 'foodomain.foo', 'secure' => true, 'httponly' => false]);
+        $service = $this->getService(null, array('name' => 'foo', 'path' => '/foo', 'domain' => 'foodomain.foo', 'secure' => true, 'httponly' => false));
         $request = new Request();
-        $request->cookies->set('foo', $this->encodeCookie(['fooseries', 'foovalue']));
+        $request->cookies->set('foo', $this->encodeCookie(array('fooseries', 'foovalue')));
         $response = new Response();
-        $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
+        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
 
-        $tokenProvider = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\RememberMe\TokenProviderInterface')->getMock();
+        $tokenProvider = $this->getMock('Symfony\Component\Security\Core\Authentication\RememberMe\TokenProviderInterface');
         $tokenProvider
             ->expects($this->once())
             ->method('deleteTokenBySeries')
             ->with($this->equalTo('fooseries'))
-            ->willReturn(null)
+            ->will($this->returnValue(null))
         ;
         $service->setTokenProvider($tokenProvider);
 
@@ -216,12 +215,12 @@ class PersistentTokenBasedRememberMeServicesTest extends TestCase
 
     public function testLogoutSimplyIgnoresNonSetRequestCookie()
     {
-        $service = $this->getService(null, ['name' => 'foo', 'path' => null, 'domain' => null]);
+        $service = $this->getService(null, array('name' => 'foo', 'path' => null, 'domain' => null));
         $request = new Request();
         $response = new Response();
-        $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
+        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
 
-        $tokenProvider = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\RememberMe\TokenProviderInterface')->getMock();
+        $tokenProvider = $this->getMock('Symfony\Component\Security\Core\Authentication\RememberMe\TokenProviderInterface');
         $tokenProvider
             ->expects($this->never())
             ->method('deleteTokenBySeries')
@@ -238,13 +237,13 @@ class PersistentTokenBasedRememberMeServicesTest extends TestCase
 
     public function testLogoutSimplyIgnoresInvalidCookie()
     {
-        $service = $this->getService(null, ['name' => 'foo', 'path' => null, 'domain' => null]);
+        $service = $this->getService(null, array('name' => 'foo', 'path' => null, 'domain' => null));
         $request = new Request();
         $request->cookies->set('foo', 'somefoovalue');
         $response = new Response();
-        $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
+        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
 
-        $tokenProvider = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\RememberMe\TokenProviderInterface')->getMock();
+        $tokenProvider = $this->getMock('Symfony\Component\Security\Core\Authentication\RememberMe\TokenProviderInterface');
         $tokenProvider
             ->expects($this->never())
             ->method('deleteTokenBySeries')
@@ -258,7 +257,7 @@ class PersistentTokenBasedRememberMeServicesTest extends TestCase
 
     public function testLoginFail()
     {
-        $service = $this->getService(null, ['name' => 'foo', 'path' => null, 'domain' => null]);
+        $service = $this->getService(null, array('name' => 'foo', 'path' => null, 'domain' => null));
         $request = new Request();
 
         $this->assertFalse($request->attributes->has(RememberMeServicesInterface::COOKIE_ATTR_NAME));
@@ -268,24 +267,24 @@ class PersistentTokenBasedRememberMeServicesTest extends TestCase
 
     public function testLoginSuccessSetsCookieWhenLoggedInWithNonRememberMeTokenInterfaceImplementation()
     {
-        $service = $this->getService(null, ['name' => 'foo', 'domain' => 'myfoodomain.foo', 'path' => '/foo/path', 'secure' => true, 'httponly' => true, 'lifetime' => 3600, 'always_remember_me' => true]);
+        $service = $this->getService(null, array('name' => 'foo', 'domain' => 'myfoodomain.foo', 'path' => '/foo/path', 'secure' => true, 'httponly' => true, 'lifetime' => 3600, 'always_remember_me' => true));
         $request = new Request();
         $response = new Response();
 
-        $account = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock();
+        $account = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
         $account
             ->expects($this->once())
             ->method('getUsername')
-            ->willReturn('foo')
+            ->will($this->returnValue('foo'))
         ;
-        $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
+        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
         $token
             ->expects($this->any())
             ->method('getUser')
-            ->willReturn($account)
+            ->will($this->returnValue($account))
         ;
 
-        $tokenProvider = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\RememberMe\TokenProviderInterface')->getMock();
+        $tokenProvider = $this->getMock('Symfony\Component\Security\Core\Authentication\RememberMe\TokenProviderInterface');
         $tokenProvider
             ->expects($this->once())
             ->method('createNewToken')
@@ -316,22 +315,22 @@ class PersistentTokenBasedRememberMeServicesTest extends TestCase
         return $r->invoke($service, $parts);
     }
 
-    protected function getService($userProvider = null, $options = [], $logger = null)
+    protected function getService($userProvider = null, $options = array(), $logger = null)
     {
         if (null === $userProvider) {
             $userProvider = $this->getProvider();
         }
 
-        return new PersistentTokenBasedRememberMeServices([$userProvider], 'foosecret', 'fookey', $options, $logger);
+        return new PersistentTokenBasedRememberMeServices(array($userProvider), 'foosecret', 'fookey', $options, $logger);
     }
 
     protected function getProvider()
     {
-        $provider = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserProviderInterface')->getMock();
+        $provider = $this->getMock('Symfony\Component\Security\Core\User\UserProviderInterface');
         $provider
             ->expects($this->any())
             ->method('supportsClass')
-            ->willReturn(true)
+            ->will($this->returnValue(true))
         ;
 
         return $provider;

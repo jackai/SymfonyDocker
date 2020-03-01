@@ -17,22 +17,15 @@ class NameNodeTest extends AbstractNodeTest
 {
     public function getEvaluateData()
     {
-        return [
-            ['bar', new NameNode('foo'), ['foo' => 'bar']],
-        ];
+        return array(
+            array('bar', new NameNode('foo'), array('foo' => 'bar')),
+        );
     }
 
     public function getCompileData()
     {
-        return [
-            ['$foo', new NameNode('foo')],
-        ];
-    }
-
-    public function getDumpData()
-    {
-        return [
-            ['foo', new NameNode('foo')],
-        ];
+        return array(
+            array('$foo', new NameNode('foo')),
+        );
     }
 }

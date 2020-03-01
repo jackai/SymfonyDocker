@@ -1,5 +1,5 @@
 {
-    "Version": "36",
+    "Version": "2.1.13.21",
     "Names": {
         "ADP": [
             "ADP",
@@ -23,7 +23,7 @@
         ],
         "AMD": [
             "AMD",
-            "dram"
+            "dram armenio"
         ],
         "ANG": [
             "ANG",
@@ -75,7 +75,7 @@
         ],
         "AZN": [
             "AZN",
-            "manat azerbaiyano"
+            "manat azerí"
         ],
         "BAD": [
             "BAD",
@@ -83,7 +83,7 @@
         ],
         "BAM": [
             "BAM",
-            "marco convertible de Bosnia y Herzegovina"
+            "marco convertible de Bosnia-Herzegovina"
         ],
         "BBD": [
             "BBD",
@@ -185,13 +185,9 @@
             "BYB",
             "nuevo rublo bielorruso (1994–1999)"
         ],
-        "BYN": [
-            "BYN",
-            "rublo bielorruso"
-        ],
         "BYR": [
             "BYR",
-            "rublo bielorruso (2000–2016)"
+            "rublo bielorruso"
         ],
         "BZD": [
             "BZD",
@@ -224,10 +220,6 @@
         "CLP": [
             "CLP",
             "peso chileno"
-        ],
-        "CNH": [
-            "CNH",
-            "yuan chino (extracontinental)"
         ],
         "CNY": [
             "CNY",
@@ -315,7 +307,7 @@
         ],
         "ERN": [
             "ERN",
-            "nakfa"
+            "nakfa eritreo"
         ],
         "ESA": [
             "ESA",
@@ -355,7 +347,7 @@
         ],
         "GBP": [
             "GBP",
-            "libra esterlina"
+            "libra británica"
         ],
         "GEK": [
             "GEK",
@@ -615,10 +607,6 @@
         ],
         "MRO": [
             "MRO",
-            "uguiya (1973–2017)"
-        ],
-        "MRU": [
-            "MRU",
             "uguiya"
         ],
         "MTL": [
@@ -639,7 +627,7 @@
         ],
         "MWK": [
             "MWK",
-            "kuacha malauí"
+            "kwacha malauí"
         ],
         "MXN": [
             "MXN",
@@ -715,11 +703,11 @@
         ],
         "PEN": [
             "PEN",
-            "sol peruano"
+            "nuevo sol peruano"
         ],
         "PES": [
             "PES",
-            "sol peruano (1863–1965)"
+            "sol peruano"
         ],
         "PGK": [
             "PGK",
@@ -847,10 +835,6 @@
         ],
         "STD": [
             "STD",
-            "dobra (1977–2017)"
-        ],
-        "STN": [
-            "STN",
             "dobra"
         ],
         "SUR": [
@@ -938,7 +922,7 @@
             "chelín ugandés"
         ],
         "USD": [
-            "US$",
+            "$",
             "dólar estadounidense"
         ],
         "USN": [
@@ -961,10 +945,6 @@
             "UYU",
             "peso uruguayo"
         ],
-        "UYW": [
-            "UYW",
-            "unidad previsional uruguayo"
-        ],
         "UZS": [
             "UZS",
             "sum"
@@ -975,10 +955,6 @@
         ],
         "VEF": [
             "VEF",
-            "bolívar venezolano (2008–2018)"
-        ],
-        "VES": [
-            "VES",
             "bolívar venezolano"
         ],
         "VND": [
@@ -995,7 +971,7 @@
         ],
         "XAF": [
             "XAF",
-            "franco CFA de África Central"
+            "franco CFA BEAC"
         ],
         "XCD": [
             "XCD",
@@ -1015,7 +991,7 @@
         ],
         "XOF": [
             "XOF",
-            "franco CFA de África Occidental"
+            "franco CFA BCEAO"
         ],
         "XPF": [
             "CFPF",

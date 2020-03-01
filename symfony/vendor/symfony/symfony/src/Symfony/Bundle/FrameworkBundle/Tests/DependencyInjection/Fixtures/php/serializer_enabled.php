@@ -1,7 +1,7 @@
 <?php
 
-$container->loadFromExtension('framework', [
-    'serializer' => [
+$container->loadFromExtension('framework', array(
+    'serializer' => array(
         'enabled' => true,
-    ],
-]);
+    ),
+));

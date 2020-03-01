@@ -1,5 +1,5 @@
 {
-    "Version": "36",
+    "Version": "2.1.13.33",
     "Names": {
         "AC": "Ascension-saari",
         "AD": "Andorra",
@@ -146,7 +146,7 @@
         "MF": "Saint-Martin",
         "MG": "Madagaskar",
         "MH": "Marshallinsaaret",
-        "MK": "Pohjois-Makedonia",
+        "MK": "Makedonia",
         "ML": "Mali",
         "MM": "Myanmar (Burma)",
         "MN": "Mongolia",
@@ -209,7 +209,7 @@
         "SM": "San Marino",
         "SN": "Senegal",
         "SO": "Somalia",
-        "SR": "Suriname",
+        "SR": "Surinam",
         "SS": "Etelä-Sudan",
         "ST": "São Tomé ja Príncipe",
         "SV": "El Salvador",

@@ -54,11 +54,11 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('form_themes')
                     ->addDefaultChildrenIfNoneSet()
                     ->prototype('scalar')->defaultValue('form_div_layout.html.twig')->end()
-                    ->example(['MyBundle::form.html.twig'])
+                    ->example(array('MyBundle::form.html.twig'))
                     ->validate()
-                        ->ifTrue(function ($v) { return !\in_array('form_div_layout.html.twig', $v); })
+                        ->ifTrue(function ($v) { return !in_array('form_div_layout.html.twig', $v); })
                         ->then(function ($v) {
-                            return array_merge(['form_div_layout.html.twig'], $v);
+                            return array_merge(array('form_div_layout.html.twig'), $v);
                         })
                     ->end()
                 ->end()
@@ -74,36 +74,36 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('globals')
                     ->normalizeKeys(false)
                     ->useAttributeAsKey('key')
-                    ->example(['foo' => '"@bar"', 'pi' => 3.14])
+                    ->example(array('foo' => '"@bar"', 'pi' => 3.14))
                     ->prototype('array')
                         ->beforeNormalization()
-                            ->ifTrue(function ($v) { return \is_string($v) && 0 === strpos($v, '@'); })
+                            ->ifTrue(function ($v) { return is_string($v) && 0 === strpos($v, '@'); })
                             ->then(function ($v) {
                                 if (0 === strpos($v, '@@')) {
                                     return substr($v, 1);
                                 }
 
-                                return ['id' => substr($v, 1), 'type' => 'service'];
+                                return array('id' => substr($v, 1), 'type' => 'service');
                             })
                         ->end()
                         ->beforeNormalization()
                             ->ifTrue(function ($v) {
-                                if (\is_array($v)) {
+                                if (is_array($v)) {
                                     $keys = array_keys($v);
                                     sort($keys);
 
-                                    return $keys !== ['id', 'type'] && $keys !== ['value'];
+                                    return $keys !== array('id', 'type') && $keys !== array('value');
                                 }
 
                                 return true;
                             })
-                            ->then(function ($v) { return ['value' => $v]; })
+                            ->then(function ($v) { return array('value' => $v); })
                         ->end()
                         ->children()
                             ->scalarNode('id')->end()
                             ->scalarNode('type')
                                 ->validate()
-                                    ->ifNotInArray(['service'])
+                                    ->ifNotInArray(array('service'))
                                     ->thenInvalid('The %s type is not supported')
                                 ->end()
                             ->end()
@@ -120,29 +120,25 @@ class Configuration implements ConfigurationInterface
         $rootNode
             ->fixXmlConfig('path')
             ->children()
-                ->variableNode('autoescape')->defaultValue('name')->end()
+                ->variableNode('autoescape')->defaultValue('filename')->end()
                 ->scalarNode('autoescape_service')->defaultNull()->end()
                 ->scalarNode('autoescape_service_method')->defaultNull()->end()
-                ->scalarNode('base_template_class')->example('Twig\Template')->cannotBeEmpty()->end()
+                ->scalarNode('base_template_class')->example('Twig_Template')->cannotBeEmpty()->end()
                 ->scalarNode('cache')->defaultValue('%kernel.cache_dir%/twig')->end()
                 ->scalarNode('charset')->defaultValue('%kernel.charset%')->end()
                 ->booleanNode('debug')->defaultValue('%kernel.debug%')->end()
                 ->booleanNode('strict_variables')->end()
                 ->scalarNode('auto_reload')->end()
                 ->integerNode('optimizations')->min(-1)->end()
-                ->scalarNode('default_path')
-                    ->info('The default path used to load templates')
-                    ->defaultValue('%kernel.project_dir%/templates')
-                ->end()
                 ->arrayNode('paths')
                     ->normalizeKeys(false)
                     ->useAttributeAsKey('paths')
                     ->beforeNormalization()
                         ->always()
                         ->then(function ($paths) {
-                            $normalized = [];
+                            $normalized = array();
                             foreach ($paths as $path => $namespace) {
-                                if (\is_array($namespace)) {
+                                if (is_array($namespace)) {
                                     // xml
                                     $path = $namespace['value'];
                                     $namespace = $namespace['namespace'];

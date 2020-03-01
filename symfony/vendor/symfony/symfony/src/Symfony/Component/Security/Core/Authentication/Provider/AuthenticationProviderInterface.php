@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Security\Core\Authentication\Provider;
 
-use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 
 /**
  * AuthenticationProviderInterface is the interface for all authentication
@@ -25,14 +25,9 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 interface AuthenticationProviderInterface extends AuthenticationManagerInterface
 {
     /**
-     * Use this constant for not provided username.
-     *
-     * @var string
-     */
-    const USERNAME_NONE_PROVIDED = 'NONE_PROVIDED';
-
-    /**
      * Checks whether this provider supports the given token.
+     *
+     * @param TokenInterface $token A TokenInterface instance
      *
      * @return bool true if the implementation supports the Token, false otherwise
      */

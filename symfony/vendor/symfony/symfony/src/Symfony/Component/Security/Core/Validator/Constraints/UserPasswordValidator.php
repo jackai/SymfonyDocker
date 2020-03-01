@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\Security\Core\Validator\Constraints;
 
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
@@ -36,13 +36,7 @@ class UserPasswordValidator extends ConstraintValidator
     public function validate($password, Constraint $constraint)
     {
         if (!$constraint instanceof UserPassword) {
-            throw new UnexpectedTypeException($constraint, UserPassword::class);
-        }
-
-        if (null === $password || '' === $password) {
-            $this->context->addViolation($constraint->message);
-
-            return;
+            throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\UserPassword');
         }
 
         $user = $this->tokenStorage->getToken()->getUser();
@@ -53,7 +47,7 @@ class UserPasswordValidator extends ConstraintValidator
 
         $encoder = $this->encoderFactory->getEncoder($user);
 
-        if (null === $user->getPassword() || !$encoder->isPasswordValid($user->getPassword(), $password, $user->getSalt())) {
+        if (!$encoder->isPasswordValid($user->getPassword(), $password, $user->getSalt())) {
             $this->context->addViolation($constraint->message);
         }
     }

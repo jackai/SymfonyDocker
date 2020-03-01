@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Intl\Tests\Collator;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Intl\Collator\Collator;
 
 /**
@@ -19,7 +18,7 @@ use Symfony\Component\Intl\Collator\Collator;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-abstract class AbstractCollatorTest extends TestCase
+abstract class AbstractCollatorTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @dataProvider asortProvider
@@ -33,24 +32,24 @@ abstract class AbstractCollatorTest extends TestCase
 
     public function asortProvider()
     {
-        return [
+        return array(
             /* array, sortFlag, expected */
-            [
-                ['a', 'b', 'c'],
+            array(
+                array('a', 'b', 'c'),
                 Collator::SORT_REGULAR,
-                ['a', 'b', 'c'],
-            ],
-            [
-                ['c', 'b', 'a'],
+                array('a', 'b', 'c'),
+            ),
+            array(
+                array('c', 'b', 'a'),
                 Collator::SORT_REGULAR,
-                [2 => 'a', 1 => 'b',  0 => 'c'],
-            ],
-            [
-                ['b', 'c', 'a'],
+                array(2 => 'a', 1 => 'b',  0 => 'c'),
+            ),
+            array(
+                array('b', 'c', 'a'),
                 Collator::SORT_REGULAR,
-                [2 => 'a', 0 => 'b', 1 => 'c'],
-            ],
-        ];
+                array(2 => 'a', 0 => 'b', 1 => 'c'),
+            ),
+        );
     }
 
     /**

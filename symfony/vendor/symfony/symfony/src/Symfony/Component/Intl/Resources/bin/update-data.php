@@ -9,8 +9,7 @@
  * file that was distributed with this source code.
  */
 
-use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Intl\Data\Bundle\Compiler\GenrbCompiler;
+use Symfony\Component\Intl\Data\Bundle\Reader\JsonBundleReader;
 use Symfony\Component\Intl\Data\Bundle\Writer\JsonBundleWriter;
 use Symfony\Component\Intl\Data\Generator\CurrencyDataGenerator;
 use Symfony\Component\Intl\Data\Generator\GeneratorConfig;
@@ -18,9 +17,16 @@ use Symfony\Component\Intl\Data\Generator\LanguageDataGenerator;
 use Symfony\Component\Intl\Data\Generator\LocaleDataGenerator;
 use Symfony\Component\Intl\Data\Generator\RegionDataGenerator;
 use Symfony\Component\Intl\Data\Generator\ScriptDataGenerator;
+use Symfony\Component\Intl\Data\Provider\LanguageDataProvider;
+use Symfony\Component\Intl\Data\Provider\RegionDataProvider;
+use Symfony\Component\Intl\Data\Provider\ScriptDataProvider;
 use Symfony\Component\Intl\Intl;
+use Symfony\Component\Intl\Data\Bundle\Compiler\GenrbCompiler;
+use Symfony\Component\Intl\Data\Bundle\Reader\BundleEntryReader;
 use Symfony\Component\Intl\Locale;
-use Symfony\Component\Intl\Util\GitRepository;
+use Symfony\Component\Intl\Util\IcuVersion;
+use Symfony\Component\Intl\Util\SvnRepository;
+use Symfony\Component\Filesystem\Filesystem;
 
 require_once __DIR__.'/common.php';
 require_once __DIR__.'/autoload.php';
@@ -30,11 +36,11 @@ $argv = $_SERVER['argv'];
 
 if ($argc > 3 || 2 === $argc && '-h' === $argv[1]) {
     bailout(<<<'MESSAGE'
-Usage: php update-data.php <path/to/icu/source> <path/to/icu/build>
+Usage: php update-icu-component.php <path/to/icu/source> <path/to/icu/build>
 
 Updates the ICU data for Symfony to the latest version of ICU.
 
-If you downloaded the git repository before, you can pass the path to the
+If you downloaded the SVN repository before, you can pass the path to the
 repository source in the first optional argument.
 
 If you also built the repository before, you can pass the directory where that
@@ -58,30 +64,36 @@ if (!Intl::isExtensionLoaded()) {
     bailout('The intl extension for PHP is not installed.');
 }
 
-if ($argc >= 2) {
-    $repoDir = $argv[1];
-    $git = new GitRepository($repoDir);
+$filesystem = new Filesystem();
+$urls = parse_ini_file(__DIR__.'/icu.ini');
 
-    echo "Using the existing git repository at {$repoDir}.\n";
-} else {
-    echo "Starting git clone. This may take a while...\n";
+echo "icu.ini parsed. Available versions:\n";
 
-    $repoDir = sys_get_temp_dir().'/icu-data';
-    $git = GitRepository::download('https://github.com/unicode-org/icu.git', $repoDir);
+$maxVersion = 0;
 
-    echo "Git clone to {$repoDir} complete.\n";
+foreach ($urls as $urlVersion => $url) {
+    $maxVersion = IcuVersion::compare($maxVersion, $urlVersion, '<')
+        ? $urlVersion
+        : $maxVersion;
+
+    echo "  $urlVersion\n";
 }
 
-$gitTag = $git->getLastTag(function ($tag) {
-    return preg_match('#^release-[0-9]{1,}-[0-9]{1}$#', $tag);
-});
-$shortIcuVersion = strip_minor_versions(preg_replace('#release-([0-9]{1,})-([0-9]{1,})#', '$1.$2', $gitTag));
+$shortIcuVersion = strip_minor_versions($maxVersion);
 
-echo "Checking out `{$gitTag}` for version `{$shortIcuVersion}`...\n";
-$git->checkout('tags/'.$gitTag);
+if ($argc >= 2) {
+    $sourceDir = $argv[1];
+    $svn = new SvnRepository($sourceDir);
 
-$filesystem = new Filesystem();
-$sourceDir = $repoDir.'/icu4c/source';
+    echo "Using existing SVN repository at {$sourceDir}.\n";
+} else {
+    echo "Starting SVN checkout for version $shortIcuVersion. This may take a while...\n";
+
+    $sourceDir = sys_get_temp_dir().'/icu-data/'.$shortIcuVersion.'/source';
+    $svn = SvnRepository::download($urls[$shortIcuVersion], $sourceDir);
+
+    echo "SVN checkout to {$sourceDir} complete.\n";
+}
 
 if ($argc >= 3) {
     $buildDir = $argv[2];
@@ -165,62 +177,117 @@ echo "Preparing resource bundle compilation (version $icuVersionInDownload)...\n
 
 $compiler = new GenrbCompiler($genrb, $genrbEnv);
 $config = new GeneratorConfig($sourceDir.'/data', $icuVersionInDownload);
-$jsonDir = dirname(__DIR__).'/data';
 
+$baseDir = dirname(__DIR__).'/data';
+
+//$txtDir = $baseDir.'/txt';
+$jsonDir = $baseDir;
+//$phpDir = $baseDir.'/'.Intl::PHP;
+//$resDir = $baseDir.'/'.Intl::RB_V2;
+
+$targetDirs = array($jsonDir/*, $resDir*/);
+$workingDirs = array($jsonDir/*, $txtDir, $resDir*/);
+
+//$config->addBundleWriter($txtDir, new TextBundleWriter());
 $config->addBundleWriter($jsonDir, new JsonBundleWriter());
 
 echo "Starting resource bundle compilation. This may take a while...\n";
 
+$filesystem->remove($workingDirs);
+
+foreach ($workingDirs as $targetDir) {
+    $filesystem->mkdir(array(
+        $targetDir.'/'.Intl::CURRENCY_DIR,
+        $targetDir.'/'.Intl::LANGUAGE_DIR,
+        $targetDir.'/'.Intl::LOCALE_DIR,
+        $targetDir.'/'.Intl::REGION_DIR,
+        $targetDir.'/'.Intl::SCRIPT_DIR,
+    ));
+}
+
 // We don't want to use fallback to English during generation
-Locale::setDefaultFallback('root');
+Locale::setDefaultFallback(null);
 
 echo "Generating language data...\n";
 
 $generator = new LanguageDataGenerator($compiler, Intl::LANGUAGE_DIR);
 $generator->generateData($config);
 
+//echo "Compiling...\n";
+//
+//$compiler->compile($txtDir.'/'.Intl::LANGUAGE_DIR, $resDir.'/'.Intl::LANGUAGE_DIR);
+
 echo "Generating script data...\n";
 
 $generator = new ScriptDataGenerator($compiler, Intl::SCRIPT_DIR);
 $generator->generateData($config);
+
+//echo "Compiling...\n";
+//
+//$compiler->compile($txtDir.'/'.Intl::SCRIPT_DIR, $resDir.'/'.Intl::SCRIPT_DIR);
 
 echo "Generating region data...\n";
 
 $generator = new RegionDataGenerator($compiler, Intl::REGION_DIR);
 $generator->generateData($config);
 
+//echo "Compiling...\n";
+//
+//$compiler->compile($txtDir.'/'.Intl::REGION_DIR, $resDir.'/'.Intl::REGION_DIR);
+
 echo "Generating currency data...\n";
 
 $generator = new CurrencyDataGenerator($compiler, Intl::CURRENCY_DIR);
 $generator->generateData($config);
 
+//echo "Compiling...\n";
+//
+//$compiler->compile($txtDir.'/'.Intl::CURRENCY_DIR, $resDir.'/'.Intl::CURRENCY_DIR);
+
 echo "Generating locale data...\n";
 
-$generator = new LocaleDataGenerator($compiler, Intl::LOCALE_DIR);
+$reader = new BundleEntryReader(new JsonBundleReader());
+
+$generator = new LocaleDataGenerator(
+    Intl::LOCALE_DIR,
+    new LanguageDataProvider($jsonDir.'/'.Intl::LANGUAGE_DIR, $reader),
+    new ScriptDataProvider($jsonDir.'/'.Intl::SCRIPT_DIR, $reader),
+    new RegionDataProvider($jsonDir.'/'.Intl::REGION_DIR, $reader)
+);
+
 $generator->generateData($config);
+
+//echo "Compiling...\n";
+//
+//$compiler->compile($txtDir.'/'.Intl::LOCALE_DIR, $resDir.'/'.Intl::LOCALE_DIR);
+//
+//$filesystem->remove($txtDir);
 
 echo "Resource bundle compilation complete.\n";
 
-$gitInfo = <<<GIT_INFO
-Git information
+$svnInfo = <<<SVN_INFO
+SVN information
 ===============
 
-URL: {$git->getUrl()}
-Revision: {$git->getLastCommitHash()}
-Author: {$git->getLastAuthor()}
-Date: {$git->getLastAuthoredDate()->format('c')}
+URL: {$svn->getUrl()}
+Revision: {$svn->getLastCommit()->getRevision()}
+Author: {$svn->getLastCommit()->getAuthor()}
+Date: {$svn->getLastCommit()->getDate()}
 
-GIT_INFO;
+SVN_INFO;
 
-$gitInfoFile = $jsonDir.'/git-info.txt';
+foreach ($targetDirs as $targetDir) {
+    $svnInfoFile = $targetDir.'/svn-info.txt';
 
-file_put_contents($gitInfoFile, $gitInfo);
+    file_put_contents($svnInfoFile, $svnInfo);
 
-echo "Wrote $gitInfoFile.\n";
+    echo "Wrote $svnInfoFile.\n";
 
-$versionFile = $jsonDir.'/version.txt';
+    $versionFile = $targetDir.'/version.txt';
 
-file_put_contents($versionFile, "$icuVersionInDownload\n");
+    file_put_contents($versionFile, "$icuVersionInDownload\n");
 
-echo "Wrote $versionFile.\n";
+    echo "Wrote $versionFile.\n";
+}
+
 echo "Done.\n";

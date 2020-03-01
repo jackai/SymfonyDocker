@@ -11,14 +11,11 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Routing;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
-use Symfony\Component\DependencyInjection\Config\ContainerParametersResource;
-use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
-class RouterTest extends TestCase
+class RouterTest extends \PHPUnit_Framework_TestCase
 {
     public function testGenerateWithServiceParam()
     {
@@ -26,12 +23,12 @@ class RouterTest extends TestCase
 
         $routes->add('foo', new Route(
             ' /{_locale}',
-            [
+            array(
                 '_locale' => '%locale%',
-            ],
-            [
+            ),
+            array(
                 '_locale' => 'en|es',
-            ], [], '', [], [], '"%foo%" == "bar"'
+            ), array(), '', array(), array(), '"%foo%" == "bar"'
         ));
 
         $sc = $this->getServiceContainer($routes);
@@ -40,8 +37,8 @@ class RouterTest extends TestCase
 
         $router = new Router($sc, 'foo');
 
-        $this->assertSame('/en', $router->generate('foo', ['_locale' => 'en']));
-        $this->assertSame('/', $router->generate('foo', ['_locale' => 'es']));
+        $this->assertSame('/en', $router->generate('foo', array('_locale' => 'en')));
+        $this->assertSame('/', $router->generate('foo', array('_locale' => 'es')));
         $this->assertSame('"bar" == "bar"', $router->getRouteCollection()->get('foo')->getCondition());
     }
 
@@ -51,15 +48,15 @@ class RouterTest extends TestCase
 
         $routes->add('foo', new Route(
             '/foo',
-            [
+            array(
                 'foo' => 'before_%parameter.foo%',
                 'bar' => '%parameter.bar%_after',
                 'baz' => '%%escaped%%',
-                'boo' => ['%parameter%', '%%escaped_parameter%%', ['%bee_parameter%', 'bee']],
-                'bee' => ['bee', 'bee'],
-            ],
-            [
-            ]
+                'boo' => array('%parameter%', '%%escaped_parameter%%', array('%bee_parameter%', 'bee')),
+                'bee' => array('bee', 'bee'),
+            ),
+            array(
+            )
         ));
 
         $sc = $this->getServiceContainer($routes);
@@ -73,13 +70,13 @@ class RouterTest extends TestCase
         $route = $router->getRouteCollection()->get('foo');
 
         $this->assertEquals(
-            [
+            array(
                 'foo' => 'before_foo',
                 'bar' => 'bar_after',
                 'baz' => '%escaped%',
-                'boo' => ['boo', '%escaped_parameter%', ['foo_bee', 'bee']],
-                'bee' => ['bee', 'bee'],
-            ],
+                'boo' => array('boo', '%escaped_parameter%', array('foo_bee', 'bee')),
+                'bee' => array('bee', 'bee'),
+            ),
             $route->getDefaults()
         );
     }
@@ -90,13 +87,13 @@ class RouterTest extends TestCase
 
         $routes->add('foo', new Route(
             '/foo',
-            [
-            ],
-            [
+            array(
+            ),
+            array(
                 'foo' => 'before_%parameter.foo%',
                 'bar' => '%parameter.bar%_after',
                 'baz' => '%%escaped%%',
-            ]
+            )
         ));
 
         $sc = $this->getServiceContainer($routes);
@@ -107,11 +104,11 @@ class RouterTest extends TestCase
         $route = $router->getRouteCollection()->get('foo');
 
         $this->assertEquals(
-            [
+            array(
                 'foo' => 'before_foo',
                 'bar' => 'bar_after',
                 'baz' => '%escaped%',
-            ],
+            ),
             $route->getRequirements()
         );
     }
@@ -123,43 +120,15 @@ class RouterTest extends TestCase
         $routes->add('foo', new Route('/before/%parameter.foo%/after/%%escaped%%'));
 
         $sc = $this->getServiceContainer($routes);
-        $sc->setParameter('parameter.foo', 'foo-%%escaped%%');
+        $sc->setParameter('parameter.foo', 'foo');
 
         $router = new Router($sc, 'foo');
         $route = $router->getRouteCollection()->get('foo');
 
         $this->assertEquals(
-            '/before/foo-%escaped%/after/%escaped%',
+            '/before/foo/after/%escaped%',
             $route->getPath()
         );
-    }
-
-    public function testEnvPlaceholders()
-    {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');
-        $this->expectExceptionMessage('Using "%env(FOO)%" is not allowed in routing configuration.');
-        $routes = new RouteCollection();
-
-        $routes->add('foo', new Route('/%env(FOO)%'));
-
-        $router = new Router($this->getServiceContainer($routes), 'foo');
-        $router->getRouteCollection();
-    }
-
-    public function testIndirectEnvPlaceholders()
-    {
-        $routes = new RouteCollection();
-
-        $routes->add('foo', new Route('/%foo%'));
-
-        $router = new Router($container = $this->getServiceContainer($routes), 'foo');
-        $container->setParameter('foo', 'foo-%bar%');
-        $container->setParameter('bar', '%env(string:FOO)%');
-
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Using "%env(string:FOO)%" is not allowed in routing configuration.');
-
-        $router->getRouteCollection();
     }
 
     public function testHostPlaceholders()
@@ -183,10 +152,12 @@ class RouterTest extends TestCase
         );
     }
 
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException
+     * @expectedExceptionMessage You have requested a non-existent parameter "nope".
+     */
     public function testExceptionOnNonExistentParameter()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException');
-        $this->expectExceptionMessage('You have requested a non-existent parameter "nope".');
         $routes = new RouteCollection();
 
         $routes->add('foo', new Route('/%nope%'));
@@ -197,10 +168,12 @@ class RouterTest extends TestCase
         $router->getRouteCollection()->get('foo');
     }
 
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\RuntimeException
+     * @expectedExceptionMessage The container parameter "object", used in the route configuration value "/%object%", must be a string or numeric, but it is of type object.
+     */
     public function testExceptionOnNonStringParameter()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\RuntimeException');
-        $this->expectExceptionMessage('The container parameter "object", used in the route configuration value "/%object%", must be a string or numeric, but it is of type object.');
         $routes = new RouteCollection();
 
         $routes->add('foo', new Route('/%object%'));
@@ -218,7 +191,7 @@ class RouterTest extends TestCase
     public function testDefaultValuesAsNonStrings($value)
     {
         $routes = new RouteCollection();
-        $routes->add('foo', new Route('foo', ['foo' => $value], ['foo' => '\d+']));
+        $routes->add('foo', new Route('foo', array('foo' => $value), array('foo' => '\d+')));
 
         $sc = $this->getServiceContainer($routes);
 
@@ -229,45 +202,32 @@ class RouterTest extends TestCase
         $this->assertSame($value, $route->getDefault('foo'));
     }
 
-    public function testGetRouteCollectionAddsContainerParametersResource()
-    {
-        $routeCollection = new RouteCollection();
-        $routeCollection->add('foo', new Route('/%locale%'));
-
-        $sc = $this->getServiceContainer($routeCollection);
-        $sc->setParameter('locale', 'en');
-
-        $router = new Router($sc, 'foo');
-
-        $routeCollection = $router->getRouteCollection();
-
-        $this->assertEquals([new ContainerParametersResource(['locale' => 'en'])], $routeCollection->getResources());
-    }
-
     public function getNonStringValues()
     {
-        return [[null], [false], [true], [new \stdClass()], [['foo', 'bar']], [[[]]]];
+        return array(array(null), array(false), array(true), array(new \stdClass()), array(array('foo', 'bar')), array(array(array())));
     }
 
     /**
+     * @param RouteCollection $routes
+     *
      * @return \Symfony\Component\DependencyInjection\Container
      */
     private function getServiceContainer(RouteCollection $routes)
     {
-        $loader = $this->getMockBuilder('Symfony\Component\Config\Loader\LoaderInterface')->getMock();
+        $loader = $this->getMock('Symfony\Component\Config\Loader\LoaderInterface');
 
         $loader
             ->expects($this->any())
             ->method('load')
-            ->willReturn($routes)
+            ->will($this->returnValue($routes))
         ;
 
-        $sc = $this->getMockBuilder('Symfony\\Component\\DependencyInjection\\Container')->setMethods(['get'])->getMock();
+        $sc = $this->getMock('Symfony\\Component\\DependencyInjection\\Container', array('get'));
 
         $sc
             ->expects($this->once())
             ->method('get')
-            ->willReturn($loader)
+            ->will($this->returnValue($loader))
         ;
 
         return $sc;

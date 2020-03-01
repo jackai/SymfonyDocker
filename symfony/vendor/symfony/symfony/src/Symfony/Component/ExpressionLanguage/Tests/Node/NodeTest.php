@@ -11,17 +11,16 @@
 
 namespace Symfony\Component\ExpressionLanguage\Tests\Node;
 
-use PHPUnit\Framework\TestCase;
-use Symfony\Component\ExpressionLanguage\Node\ConstantNode;
 use Symfony\Component\ExpressionLanguage\Node\Node;
+use Symfony\Component\ExpressionLanguage\Node\ConstantNode;
 
-class NodeTest extends TestCase
+class NodeTest extends \PHPUnit_Framework_TestCase
 {
     public function testToString()
     {
-        $node = new Node([new ConstantNode('foo')]);
+        $node = new Node(array(new ConstantNode('foo')));
 
-        $this->assertEquals(<<<'EOF'
+        $this->assertEquals(<<<EOF
 Node(
     ConstantNode(value: 'foo')
 )
@@ -31,7 +30,7 @@ EOF
 
     public function testSerialization()
     {
-        $node = new Node(['foo' => 'bar'], ['bar' => 'foo']);
+        $node = new Node(array('foo' => 'bar'), array('bar' => 'foo'));
 
         $serializedNode = serialize($node);
         $unserializedNode = unserialize($serializedNode);

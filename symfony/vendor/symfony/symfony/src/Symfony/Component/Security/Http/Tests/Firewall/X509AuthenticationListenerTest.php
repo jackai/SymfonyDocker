@@ -11,18 +11,17 @@
 
 namespace Symfony\Component\Security\Http\Tests\Firewall;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Http\Firewall\X509AuthenticationListener;
 
-class X509AuthenticationListenerTest extends TestCase
+class X509AuthenticationListenerTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @dataProvider dataProviderGetPreAuthenticatedData
      */
     public function testGetPreAuthenticatedData($user, $credentials)
     {
-        $serverVars = [];
+        $serverVars = array();
         if ('' !== $user) {
             $serverVars['SSL_CLIENT_S_DN_Email'] = $user;
         }
@@ -30,95 +29,95 @@ class X509AuthenticationListenerTest extends TestCase
             $serverVars['SSL_CLIENT_S_DN'] = $credentials;
         }
 
-        $request = new Request([], [], [], [], [], $serverVars);
+        $request = new Request(array(), array(), array(), array(), array(), $serverVars);
 
-        $tokenStorage = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')->getMock();
+        $tokenStorage = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface');
 
-        $authenticationManager = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface')->getMock();
+        $authenticationManager = $this->getMock('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface');
 
         $listener = new X509AuthenticationListener($tokenStorage, $authenticationManager, 'TheProviderKey');
 
         $method = new \ReflectionMethod($listener, 'getPreAuthenticatedData');
         $method->setAccessible(true);
 
-        $result = $method->invokeArgs($listener, [$request]);
-        $this->assertSame($result, [$user, $credentials]);
+        $result = $method->invokeArgs($listener, array($request));
+        $this->assertSame($result, array($user, $credentials));
     }
 
     public static function dataProviderGetPreAuthenticatedData()
     {
-        return [
-            'validValues' => ['TheUser', 'TheCredentials'],
-            'noCredentials' => ['TheUser', ''],
-        ];
+        return array(
+            'validValues' => array('TheUser', 'TheCredentials'),
+            'noCredentials' => array('TheUser', ''),
+        );
     }
 
     /**
      * @dataProvider dataProviderGetPreAuthenticatedDataNoUser
      */
-    public function testGetPreAuthenticatedDataNoUser($emailAddress, $credentials)
+    public function testGetPreAuthenticatedDataNoUser($emailAddress)
     {
-        $request = new Request([], [], [], [], [], ['SSL_CLIENT_S_DN' => $credentials]);
+        $credentials = 'CN=Sample certificate DN/emailAddress='.$emailAddress;
+        $request = new Request(array(), array(), array(), array(), array(), array('SSL_CLIENT_S_DN' => $credentials));
 
-        $tokenStorage = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')->getMock();
+        $tokenStorage = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface');
 
-        $authenticationManager = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface')->getMock();
+        $authenticationManager = $this->getMock('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface');
 
         $listener = new X509AuthenticationListener($tokenStorage, $authenticationManager, 'TheProviderKey');
 
         $method = new \ReflectionMethod($listener, 'getPreAuthenticatedData');
         $method->setAccessible(true);
 
-        $result = $method->invokeArgs($listener, [$request]);
-        $this->assertSame($result, [$emailAddress, $credentials]);
+        $result = $method->invokeArgs($listener, array($request));
+        $this->assertSame($result, array($emailAddress, $credentials));
     }
 
     public static function dataProviderGetPreAuthenticatedDataNoUser()
     {
-        yield ['cert@example.com', 'CN=Sample certificate DN/emailAddress=cert@example.com'];
-        yield ['cert+something@example.com', 'CN=Sample certificate DN/emailAddress=cert+something@example.com'];
-        yield ['cert@example.com', 'CN=Sample certificate DN,emailAddress=cert@example.com'];
-        yield ['cert+something@example.com', 'CN=Sample certificate DN,emailAddress=cert+something@example.com'];
-        yield ['cert+something@example.com', 'emailAddress=cert+something@example.com,CN=Sample certificate DN'];
-        yield ['cert+something@example.com', 'emailAddress=cert+something@example.com'];
-        yield ['firstname.lastname@mycompany.co.uk', 'emailAddress=firstname.lastname@mycompany.co.uk,CN=Firstname.Lastname,OU=london,OU=company design and engineering,OU=Issuer London,OU=Roaming,OU=Interactive,OU=Users,OU=Standard,OU=Business,DC=england,DC=core,DC=company,DC=co,DC=uk'];
+        return array(
+            'basicEmailAddress' => array('cert@example.com'),
+            'emailAddressWithPlusSign' => array('cert+something@example.com'),
+        );
     }
 
+    /**
+     * @expectedException \Symfony\Component\Security\Core\Exception\BadCredentialsException
+     */
     public function testGetPreAuthenticatedDataNoData()
     {
-        $this->expectException('Symfony\Component\Security\Core\Exception\BadCredentialsException');
-        $request = new Request([], [], [], [], [], []);
+        $request = new Request(array(), array(), array(), array(), array(), array());
 
-        $tokenStorage = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')->getMock();
+        $tokenStorage = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface');
 
-        $authenticationManager = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface')->getMock();
+        $authenticationManager = $this->getMock('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface');
 
         $listener = new X509AuthenticationListener($tokenStorage, $authenticationManager, 'TheProviderKey');
 
         $method = new \ReflectionMethod($listener, 'getPreAuthenticatedData');
         $method->setAccessible(true);
 
-        $method->invokeArgs($listener, [$request]);
+        $result = $method->invokeArgs($listener, array($request));
     }
 
     public function testGetPreAuthenticatedDataWithDifferentKeys()
     {
-        $userCredentials = ['TheUser', 'TheCredentials'];
+        $userCredentials = array('TheUser', 'TheCredentials');
 
-        $request = new Request([], [], [], [], [], [
+        $request = new Request(array(), array(), array(), array(), array(), array(
             'TheUserKey' => 'TheUser',
             'TheCredentialsKey' => 'TheCredentials',
-        ]);
-        $tokenStorage = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')->getMock();
+        ));
+        $tokenStorage = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface');
 
-        $authenticationManager = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface')->getMock();
+        $authenticationManager = $this->getMock('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface');
 
         $listener = new X509AuthenticationListener($tokenStorage, $authenticationManager, 'TheProviderKey', 'TheUserKey', 'TheCredentialsKey');
 
         $method = new \ReflectionMethod($listener, 'getPreAuthenticatedData');
         $method->setAccessible(true);
 
-        $result = $method->invokeArgs($listener, [$request]);
+        $result = $method->invokeArgs($listener, array($request));
         $this->assertSame($result, $userCredentials);
     }
 }

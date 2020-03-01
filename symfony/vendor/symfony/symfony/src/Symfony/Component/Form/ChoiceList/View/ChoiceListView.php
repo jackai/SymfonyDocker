@@ -22,16 +22,28 @@ namespace Symfony\Component\Form\ChoiceList\View;
  */
 class ChoiceListView
 {
+    /**
+     * The choices.
+     *
+     * @var ChoiceGroupView[]|ChoiceView[]
+     */
     public $choices;
+
+    /**
+     * The preferred choices.
+     *
+     * @var ChoiceGroupView[]|ChoiceView[]
+     */
     public $preferredChoices;
 
     /**
      * Creates a new choice list view.
      *
      * @param ChoiceGroupView[]|ChoiceView[] $choices          The choice views
-     * @param ChoiceGroupView[]|ChoiceView[] $preferredChoices the preferred choice views
+     * @param ChoiceGroupView[]|ChoiceView[] $preferredChoices The preferred
+     *                                                         choice views.
      */
-    public function __construct(array $choices = [], array $preferredChoices = [])
+    public function __construct(array $choices = array(), array $preferredChoices = array())
     {
         $this->choices = $choices;
         $this->preferredChoices = $preferredChoices;

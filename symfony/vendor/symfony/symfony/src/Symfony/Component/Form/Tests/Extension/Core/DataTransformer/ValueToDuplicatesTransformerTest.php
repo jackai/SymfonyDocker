@@ -11,16 +11,15 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\DataTransformer;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\DataTransformer\ValueToDuplicatesTransformer;
 
-class ValueToDuplicatesTransformerTest extends TestCase
+class ValueToDuplicatesTransformerTest extends \PHPUnit_Framework_TestCase
 {
     private $transformer;
 
     protected function setUp()
     {
-        $this->transformer = new ValueToDuplicatesTransformer(['a', 'b', 'c']);
+        $this->transformer = new ValueToDuplicatesTransformer(array('a', 'b', 'c'));
     }
 
     protected function tearDown()
@@ -30,108 +29,114 @@ class ValueToDuplicatesTransformerTest extends TestCase
 
     public function testTransform()
     {
-        $output = [
+        $output = array(
             'a' => 'Foo',
             'b' => 'Foo',
             'c' => 'Foo',
-        ];
+        );
 
         $this->assertSame($output, $this->transformer->transform('Foo'));
     }
 
     public function testTransformEmpty()
     {
-        $output = [
+        $output = array(
             'a' => null,
             'b' => null,
             'c' => null,
-        ];
+        );
 
         $this->assertSame($output, $this->transformer->transform(null));
     }
 
     public function testReverseTransform()
     {
-        $input = [
+        $input = array(
             'a' => 'Foo',
             'b' => 'Foo',
             'c' => 'Foo',
-        ];
+        );
 
         $this->assertSame('Foo', $this->transformer->reverseTransform($input));
     }
 
     public function testReverseTransformCompletelyEmpty()
     {
-        $input = [
+        $input = array(
             'a' => '',
             'b' => '',
             'c' => '',
-        ];
+        );
 
         $this->assertNull($this->transformer->reverseTransform($input));
     }
 
     public function testReverseTransformCompletelyNull()
     {
-        $input = [
+        $input = array(
             'a' => null,
             'b' => null,
             'c' => null,
-        ];
+        );
 
         $this->assertNull($this->transformer->reverseTransform($input));
     }
 
     public function testReverseTransformEmptyArray()
     {
-        $input = [
-            'a' => [],
-            'b' => [],
-            'c' => [],
-        ];
+        $input = array(
+            'a' => array(),
+            'b' => array(),
+            'c' => array(),
+        );
 
         $this->assertNull($this->transformer->reverseTransform($input));
     }
 
     public function testReverseTransformZeroString()
     {
-        $input = [
+        $input = array(
             'a' => '0',
             'b' => '0',
             'c' => '0',
-        ];
+        );
 
         $this->assertSame('0', $this->transformer->reverseTransform($input));
     }
 
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
+     */
     public function testReverseTransformPartiallyNull()
     {
-        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
-        $input = [
+        $input = array(
             'a' => 'Foo',
             'b' => 'Foo',
             'c' => null,
-        ];
+        );
 
         $this->transformer->reverseTransform($input);
     }
 
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
+     */
     public function testReverseTransformDifferences()
     {
-        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
-        $input = [
+        $input = array(
             'a' => 'Foo',
             'b' => 'Bar',
             'c' => 'Foo',
-        ];
+        );
 
         $this->transformer->reverseTransform($input);
     }
 
+    /**
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
+     */
     public function testReverseTransformRequiresArray()
     {
-        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
         $this->transformer->reverseTransform('12345');
     }
 }

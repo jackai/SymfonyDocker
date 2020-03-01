@@ -11,21 +11,20 @@
 
 namespace Symfony\Bundle\TwigBundle\Tests\DependencyInjection;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\TwigBundle\DependencyInjection\Configuration;
 use Symfony\Component\Config\Definition\Processor;
 
-class ConfigurationTest extends TestCase
+class ConfigurationTest extends \PHPUnit_Framework_TestCase
 {
     public function testDoNoDuplicateDefaultFormResources()
     {
-        $input = [
-            'form_themes' => ['form_div_layout.html.twig'],
-        ];
+        $input = array(
+            'form_themes' => array('form_div_layout.html.twig'),
+        );
 
         $processor = new Processor();
-        $config = $processor->processConfiguration(new Configuration(), [$input]);
+        $config = $processor->processConfiguration(new Configuration(), array($input));
 
-        $this->assertEquals(['form_div_layout.html.twig'], $config['form_themes']);
+        $this->assertEquals(array('form_div_layout.html.twig'), $config['form_themes']);
     }
 }

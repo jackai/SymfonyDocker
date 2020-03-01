@@ -11,7 +11,7 @@
 
 namespace Symfony\Bridge\Doctrine\Form\Type;
 
-use Doctrine\Common\Persistence\ObjectManager as LegacyObjectManager;
+use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\ORMQueryBuilderLoader;
@@ -28,8 +28,8 @@ class EntityType extends DoctrineType
         // Invoke the query builder closure so that we can cache choice lists
         // for equal query builders
         $queryBuilderNormalizer = function (Options $options, $queryBuilder) {
-            if (\is_callable($queryBuilder)) {
-                $queryBuilder = \call_user_func($queryBuilder, $options['em']->getRepository($options['class']));
+            if (is_callable($queryBuilder)) {
+                $queryBuilder = call_user_func($queryBuilder, $options['em']->getRepository($options['class']));
 
                 if (null !== $queryBuilder && !$queryBuilder instanceof QueryBuilder) {
                     throw new UnexpectedTypeException($queryBuilder, 'Doctrine\ORM\QueryBuilder');
@@ -40,18 +40,19 @@ class EntityType extends DoctrineType
         };
 
         $resolver->setNormalizer('query_builder', $queryBuilderNormalizer);
-        $resolver->setAllowedTypes('query_builder', ['null', 'callable', 'Doctrine\ORM\QueryBuilder']);
+        $resolver->setAllowedTypes('query_builder', array('null', 'callable', 'Doctrine\ORM\QueryBuilder'));
     }
 
     /**
      * Return the default loader object.
      *
-     * @param QueryBuilder $queryBuilder
-     * @param string       $class
+     * @param ObjectManager $manager
+     * @param QueryBuilder  $queryBuilder
+     * @param string        $class
      *
      * @return ORMQueryBuilderLoader
      */
-    public function getLoader(LegacyObjectManager $manager, $queryBuilder, $class)
+    public function getLoader(ObjectManager $manager, $queryBuilder, $class)
     {
         return new ORMQueryBuilderLoader($queryBuilder);
     }
@@ -77,19 +78,21 @@ class EntityType extends DoctrineType
      */
     public function getQueryBuilderPartsForCachingHash($queryBuilder)
     {
-        return [
+        return array(
             $queryBuilder->getQuery()->getSQL(),
-            array_map([$this, 'parameterToArray'], $queryBuilder->getParameters()->toArray()),
-        ];
+            array_map(array($this, 'parameterToArray'), $queryBuilder->getParameters()->toArray()),
+        );
     }
 
     /**
      * Converts a query parameter to an array.
      *
+     * @param Parameter $parameter The query parameter
+     *
      * @return array The array representation of the parameter
      */
     private function parameterToArray(Parameter $parameter)
     {
-        return [$parameter->getName(), $parameter->getType(), $parameter->getValue()];
+        return array($parameter->getName(), $parameter->getType(), $parameter->getValue());
     }
 }

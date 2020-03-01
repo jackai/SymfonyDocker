@@ -12,10 +12,10 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests;
 
 use Symfony\Bundle\FrameworkBundle\Client;
-use Symfony\Bundle\FrameworkBundle\Tests\Functional\AbstractWebTestCase;
+use Symfony\Bundle\FrameworkBundle\Tests\Functional\WebTestCase;
 use Symfony\Component\HttpFoundation\Response;
 
-class ClientTest extends AbstractWebTestCase
+class ClientTest extends WebTestCase
 {
     public function testRebootKernelBetweenRequests()
     {
@@ -54,7 +54,7 @@ class ClientTest extends AbstractWebTestCase
     private function getKernelMock()
     {
         $mock = $this->getMockBuilder($this->getKernelClass())
-            ->setMethods(['shutdown', 'boot', 'handle'])
+            ->setMethods(array('shutdown', 'boot', 'handle'))
             ->disableOriginalConstructor()
             ->getMock();
 

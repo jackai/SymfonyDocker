@@ -11,14 +11,11 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Validator;
 
-use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\ConstraintValidatorFactoryInterface;
 use Symfony\Component\Validator\ConstraintValidatorInterface;
-use Symfony\Component\Validator\ContainerConstraintValidatorFactory;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
-use Symfony\Component\Validator\Exception\ValidatorException;
-
-@trigger_error(sprintf('The %s class is deprecated since Symfony 3.3 and will be removed in 4.0. Use %s instead.', ConstraintValidatorFactory::class, ContainerConstraintValidatorFactory::class), E_USER_DEPRECATED);
 
 /**
  * Uses a service container to create constraint validators.
@@ -39,28 +36,31 @@ use Symfony\Component\Validator\Exception\ValidatorException;
  *     }
  *
  * @author Kris Wallsmith <kris@symfony.com>
- *
- * @deprecated since version 3.3
  */
-class ConstraintValidatorFactory extends ContainerConstraintValidatorFactory
+class ConstraintValidatorFactory implements ConstraintValidatorFactoryInterface
 {
     protected $container;
     protected $validators;
 
-    public function __construct(ContainerInterface $container, array $validators = [])
+    /**
+     * Constructor.
+     *
+     * @param ContainerInterface $container  The service container
+     * @param array              $validators An array of validators
+     */
+    public function __construct(ContainerInterface $container, array $validators = array())
     {
-        parent::__construct($container);
-
-        $this->validators = $validators;
         $this->container = $container;
+        $this->validators = $validators;
     }
 
     /**
      * Returns the validator for the supplied constraint.
      *
+     * @param Constraint $constraint A constraint
+     *
      * @return ConstraintValidatorInterface A validator for the supplied constraint
      *
-     * @throws ValidatorException      When the validator class does not exist
      * @throws UnexpectedTypeException When the validator is not an instance of ConstraintValidatorInterface
      */
     public function getInstance(Constraint $constraint)
@@ -68,10 +68,8 @@ class ConstraintValidatorFactory extends ContainerConstraintValidatorFactory
         $name = $constraint->validatedBy();
 
         if (!isset($this->validators[$name])) {
-            return parent::getInstance($constraint);
-        }
-
-        if (\is_string($this->validators[$name])) {
+            $this->validators[$name] = new $name();
+        } elseif (is_string($this->validators[$name])) {
             $this->validators[$name] = $this->container->get($this->validators[$name]);
         }
 

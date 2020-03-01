@@ -15,7 +15,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 /**
  * Exposes some Symfony parameters and services as an "app" global variable.
@@ -50,41 +49,28 @@ class AppVariable
     }
 
     /**
-     * Returns the current token.
-     *
-     * @return TokenInterface|null
-     *
-     * @throws \RuntimeException When the TokenStorage is not available
-     */
-    public function getToken()
-    {
-        if (null === $tokenStorage = $this->tokenStorage) {
-            throw new \RuntimeException('The "app.token" variable is not available.');
-        }
-
-        return $tokenStorage->getToken();
-    }
-
-    /**
      * Returns the current user.
      *
-     * @return object|null
+     * @return mixed
      *
      * @see TokenInterface::getUser()
      */
     public function getUser()
     {
-        if (null === $tokenStorage = $this->tokenStorage) {
+        if (null !== $this->tokenStorage) {
+            $tokenStorage = $this->tokenStorage;
+        } else {
             throw new \RuntimeException('The "app.user" variable is not available.');
         }
 
         if (!$token = $tokenStorage->getToken()) {
-            return null;
+            return;
         }
 
         $user = $token->getUser();
-
-        return \is_object($user) ? $user : null;
+        if (is_object($user)) {
+            return $user;
+        }
     }
 
     /**
@@ -112,7 +98,9 @@ class AppVariable
             throw new \RuntimeException('The "app.session" variable is not available.');
         }
 
-        return ($request = $this->getRequest()) ? $request->getSession() : null;
+        if ($request = $this->getRequest()) {
+            return $request->getSession();
+        }
     }
 
     /**
@@ -141,40 +129,5 @@ class AppVariable
         }
 
         return $this->debug;
-    }
-
-    /**
-     * Returns some or all the existing flash messages:
-     *  * getFlashes() returns all the flash messages
-     *  * getFlashes('notice') returns a simple array with flash messages of that type
-     *  * getFlashes(['notice', 'error']) returns a nested array of type => messages.
-     *
-     * @return array
-     */
-    public function getFlashes($types = null)
-    {
-        try {
-            $session = $this->getSession();
-            if (null === $session) {
-                return [];
-            }
-        } catch (\RuntimeException $e) {
-            return [];
-        }
-
-        if (null === $types || '' === $types || [] === $types) {
-            return $session->getFlashBag()->all();
-        }
-
-        if (\is_string($types)) {
-            return $session->getFlashBag()->get($types);
-        }
-
-        $result = [];
-        foreach ($types as $type) {
-            $result[$type] = $session->getFlashBag()->get($type);
-        }
-
-        return $result;
     }
 }

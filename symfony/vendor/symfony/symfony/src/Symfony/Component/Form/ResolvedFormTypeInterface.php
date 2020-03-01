@@ -30,7 +30,7 @@ interface ResolvedFormTypeInterface
     /**
      * Returns the parent type.
      *
-     * @return self|null The parent type or null
+     * @return ResolvedFormTypeInterface|null The parent type or null
      */
     public function getParent();
 
@@ -57,7 +57,7 @@ interface ResolvedFormTypeInterface
      *
      * @return FormBuilderInterface The created form builder
      */
-    public function createBuilder(FormFactoryInterface $factory, $name, array $options = []);
+    public function createBuilder(FormFactoryInterface $factory, $name, array $options = array());
 
     /**
      * Creates a new form view for a form of this type.

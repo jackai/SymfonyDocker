@@ -11,9 +11,9 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection;
 
-use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
+use Symfony\Component\Config\FileLocator;
 
 class PhpFrameworkExtensionTest extends FrameworkExtensionTest
 {
@@ -23,33 +23,37 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTest
         $loader->load($file.'.php');
     }
 
+    /**
+     * @expectedException \LogicException
+     */
     public function testAssetsCannotHavePathAndUrl()
     {
-        $this->expectException('LogicException');
         $this->createContainerFromClosure(function ($container) {
-            $container->loadFromExtension('framework', [
-                'assets' => [
+            $container->loadFromExtension('framework', array(
+                'assets' => array(
                     'base_urls' => 'http://cdn.example.com',
                     'base_path' => '/foo',
-                ],
-            ]);
+                ),
+            ));
         });
     }
 
+    /**
+     * @expectedException \LogicException
+     */
     public function testAssetPackageCannotHavePathAndUrl()
     {
-        $this->expectException('LogicException');
         $this->createContainerFromClosure(function ($container) {
-            $container->loadFromExtension('framework', [
-                'assets' => [
-                    'packages' => [
-                        'impossible' => [
+            $container->loadFromExtension('framework', array(
+                'assets' => array(
+                    'packages' => array(
+                        'impossible' => array(
                             'base_urls' => 'http://cdn.example.com',
                             'base_path' => '/foo',
-                        ],
-                    ],
-                ],
-            ]);
+                        ),
+                    ),
+                ),
+            ));
         });
     }
 }

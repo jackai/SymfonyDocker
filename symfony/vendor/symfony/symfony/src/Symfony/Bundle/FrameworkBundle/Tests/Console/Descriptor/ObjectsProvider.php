@@ -12,13 +12,11 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Console\Descriptor;
 
 use Symfony\Component\DependencyInjection\Alias;
-use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\Routing\CompiledRoute;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
@@ -31,60 +29,60 @@ class ObjectsProvider
             $collection1->add($name, $route);
         }
 
-        return ['route_collection_1' => $collection1];
+        return array('route_collection_1' => $collection1);
     }
 
     public static function getRoutes()
     {
-        return [
-            'route_1' => new RouteStub(
+        return array(
+            'route_1' => new Route(
                 '/hello/{name}',
-                ['name' => 'Joseph'],
-                ['name' => '[a-z]+'],
-                ['opt1' => 'val1', 'opt2' => 'val2'],
+                array('name' => 'Joseph'),
+                array('name' => '[a-z]+'),
+                array('opt1' => 'val1', 'opt2' => 'val2'),
                 'localhost',
-                ['http', 'https'],
-                ['get', 'head']
+                array('http', 'https'),
+                array('get', 'head')
             ),
-            'route_2' => new RouteStub(
+            'route_2' => new Route(
                 '/name/add',
-                [],
-                [],
-                ['opt1' => 'val1', 'opt2' => 'val2'],
+                array(),
+                array(),
+                array('opt1' => 'val1', 'opt2' => 'val2'),
                 'localhost',
-                ['http', 'https'],
-                ['put', 'post']
+                array('http', 'https'),
+                array('put', 'post')
             ),
-        ];
+        );
     }
 
     public static function getContainerParameters()
     {
-        return [
-            'parameters_1' => new ParameterBag([
+        return array(
+            'parameters_1' => new ParameterBag(array(
                 'integer' => 12,
                 'string' => 'Hello world!',
                 'boolean' => true,
-                'array' => [12, 'Hello world!', true],
-            ]),
-        ];
+                'array' => array(12, 'Hello world!', true),
+            )),
+        );
     }
 
     public static function getContainerParameter()
     {
         $builder = new ContainerBuilder();
         $builder->setParameter('database_name', 'symfony');
-        $builder->setParameter('twig.form.resources', [
+        $builder->setParameter('twig.form.resources', array(
             'bootstrap_3_horizontal_layout.html.twig',
             'bootstrap_3_layout.html.twig',
             'form_div_layout.html.twig',
             'form_table_layout.html.twig',
-        ]);
+        ));
 
-        return [
+        return array(
             'parameter' => $builder,
             'array_parameter' => $builder,
-        ];
+        );
     }
 
     public static function getContainerBuilders()
@@ -93,7 +91,7 @@ class ObjectsProvider
         $builder1->setDefinitions(self::getContainerDefinitions());
         $builder1->setAliases(self::getContainerAliases());
 
-        return ['builder_1' => $builder1];
+        return array('builder_1' => $builder1);
     }
 
     public static function getContainerDefinitions()
@@ -101,45 +99,32 @@ class ObjectsProvider
         $definition1 = new Definition('Full\\Qualified\\Class1');
         $definition2 = new Definition('Full\\Qualified\\Class2');
 
-        return [
+        return array(
             'definition_1' => $definition1
                 ->setPublic(true)
                 ->setSynthetic(false)
                 ->setLazy(true)
                 ->setAbstract(true)
-                ->addArgument(new Reference('definition2'))
-                ->addArgument('%parameter%')
-                ->addArgument(new Definition('inline_service', ['arg1', 'arg2']))
-                ->addArgument([
-                    'foo',
-                    new Reference('definition2'),
-                    new Definition('inline_service'),
-                ])
-                ->addArgument(new IteratorArgument([
-                    new Reference('definition_1'),
-                    new Reference('definition_2'),
-                ]))
-                ->setFactory(['Full\\Qualified\\FactoryClass', 'get']),
+                ->setFactory(array('Full\\Qualified\\FactoryClass', 'get')),
             'definition_2' => $definition2
                 ->setPublic(false)
                 ->setSynthetic(true)
                 ->setFile('/path/to/file')
                 ->setLazy(false)
                 ->setAbstract(false)
-                ->addTag('tag1', ['attr1' => 'val1', 'attr2' => 'val2'])
-                ->addTag('tag1', ['attr3' => 'val3'])
+                ->addTag('tag1', array('attr1' => 'val1', 'attr2' => 'val2'))
+                ->addTag('tag1', array('attr3' => 'val3'))
                 ->addTag('tag2')
-                ->addMethodCall('setMailer', [new Reference('mailer')])
-                ->setFactory([new Reference('factory.service'), 'get']),
-        ];
+                ->setFactory(array(new Reference('factory.service'), 'get')),
+        );
     }
 
     public static function getContainerAliases()
     {
-        return [
+        return array(
             'alias_1' => new Alias('service_1', true),
             'alias_2' => new Alias('service_2', false),
-        ];
+        );
     }
 
     public static function getEventDispatchers()
@@ -150,26 +135,20 @@ class ObjectsProvider
         $eventDispatcher->addListener('event1', function () { return 'Closure'; }, -1);
         $eventDispatcher->addListener('event2', new CallableClass());
 
-        return ['event_dispatcher_1' => $eventDispatcher];
+        return array('event_dispatcher_1' => $eventDispatcher);
     }
 
     public static function getCallables()
     {
-        $callables = [
+        return array(
             'callable_1' => 'array_key_exists',
-            'callable_2' => ['Symfony\\Bundle\\FrameworkBundle\\Tests\\Console\\Descriptor\\CallableClass', 'staticMethod'],
-            'callable_3' => [new CallableClass(), 'method'],
+            'callable_2' => array('Symfony\\Bundle\\FrameworkBundle\\Tests\\Console\\Descriptor\\CallableClass', 'staticMethod'),
+            'callable_3' => array(new CallableClass(), 'method'),
             'callable_4' => 'Symfony\\Bundle\\FrameworkBundle\\Tests\\Console\\Descriptor\\CallableClass::staticMethod',
-            'callable_5' => ['Symfony\\Bundle\\FrameworkBundle\\Tests\\Console\\Descriptor\\ExtendedCallableClass', 'parent::staticMethod'],
+            'callable_5' => array('Symfony\\Bundle\\FrameworkBundle\\Tests\\Console\\Descriptor\\ExtendedCallableClass', 'parent::staticMethod'),
             'callable_6' => function () { return 'Closure'; },
             'callable_7' => new CallableClass(),
-        ];
-
-        if (\PHP_VERSION_ID >= 70100) {
-            $callables['callable_from_callable'] = \Closure::fromCallable(new CallableClass());
-        }
-
-        return $callables;
+        );
     }
 }
 
@@ -178,11 +157,9 @@ class CallableClass
     public function __invoke()
     {
     }
-
     public static function staticMethod()
     {
     }
-
     public function method()
     {
     }
@@ -192,13 +169,5 @@ class ExtendedCallableClass extends CallableClass
 {
     public static function staticMethod()
     {
-    }
-}
-
-class RouteStub extends Route
-{
-    public function compile()
-    {
-        return new CompiledRoute('', '#PATH_REGEX#', [], [], '#HOST_REGEX#');
     }
 }

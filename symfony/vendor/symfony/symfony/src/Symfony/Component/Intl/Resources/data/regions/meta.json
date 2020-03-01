@@ -1,5 +1,5 @@
 {
-    "Version": "36",
+    "Version": "2.1.12.90",
     "Regions": [
         "AC",
         "AD",
@@ -248,8 +248,6 @@
         "VU",
         "WF",
         "WS",
-        "XA",
-        "XB",
         "XK",
         "YE",
         "YT",

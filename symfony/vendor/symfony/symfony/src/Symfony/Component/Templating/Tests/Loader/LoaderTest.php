@@ -11,16 +11,15 @@
 
 namespace Symfony\Component\Templating\Tests\Loader;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Templating\Loader\Loader;
 use Symfony\Component\Templating\TemplateReferenceInterface;
 
-class LoaderTest extends TestCase
+class LoaderTest extends \PHPUnit_Framework_TestCase
 {
     public function testGetSetLogger()
     {
         $loader = new ProjectTemplateLoader4();
-        $logger = $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock();
+        $logger = $this->getMock('Psr\Log\LoggerInterface');
         $loader->setLogger($logger);
         $this->assertSame($logger, $loader->getLogger(), '->setLogger() sets the logger instance');
     }
@@ -35,6 +34,11 @@ class ProjectTemplateLoader4 extends Loader
     public function getLogger()
     {
         return $this->logger;
+    }
+
+    public function getDebugger()
+    {
+        return $this->debugger;
     }
 
     public function isFresh(TemplateReferenceInterface $template, $time)

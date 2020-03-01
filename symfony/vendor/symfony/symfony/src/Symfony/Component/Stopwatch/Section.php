@@ -21,17 +21,12 @@ class Section
     /**
      * @var StopwatchEvent[]
      */
-    private $events = [];
+    private $events = array();
 
     /**
-     * @var float|null
+     * @var null|float
      */
     private $origin;
-
-    /**
-     * @var bool
-     */
-    private $morePrecision;
 
     /**
      * @var string
@@ -41,16 +36,16 @@ class Section
     /**
      * @var Section[]
      */
-    private $children = [];
+    private $children = array();
 
     /**
-     * @param float|null $origin        Set the origin of the events in this section, use null to set their origin to their start time
-     * @param bool       $morePrecision If true, time is stored as float to keep the original microsecond precision
+     * Constructor.
+     *
+     * @param float|null $origin Set the origin of the events in this section, use null to set their origin to their start time
      */
-    public function __construct($origin = null, $morePrecision = false)
+    public function __construct($origin = null)
     {
         $this->origin = is_numeric($origin) ? $origin : null;
-        $this->morePrecision = $morePrecision;
     }
 
     /**
@@ -58,7 +53,7 @@ class Section
      *
      * @param string $id The child section identifier
      *
-     * @return self|null The child section or null when none found
+     * @return Section|null The child section or null when none found
      */
     public function get($id)
     {
@@ -67,21 +62,19 @@ class Section
                 return $child;
             }
         }
-
-        return null;
     }
 
     /**
      * Creates or re-opens a child section.
      *
-     * @param string|null $id Null to create a new section, the identifier to re-open an existing one
+     * @param string|null $id null to create a new section, the identifier to re-open an existing one
      *
-     * @return self
+     * @return Section A child section
      */
     public function open($id)
     {
         if (null === $session = $this->get($id)) {
-            $session = $this->children[] = new self(microtime(true) * 1000, $this->morePrecision);
+            $session = $this->children[] = new self(microtime(true) * 1000);
         }
 
         return $session;
@@ -100,7 +93,7 @@ class Section
      *
      * @param string $id The session identifier
      *
-     * @return $this
+     * @return Section The current section
      */
     public function setId($id)
     {
@@ -112,15 +105,15 @@ class Section
     /**
      * Starts an event.
      *
-     * @param string      $name     The event name
-     * @param string|null $category The event category
+     * @param string $name     The event name
+     * @param string $category The event category
      *
      * @return StopwatchEvent The event
      */
     public function startEvent($name, $category)
     {
         if (!isset($this->events[$name])) {
-            $this->events[$name] = new StopwatchEvent($this->origin ?: microtime(true) * 1000, $category, $this->morePrecision);
+            $this->events[$name] = new StopwatchEvent($this->origin ?: microtime(true) * 1000, $category);
         }
 
         return $this->events[$name]->start();

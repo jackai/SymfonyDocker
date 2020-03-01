@@ -11,13 +11,12 @@
 
 namespace Symfony\Component\Form\Tests\Util;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Util\OrderedHashMap;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class OrderedHashMapTest extends TestCase
+class OrderedHashMapTest extends \PHPUnit_Framework_TestCase
 {
     public function testGet()
     {
@@ -27,9 +26,11 @@ class OrderedHashMapTest extends TestCase
         $this->assertSame(1, $map['first']);
     }
 
+    /**
+     * @expectedException \OutOfBoundsException
+     */
     public function testGetNonExistingFails()
     {
-        $this->expectException('OutOfBoundsException');
         $map = new OrderedHashMap();
 
         $map['first'];
@@ -41,7 +42,7 @@ class OrderedHashMapTest extends TestCase
         $map['first'] = 1;
         $map['second'] = 2;
 
-        $this->assertSame(['first' => 1, 'second' => 2], iterator_to_array($map));
+        $this->assertSame(array('first' => 1, 'second' => 2), iterator_to_array($map));
     }
 
     public function testInsertNullKeys()
@@ -51,16 +52,7 @@ class OrderedHashMapTest extends TestCase
         $map['foo'] = 2;
         $map[] = 3;
 
-        $this->assertSame([0 => 1, 'foo' => 2, 1 => 3], iterator_to_array($map));
-    }
-
-    public function testInsertLooselyEqualKeys()
-    {
-        $map = new OrderedHashMap();
-        $map['1 as a string'] = '1 as a string';
-        $map[1] = 1;
-
-        $this->assertSame(['1 as a string' => '1 as a string', 1 => 1], iterator_to_array($map));
+        $this->assertSame(array(0 => 1, 'foo' => 2, 1 => 3), iterator_to_array($map));
     }
 
     /**
@@ -81,7 +73,7 @@ class OrderedHashMapTest extends TestCase
         $map['second'] = 2;
         $map['first'] = 1;
 
-        $this->assertSame(['first' => 1, 'second' => 2], iterator_to_array($map));
+        $this->assertSame(array('first' => 1, 'second' => 2), iterator_to_array($map));
     }
 
     public function testIsset()
@@ -89,14 +81,14 @@ class OrderedHashMapTest extends TestCase
         $map = new OrderedHashMap();
         $map['first'] = 1;
 
-        $this->assertArrayHasKey('first', $map);
+        $this->assertTrue(isset($map['first']));
     }
 
     public function testIssetReturnsFalseForNonExisting()
     {
         $map = new OrderedHashMap();
 
-        $this->assertArrayNotHasKey('first', $map);
+        $this->assertFalse(isset($map['first']));
     }
 
     public function testIssetReturnsFalseForNull()
@@ -104,7 +96,7 @@ class OrderedHashMapTest extends TestCase
         $map = new OrderedHashMap();
         $map['first'] = null;
 
-        $this->assertArrayNotHasKey('first', $map);
+        $this->assertFalse(isset($map['first']));
     }
 
     public function testUnset()
@@ -115,28 +107,14 @@ class OrderedHashMapTest extends TestCase
 
         unset($map['first']);
 
-        $this->assertSame(['second' => 2], iterator_to_array($map));
-    }
-
-    public function testUnsetFromLooselyEqualKeysHashMap()
-    {
-        $map = new OrderedHashMap();
-        $map['1 as a string'] = '1 as a string';
-        $map[1] = 1;
-
-        unset($map[1]);
-
-        $this->assertSame(['1 as a string' => '1 as a string'], iterator_to_array($map));
+        $this->assertSame(array('second' => 2), iterator_to_array($map));
     }
 
     public function testUnsetNonExistingSucceeds()
     {
         $map = new OrderedHashMap();
-        $map['second'] = 2;
 
         unset($map['first']);
-
-        $this->assertSame(['second' => 2], iterator_to_array($map));
     }
 
     public function testEmptyIteration()
@@ -152,7 +130,7 @@ class OrderedHashMapTest extends TestCase
 
     public function testIterationSupportsInsertion()
     {
-        $map = new OrderedHashMap(['first' => 1]);
+        $map = new OrderedHashMap(array('first' => 1));
         $it = $map->getIterator();
 
         $it->rewind();
@@ -183,7 +161,7 @@ class OrderedHashMapTest extends TestCase
 
     public function testIterationSupportsDeletionAndInsertion()
     {
-        $map = new OrderedHashMap(['first' => 1, 'removed' => 2]);
+        $map = new OrderedHashMap(array('first' => 1, 'removed' => 2));
         $it = $map->getIterator();
 
         $it->rewind();
@@ -215,7 +193,7 @@ class OrderedHashMapTest extends TestCase
 
     public function testIterationSupportsDeletionOfCurrentElement()
     {
-        $map = new OrderedHashMap(['removed' => 1, 'next' => 2]);
+        $map = new OrderedHashMap(array('removed' => 1, 'next' => 2));
         $it = $map->getIterator();
 
         $it->rewind();
@@ -245,7 +223,7 @@ class OrderedHashMapTest extends TestCase
 
     public function testIterationIgnoresReplacementOfCurrentElement()
     {
-        $map = new OrderedHashMap(['replaced' => 1, 'next' => 2]);
+        $map = new OrderedHashMap(array('replaced' => 1, 'next' => 2));
         $it = $map->getIterator();
 
         $it->rewind();
@@ -275,7 +253,7 @@ class OrderedHashMapTest extends TestCase
 
     public function testIterationSupportsDeletionOfCurrentAndLastElement()
     {
-        $map = new OrderedHashMap(['removed' => 1]);
+        $map = new OrderedHashMap(array('removed' => 1));
         $it = $map->getIterator();
 
         $it->rewind();
@@ -299,7 +277,7 @@ class OrderedHashMapTest extends TestCase
 
     public function testIterationIgnoresReplacementOfCurrentAndLastElement()
     {
-        $map = new OrderedHashMap(['replaced' => 1]);
+        $map = new OrderedHashMap(array('replaced' => 1));
         $it = $map->getIterator();
 
         $it->rewind();
@@ -323,7 +301,7 @@ class OrderedHashMapTest extends TestCase
 
     public function testIterationSupportsDeletionOfPreviousElement()
     {
-        $map = new OrderedHashMap(['removed' => 1, 'next' => 2, 'onemore' => 3]);
+        $map = new OrderedHashMap(array('removed' => 1, 'next' => 2, 'onemore' => 3));
         $it = $map->getIterator();
 
         $it->rewind();
@@ -359,7 +337,7 @@ class OrderedHashMapTest extends TestCase
 
     public function testIterationIgnoresReplacementOfPreviousElement()
     {
-        $map = new OrderedHashMap(['replaced' => 1, 'next' => 2, 'onemore' => 3]);
+        $map = new OrderedHashMap(array('replaced' => 1, 'next' => 2, 'onemore' => 3));
         $it = $map->getIterator();
 
         $it->rewind();
@@ -395,7 +373,7 @@ class OrderedHashMapTest extends TestCase
 
     public function testIterationSupportsDeletionOfMultiplePreviousElements()
     {
-        $map = new OrderedHashMap(['removed' => 1, 'alsoremoved' => 2, 'next' => 3, 'onemore' => 4]);
+        $map = new OrderedHashMap(array('removed' => 1, 'alsoremoved' => 2, 'next' => 3, 'onemore' => 4));
         $it = $map->getIterator();
 
         $it->rewind();
@@ -437,7 +415,7 @@ class OrderedHashMapTest extends TestCase
 
     public function testParallelIteration()
     {
-        $map = new OrderedHashMap(['first' => 1, 'second' => 2]);
+        $map = new OrderedHashMap(array('first' => 1, 'second' => 2));
         $it1 = $map->getIterator();
         $it2 = $map->getIterator();
 

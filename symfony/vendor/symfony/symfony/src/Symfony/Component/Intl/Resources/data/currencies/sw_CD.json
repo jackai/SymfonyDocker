@@ -1,5 +1,5 @@
 {
-    "Version": "36",
+    "Version": "2.1.11.52",
     "Names": {
         "CDF": [
             "FC",
@@ -23,10 +23,6 @@
         ],
         "MRO": [
             "MRO",
-            "Ugwiya ya Moritania (1973–2017)"
-        ],
-        "MRU": [
-            "MRU",
             "Ugwiya ya Moritania"
         ],
         "SCR": [

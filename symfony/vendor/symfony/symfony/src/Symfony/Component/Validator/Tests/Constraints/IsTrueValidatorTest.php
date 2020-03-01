@@ -13,9 +13,8 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\IsTrue;
 use Symfony\Component\Validator\Constraints\IsTrueValidator;
-use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-class IsTrueValidatorTest extends ConstraintValidatorTestCase
+class IsTrueValidatorTest extends AbstractConstraintValidatorTest
 {
     protected function createValidator()
     {
@@ -38,9 +37,9 @@ class IsTrueValidatorTest extends ConstraintValidatorTestCase
 
     public function testFalseIsInvalid()
     {
-        $constraint = new IsTrue([
+        $constraint = new IsTrue(array(
             'message' => 'myMessage',
-        ]);
+        ));
 
         $this->validator->validate(false, $constraint);
 

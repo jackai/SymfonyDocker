@@ -12,21 +12,36 @@
 namespace Symfony\Component\Form\Extension\Core\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Form\Exception\UnexpectedTypeException;
-use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 class MergeCollectionListener implements EventSubscriberInterface
 {
+    /**
+     * Whether elements may be added to the collection.
+     *
+     * @var bool
+     */
     private $allowAdd;
+
+    /**
+     * Whether elements may be removed from the collection.
+     *
+     * @var bool
+     */
     private $allowDelete;
 
     /**
-     * @param bool $allowAdd    Whether values might be added to the collection
-     * @param bool $allowDelete Whether values might be removed from the collection
+     * Creates a new listener.
+     *
+     * @param bool $allowAdd    Whether values might be added to the
+     *                          collection.
+     * @param bool $allowDelete Whether values might be removed from the
+     *                          collection.
      */
     public function __construct($allowAdd = false, $allowDelete = false)
     {
@@ -36,9 +51,9 @@ class MergeCollectionListener implements EventSubscriberInterface
 
     public static function getSubscribedEvents()
     {
-        return [
+        return array(
             FormEvents::SUBMIT => 'onSubmit',
-        ];
+        );
     }
 
     public function onSubmit(FormEvent $event)
@@ -47,14 +62,14 @@ class MergeCollectionListener implements EventSubscriberInterface
         $data = $event->getData();
 
         if (null === $data) {
-            $data = [];
+            $data = array();
         }
 
-        if (!\is_array($data) && !($data instanceof \Traversable && $data instanceof \ArrayAccess)) {
+        if (!is_array($data) && !($data instanceof \Traversable && $data instanceof \ArrayAccess)) {
             throw new UnexpectedTypeException($data, 'array or (\Traversable and \ArrayAccess)');
         }
 
-        if (null !== $dataToMergeInto && !\is_array($dataToMergeInto) && !($dataToMergeInto instanceof \Traversable && $dataToMergeInto instanceof \ArrayAccess)) {
+        if (null !== $dataToMergeInto && !is_array($dataToMergeInto) && !($dataToMergeInto instanceof \Traversable && $dataToMergeInto instanceof \ArrayAccess)) {
             throw new UnexpectedTypeException($dataToMergeInto, 'array or (\Traversable and \ArrayAccess)');
         }
 
@@ -65,15 +80,15 @@ class MergeCollectionListener implements EventSubscriberInterface
             return;
         }
 
-        if (null === $dataToMergeInto) {
+        if (!$dataToMergeInto) {
             // No original data was set. Set it if allowed
             if ($this->allowAdd) {
                 $dataToMergeInto = $data;
             }
         } else {
             // Calculate delta
-            $itemsToAdd = \is_object($data) ? clone $data : $data;
-            $itemsToDelete = [];
+            $itemsToAdd = is_object($data) ? clone $data : $data;
+            $itemsToDelete = array();
 
             foreach ($dataToMergeInto as $beforeKey => $beforeItem) {
                 foreach ($data as $afterKey => $afterItem) {

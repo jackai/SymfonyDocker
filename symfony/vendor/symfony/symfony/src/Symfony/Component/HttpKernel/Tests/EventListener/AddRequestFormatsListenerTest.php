@@ -11,9 +11,8 @@
 
 namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
-use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\EventListener\AddRequestFormatsListener;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
@@ -21,7 +20,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
  *
  * @author Gildas Quemener <gildas.quemener@gmail.com>
  */
-class AddRequestFormatsListenerTest extends TestCase
+class AddRequestFormatsListenerTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var AddRequestFormatsListener
@@ -30,7 +29,7 @@ class AddRequestFormatsListenerTest extends TestCase
 
     protected function setUp()
     {
-        $this->listener = new AddRequestFormatsListener(['csv' => ['text/csv', 'text/plain']]);
+        $this->listener = new AddRequestFormatsListener(array('csv' => array('text/csv', 'text/plain')));
     }
 
     protected function tearDown()
@@ -46,7 +45,7 @@ class AddRequestFormatsListenerTest extends TestCase
     public function testRegisteredEvent()
     {
         $this->assertEquals(
-            [KernelEvents::REQUEST => ['onKernelRequest', 1]],
+            array(KernelEvents::REQUEST => 'onKernelRequest'),
             AddRequestFormatsListener::getSubscribedEvents()
         );
     }
@@ -58,14 +57,14 @@ class AddRequestFormatsListenerTest extends TestCase
 
         $request->expects($this->once())
             ->method('setFormat')
-            ->with('csv', ['text/csv', 'text/plain']);
+            ->with('csv', array('text/csv', 'text/plain'));
 
         $this->listener->onKernelRequest($event);
     }
 
     protected function getRequestMock()
     {
-        return $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->getMock();
+        return $this->getMock('Symfony\Component\HttpFoundation\Request');
     }
 
     protected function getGetResponseEventMock(Request $request)
@@ -77,7 +76,7 @@ class AddRequestFormatsListenerTest extends TestCase
 
         $event->expects($this->any())
             ->method('getRequest')
-            ->willReturn($request);
+            ->will($this->returnValue($request));
 
         return $event;
     }

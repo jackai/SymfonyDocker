@@ -13,6 +13,7 @@ namespace Symfony\Component\Intl\Tests\Data\Provider;
 
 use Symfony\Component\Intl\Data\Provider\LocaleDataProvider;
 use Symfony\Component\Intl\Intl;
+use Symfony\Component\Intl\Locale;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -23,7 +24,6 @@ abstract class AbstractLocaleDataProviderTest extends AbstractDataProviderTest
      * @var LocaleDataProvider
      */
     protected $dataProvider;
-    private $defaultLocale;
 
     protected function setUp()
     {
@@ -33,13 +33,6 @@ abstract class AbstractLocaleDataProviderTest extends AbstractDataProviderTest
             $this->getDataDirectory().'/'.Intl::LOCALE_DIR,
             $this->createEntryReader()
         );
-
-        $this->defaultLocale = \Locale::getDefault();
-    }
-
-    protected function tearDown()
-    {
-        \Locale::setDefault($this->defaultLocale);
     }
 
     abstract protected function getDataDirectory();
@@ -63,15 +56,12 @@ abstract class AbstractLocaleDataProviderTest extends AbstractDataProviderTest
 
         sort($locales);
 
-        // We can't assert on exact list of locale, as there's too many variations.
-        // The best we can do is to make sure getNames() returns a subset of what getLocales() returns.
-        $this->assertNotEmpty($locales);
-        $this->assertEmpty(array_diff($locales, $this->getLocales()));
+        $this->assertSame($this->getLocales(), $locales);
     }
 
     public function testGetNamesDefaultLocale()
     {
-        \Locale::setDefault('de_AT');
+        Locale::setDefault('de_AT');
 
         $this->assertSame(
             $this->dataProvider->getNames('de_AT'),
@@ -107,7 +97,7 @@ abstract class AbstractLocaleDataProviderTest extends AbstractDataProviderTest
 
     public function testGetNameDefaultLocale()
     {
-        \Locale::setDefault('de_AT');
+        Locale::setDefault('de_AT');
 
         $names = $this->dataProvider->getNames('de_AT');
 

@@ -1,5 +1,5 @@
 {
-    "Version": "36",
+    "Version": "2.1.11.86",
     "Names": {
         "USD": [
             "US$",
@@ -8,10 +8,6 @@
         "UYU": [
             "$",
             "peso uruguayo"
-        ],
-        "UYW": [
-            "UP",
-            "unidad previsional uruguayo"
         ]
     }
 }

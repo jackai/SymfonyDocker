@@ -17,13 +17,18 @@ use Symfony\Component\Security\Core\Exception\BadCredentialsException;
  * @author Elnur Abdurrakhimov <elnur@elnur.pro>
  * @author Terje Bråten <terje@braten.be>
  */
-class BCryptPasswordEncoder extends BasePasswordEncoder implements SelfSaltingEncoderInterface
+class BCryptPasswordEncoder extends BasePasswordEncoder
 {
     const MAX_PASSWORD_LENGTH = 72;
 
+    /**
+     * @var string
+     */
     private $cost;
 
     /**
+     * Constructor.
+     *
      * @param int $cost The algorithmic cost that should be used
      *
      * @throws \RuntimeException         When no BCrypt encoder is available
@@ -57,7 +62,7 @@ class BCryptPasswordEncoder extends BasePasswordEncoder implements SelfSaltingEn
      *
      * @throws BadCredentialsException when the given password is too long
      *
-     * @see http://lxr.php.net/xref/PHP_5_5/ext/standard/password.c#111
+     * @link http://lxr.php.net/xref/PHP_5_5/ext/standard/password.c#111
      */
     public function encodePassword($raw, $salt)
     {
@@ -65,7 +70,7 @@ class BCryptPasswordEncoder extends BasePasswordEncoder implements SelfSaltingEn
             throw new BadCredentialsException('Invalid password.');
         }
 
-        $options = ['cost' => $this->cost];
+        $options = array('cost' => $this->cost);
 
         if ($salt) {
             // Ignore $salt, the auto-generated one is always the best

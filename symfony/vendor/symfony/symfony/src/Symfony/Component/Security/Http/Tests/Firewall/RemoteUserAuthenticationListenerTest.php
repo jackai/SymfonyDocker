@@ -11,23 +11,22 @@
 
 namespace Symfony\Component\Security\Http\Tests\Firewall;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Http\Firewall\RemoteUserAuthenticationListener;
 
-class RemoteUserAuthenticationListenerTest extends TestCase
+class RemoteUserAuthenticationListenerTest extends \PHPUnit_Framework_TestCase
 {
     public function testGetPreAuthenticatedData()
     {
-        $serverVars = [
+        $serverVars = array(
             'REMOTE_USER' => 'TheUser',
-        ];
+        );
 
-        $request = new Request([], [], [], [], [], $serverVars);
+        $request = new Request(array(), array(), array(), array(), array(), $serverVars);
 
-        $tokenStorage = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')->getMock();
+        $tokenStorage = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface');
 
-        $authenticationManager = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface')->getMock();
+        $authenticationManager = $this->getMock('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface');
 
         $listener = new RemoteUserAuthenticationListener(
             $tokenStorage,
@@ -38,18 +37,20 @@ class RemoteUserAuthenticationListenerTest extends TestCase
         $method = new \ReflectionMethod($listener, 'getPreAuthenticatedData');
         $method->setAccessible(true);
 
-        $result = $method->invokeArgs($listener, [$request]);
-        $this->assertSame($result, ['TheUser', null]);
+        $result = $method->invokeArgs($listener, array($request));
+        $this->assertSame($result, array('TheUser', null));
     }
 
+    /**
+     * @expectedException \Symfony\Component\Security\Core\Exception\BadCredentialsException
+     */
     public function testGetPreAuthenticatedDataNoUser()
     {
-        $this->expectException('Symfony\Component\Security\Core\Exception\BadCredentialsException');
-        $request = new Request([], [], [], [], [], []);
+        $request = new Request(array(), array(), array(), array(), array(), array());
 
-        $tokenStorage = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')->getMock();
+        $tokenStorage = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface');
 
-        $authenticationManager = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface')->getMock();
+        $authenticationManager = $this->getMock('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface');
 
         $listener = new RemoteUserAuthenticationListener(
             $tokenStorage,
@@ -60,19 +61,19 @@ class RemoteUserAuthenticationListenerTest extends TestCase
         $method = new \ReflectionMethod($listener, 'getPreAuthenticatedData');
         $method->setAccessible(true);
 
-        $method->invokeArgs($listener, [$request]);
+        $result = $method->invokeArgs($listener, array($request));
     }
 
     public function testGetPreAuthenticatedDataWithDifferentKeys()
     {
-        $userCredentials = ['TheUser', null];
+        $userCredentials = array('TheUser', null);
 
-        $request = new Request([], [], [], [], [], [
+        $request = new Request(array(), array(), array(), array(), array(), array(
             'TheUserKey' => 'TheUser',
-        ]);
-        $tokenStorage = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')->getMock();
+        ));
+        $tokenStorage = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface');
 
-        $authenticationManager = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface')->getMock();
+        $authenticationManager = $this->getMock('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface');
 
         $listener = new RemoteUserAuthenticationListener(
             $tokenStorage,
@@ -84,7 +85,7 @@ class RemoteUserAuthenticationListenerTest extends TestCase
         $method = new \ReflectionMethod($listener, 'getPreAuthenticatedData');
         $method->setAccessible(true);
 
-        $result = $method->invokeArgs($listener, [$request]);
+        $result = $method->invokeArgs($listener, array($request));
         $this->assertSame($result, $userCredentials);
     }
 }

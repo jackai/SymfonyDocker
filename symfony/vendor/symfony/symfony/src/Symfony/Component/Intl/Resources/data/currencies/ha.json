@@ -1,5 +1,5 @@
 {
-    "Version": "36",
+    "Version": "2.1.7.39",
     "Names": {
         "AED": [
             "AED",
@@ -21,10 +21,6 @@
             "BIF",
             "Kuɗin Burundi"
         ],
-        "BRL": [
-            "R$",
-            "Ril Kudin Birazil"
-        ],
         "BWP": [
             "BWP",
             "Kuɗin Baswana"
@@ -43,7 +39,7 @@
         ],
         "CNY": [
             "CN¥",
-            "Yuwan kasar Sin"
+            "Kuɗin Caina\/Sin"
         ],
         "CVE": [
             "CVE",
@@ -75,7 +71,7 @@
         ],
         "GBP": [
             "£",
-            "Fam na Ingila"
+            "Fam kin Ingila"
         ],
         "GHC": [
             "GHC",
@@ -94,8 +90,8 @@
             "Kuɗin Indiya"
         ],
         "JPY": [
-            "¥",
-            "Yen kasar Japan"
+            "JP¥",
+            "Kuɗin Japan"
         ],
         "KES": [
             "KES",
@@ -127,10 +123,6 @@
         ],
         "MRO": [
             "MRO",
-            "Kuɗin Moritaniya (1973–2017)"
-        ],
-        "MRU": [
-            "MRU",
             "Kuɗin Moritaniya"
         ],
         "MUR": [
@@ -151,11 +143,7 @@
         ],
         "NGN": [
             "₦",
-            "Nairar Najeriya"
-        ],
-        "RUB": [
-            "RUB",
-            "Ruble kasar Rasha"
+            "Naira"
         ],
         "RWF": [
             "RWF",
@@ -187,10 +175,6 @@
         ],
         "STD": [
             "STD",
-            "Kuɗin Sawo Tome da Paransip (1977–2017)"
-        ],
-        "STN": [
-            "STN",
             "Kuɗin Sawo Tome da Paransip"
         ],
         "SZL": [
@@ -210,8 +194,8 @@
             "Sule Yuganda"
         ],
         "USD": [
-            "$",
-            "Dalar Amirka"
+            "US$",
+            "Dalar Amurka"
         ],
         "XAF": [
             "FCFA",

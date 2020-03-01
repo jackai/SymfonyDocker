@@ -11,46 +11,53 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\ParameterBag;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 
-class FrozenParameterBagTest extends TestCase
+class FrozenParameterBagTest extends \PHPUnit_Framework_TestCase
 {
     public function testConstructor()
     {
-        $parameters = [
+        $parameters = array(
             'foo' => 'foo',
             'bar' => 'bar',
-        ];
+        );
         $bag = new FrozenParameterBag($parameters);
         $this->assertEquals($parameters, $bag->all(), '__construct() takes an array of parameters as its first argument');
     }
 
+    /**
+     * @expectedException \LogicException
+     */
     public function testClear()
     {
-        $this->expectException('LogicException');
-        $bag = new FrozenParameterBag([]);
+        $bag = new FrozenParameterBag(array());
         $bag->clear();
     }
 
+    /**
+     * @expectedException \LogicException
+     */
     public function testSet()
     {
-        $this->expectException('LogicException');
-        $bag = new FrozenParameterBag([]);
+        $bag = new FrozenParameterBag(array());
         $bag->set('foo', 'bar');
     }
 
+    /**
+     * @expectedException \LogicException
+     */
     public function testAdd()
     {
-        $this->expectException('LogicException');
-        $bag = new FrozenParameterBag([]);
-        $bag->add([]);
+        $bag = new FrozenParameterBag(array());
+        $bag->add(array());
     }
 
+    /**
+     * @expectedException \LogicException
+     */
     public function testRemove()
     {
-        $this->expectException('LogicException');
-        $bag = new FrozenParameterBag(['foo' => 'bar']);
+        $bag = new FrozenParameterBag(array('foo' => 'bar'));
         $bag->remove('foo');
     }
 }

@@ -26,10 +26,7 @@ class ChainUserProvider implements UserProviderInterface
 {
     private $providers;
 
-    /**
-     * @param iterable|UserProviderInterface[] $providers
-     */
-    public function __construct($providers)
+    public function __construct(array $providers)
     {
         $this->providers = $providers;
     }
@@ -39,10 +36,6 @@ class ChainUserProvider implements UserProviderInterface
      */
     public function getProviders()
     {
-        if ($this->providers instanceof \Traversable) {
-            return iterator_to_array($this->providers);
-        }
-
         return $this->providers;
     }
 
@@ -73,10 +66,6 @@ class ChainUserProvider implements UserProviderInterface
 
         foreach ($this->providers as $provider) {
             try {
-                if (!$provider->supportsClass(\get_class($user))) {
-                    continue;
-                }
-
                 return $provider->refreshUser($user);
             } catch (UnsupportedUserException $e) {
                 // try next one
@@ -91,7 +80,7 @@ class ChainUserProvider implements UserProviderInterface
             $e->setUsername($user->getUsername());
             throw $e;
         } else {
-            throw new UnsupportedUserException(sprintf('The account "%s" is not supported.', \get_class($user)));
+            throw new UnsupportedUserException(sprintf('The account "%s" is not supported.', get_class($user)));
         }
     }
 

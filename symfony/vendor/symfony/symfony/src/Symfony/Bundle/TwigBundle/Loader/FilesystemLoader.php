@@ -14,8 +14,6 @@ namespace Symfony\Bundle\TwigBundle\Loader;
 use Symfony\Component\Config\FileLocatorInterface;
 use Symfony\Component\Templating\TemplateNameParserInterface;
 use Symfony\Component\Templating\TemplateReferenceInterface;
-use Twig\Error\LoaderError;
-use Twig\Loader\FilesystemLoader as BaseFilesystemLoader;
 
 /**
  * FilesystemLoader extends the default Twig filesystem loader
@@ -23,17 +21,20 @@ use Twig\Loader\FilesystemLoader as BaseFilesystemLoader;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class FilesystemLoader extends BaseFilesystemLoader
+class FilesystemLoader extends \Twig_Loader_Filesystem
 {
     protected $locator;
     protected $parser;
 
     /**
-     * @param string|null $rootPath The root path common to all relative paths (null for getcwd())
+     * Constructor.
+     *
+     * @param FileLocatorInterface        $locator A FileLocatorInterface instance
+     * @param TemplateNameParserInterface $parser  A TemplateNameParserInterface instance
      */
-    public function __construct(FileLocatorInterface $locator, TemplateNameParserInterface $parser, $rootPath = null)
+    public function __construct(FileLocatorInterface $locator, TemplateNameParserInterface $parser)
     {
-        parent::__construct([], $rootPath);
+        parent::__construct(array());
 
         $this->locator = $locator;
         $this->parser = $parser;
@@ -57,11 +58,10 @@ class FilesystemLoader extends BaseFilesystemLoader
      * Otherwise the template is located using the locator from the twig library.
      *
      * @param string|TemplateReferenceInterface $template The template
-     * @param bool                              $throw    When true, a LoaderError exception will be thrown if a template could not be found
      *
      * @return string The path to the template file
      *
-     * @throws LoaderError if the template could not be found
+     * @throws \Twig_Error_Loader if the template could not be found
      */
     protected function findTemplate($template, $throw = true)
     {
@@ -72,9 +72,10 @@ class FilesystemLoader extends BaseFilesystemLoader
         }
 
         $file = null;
+        $previous = null;
         try {
             $file = parent::findTemplate($logicalName);
-        } catch (LoaderError $e) {
+        } catch (\Twig_Error_Loader $e) {
             $twigLoaderException = $e;
 
             // for BC
@@ -86,11 +87,7 @@ class FilesystemLoader extends BaseFilesystemLoader
         }
 
         if (false === $file || null === $file) {
-            if ($throw) {
-                throw $twigLoaderException;
-            }
-
-            return false;
+            throw $twigLoaderException;
         }
 
         return $this->cache[$logicalName] = $file;

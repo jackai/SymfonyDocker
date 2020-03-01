@@ -1,5 +1,5 @@
 {
-    "Version": "36",
+    "Version": "2.1.12.94",
     "Names": {
         "ADP": [
             "ADP",
@@ -7,7 +7,7 @@
         ],
         "AED": [
             "AED",
-            "dirham ZEA"
+            "dirham arabski"
         ],
         "AFA": [
             "AFA",
@@ -15,7 +15,7 @@
         ],
         "AFN": [
             "AFN",
-            "afgani afgańskie"
+            "afgani"
         ],
         "ALL": [
             "ALL",
@@ -31,7 +31,7 @@
         ],
         "AOA": [
             "AOA",
-            "kwanza angolska"
+            "kwanza angolańska"
         ],
         "AOK": [
             "AOK",
@@ -139,7 +139,7 @@
         ],
         "BOB": [
             "BOB",
-            "boliviano boliwijskie"
+            "boliviano"
         ],
         "BOP": [
             "BOP",
@@ -193,13 +193,9 @@
             "BYB",
             "rubel białoruski (1994–1999)"
         ],
-        "BYN": [
-            "BYN",
-            "rubel białoruski"
-        ],
         "BYR": [
             "BYR",
-            "rubel białoruski (2000–2016)"
+            "rubel białoruski"
         ],
         "BZD": [
             "BZD",
@@ -220,10 +216,6 @@
         "CLP": [
             "CLP",
             "peso chilijskie"
-        ],
-        "CNH": [
-            "CNH",
-            "juan chiński (rynek zewnętrzny)"
         ],
         "CNY": [
             "CNY",
@@ -331,7 +323,7 @@
         ],
         "FJD": [
             "FJD",
-            "dolar fidżyjski"
+            "dolar fidżi"
         ],
         "FKP": [
             "FKP",
@@ -359,7 +351,7 @@
         ],
         "GHS": [
             "GHS",
-            "cedi ghańskie"
+            "cedi ghański"
         ],
         "GIP": [
             "GIP",
@@ -419,7 +411,7 @@
         ],
         "HTG": [
             "HTG",
-            "gourde haitański"
+            "gourde haitańskie"
         ],
         "HUF": [
             "HUF",
@@ -595,11 +587,7 @@
         ],
         "MRO": [
             "MRO",
-            "ouguiya mauretańska (1973–2017)"
-        ],
-        "MRU": [
-            "MRU",
-            "ugija mauretańska"
+            "ouguiya mauretańska"
         ],
         "MTL": [
             "MTL",
@@ -619,7 +607,7 @@
         ],
         "MWK": [
             "MWK",
-            "kwacha malawijska"
+            "kwacha malawska"
         ],
         "MXN": [
             "MXN",
@@ -691,15 +679,15 @@
         ],
         "PEN": [
             "PEN",
-            "sol peruwiański"
+            "nowy sol peruwiański"
         ],
         "PES": [
             "PES",
-            "sol peruwiański (1863–1965)"
+            "sol peruwiański"
         ],
         "PGK": [
             "PGK",
-            "kina papuańska"
+            "kina Papua Nowa Gwinea"
         ],
         "PHP": [
             "PHP",
@@ -791,7 +779,7 @@
         ],
         "SHP": [
             "SHP",
-            "funt Świętej Heleny"
+            "funt Wyspy Świętej Heleny"
         ],
         "SIT": [
             "SIT",
@@ -823,10 +811,6 @@
         ],
         "STD": [
             "STD",
-            "dobra Wysp Świętego Tomasza i Książęcej (1977–2017)"
-        ],
-        "STN": [
-            "STN",
             "dobra Wysp Świętego Tomasza i Książęcej"
         ],
         "SUR": [
@@ -935,10 +919,6 @@
         ],
         "VEF": [
             "VEF",
-            "boliwar wenezuelski (2008–2018)"
-        ],
-        "VES": [
-            "VES",
             "boliwar wenezuelski"
         ],
         "VND": [
@@ -947,11 +927,11 @@
         ],
         "VUV": [
             "VUV",
-            "vatu wanuackie"
+            "vatu Vanuatu"
         ],
         "WST": [
             "WST",
-            "tala samoańskie"
+            "tala samoańska"
         ],
         "XAF": [
             "FCFA",

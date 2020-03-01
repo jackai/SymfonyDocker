@@ -13,6 +13,7 @@ namespace Symfony\Component\Intl\Tests\Data\Provider;
 
 use Symfony\Component\Intl\Data\Provider\LanguageDataProvider;
 use Symfony\Component\Intl\Intl;
+use Symfony\Component\Intl\Locale;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -21,7 +22,7 @@ abstract class AbstractLanguageDataProviderTest extends AbstractDataProviderTest
 {
     // The below arrays document the state of the ICU data bundled with this package.
 
-    protected static $languages = [
+    protected static $languages = array(
         'aa',
         'ab',
         'ace',
@@ -51,7 +52,6 @@ abstract class AbstractLanguageDataProviderTest extends AbstractDataProviderTest
         'aro',
         'arp',
         'arq',
-        'ars',
         'arw',
         'ary',
         'arz',
@@ -64,7 +64,7 @@ abstract class AbstractLanguageDataProviderTest extends AbstractDataProviderTest
         'awa',
         'ay',
         'az',
-        'az_Arab',
+        'azb',
         'ba',
         'bal',
         'ban',
@@ -81,7 +81,6 @@ abstract class AbstractLanguageDataProviderTest extends AbstractDataProviderTest
         'bfd',
         'bfq',
         'bg',
-        'bgn',
         'bho',
         'bi',
         'bik',
@@ -110,7 +109,6 @@ abstract class AbstractLanguageDataProviderTest extends AbstractDataProviderTest
         'car',
         'cay',
         'cch',
-        'ccp',
         'ce',
         'ceb',
         'cgg',
@@ -124,14 +122,12 @@ abstract class AbstractLanguageDataProviderTest extends AbstractDataProviderTest
         'chp',
         'chr',
         'chy',
-        'cic',
         'ckb',
         'co',
         'cop',
         'cps',
         'cr',
         'crh',
-        'crs',
         'cs',
         'csb',
         'cu',
@@ -184,7 +180,6 @@ abstract class AbstractLanguageDataProviderTest extends AbstractDataProviderTest
         'ewo',
         'ext',
         'fa',
-        'fa_AF',
         'fan',
         'fat',
         'ff',
@@ -344,9 +339,7 @@ abstract class AbstractLanguageDataProviderTest extends AbstractDataProviderTest
         'ln',
         'lo',
         'lol',
-        'lou',
         'loz',
-        'lrc',
         'lt',
         'ltg',
         'lu',
@@ -408,7 +401,6 @@ abstract class AbstractLanguageDataProviderTest extends AbstractDataProviderTest
         'nb',
         'nd',
         'nds',
-        'nds_NL',
         'ne',
         'new',
         'ng',
@@ -449,7 +441,6 @@ abstract class AbstractLanguageDataProviderTest extends AbstractDataProviderTest
         'pap',
         'pau',
         'pcd',
-        'pcm',
         'pdc',
         'pdt',
         'peo',
@@ -503,7 +494,6 @@ abstract class AbstractLanguageDataProviderTest extends AbstractDataProviderTest
         'sco',
         'sd',
         'sdc',
-        'sdh',
         'se',
         'see',
         'seh',
@@ -534,7 +524,6 @@ abstract class AbstractLanguageDataProviderTest extends AbstractDataProviderTest
         'sog',
         'sq',
         'sr',
-        'sr_ME',
         'srn',
         'srr',
         'ss',
@@ -547,8 +536,8 @@ abstract class AbstractLanguageDataProviderTest extends AbstractDataProviderTest
         'sux',
         'sv',
         'sw',
-        'sw_CD',
         'swb',
+        'swc',
         'syc',
         'syr',
         'szl',
@@ -615,7 +604,6 @@ abstract class AbstractLanguageDataProviderTest extends AbstractDataProviderTest
         'wal',
         'war',
         'was',
-        'wbp',
         'wo',
         'wuu',
         'xal',
@@ -643,174 +631,175 @@ abstract class AbstractLanguageDataProviderTest extends AbstractDataProviderTest
         'zun',
         'zxx',
         'zza',
-    ];
+    );
 
-    protected static $alpha2ToAlpha3 = [
+    protected static $alpha2ToAlpha3 = array(
         'aa' => 'aar',
         'ab' => 'abk',
+        'ae' => 'ave',
         'af' => 'afr',
         'ak' => 'aka',
         'am' => 'amh',
-        'ar' => 'ara',
         'an' => 'arg',
+        'ar' => 'ara',
         'as' => 'asm',
         'av' => 'ava',
-        'ae' => 'ave',
         'ay' => 'aym',
         'az' => 'aze',
         'ba' => 'bak',
-        'bm' => 'bam',
         'be' => 'bel',
-        'bn' => 'ben',
-        'bi' => 'bis',
-        'bo' => 'bod',
-        'bs' => 'bos',
-        'br' => 'bre',
         'bg' => 'bul',
+        'bh' => 'bih',
+        'bi' => 'bis',
+        'bm' => 'bam',
+        'bn' => 'ben',
+        'bo' => 'bod',
+        'br' => 'bre',
+        'bs' => 'bos',
         'ca' => 'cat',
-        'cs' => 'ces',
-        'ch' => 'cha',
         'ce' => 'che',
-        'cu' => 'chu',
-        'cv' => 'chv',
-        'kw' => 'cor',
+        'ch' => 'cha',
         'co' => 'cos',
         'cr' => 'cre',
+        'cs' => 'ces',
+        'cu' => 'chu',
+        'cv' => 'chv',
         'cy' => 'cym',
         'da' => 'dan',
         'de' => 'deu',
         'dv' => 'div',
         'dz' => 'dzo',
+        'ee' => 'ewe',
         'el' => 'ell',
         'en' => 'eng',
         'eo' => 'epo',
+        'es' => 'spa',
         'et' => 'est',
         'eu' => 'eus',
-        'ee' => 'ewe',
-        'fo' => 'fao',
         'fa' => 'fas',
-        'fj' => 'fij',
+        'ff' => 'ful',
         'fi' => 'fin',
+        'fj' => 'fij',
+        'fo' => 'fao',
         'fr' => 'fra',
         'fy' => 'fry',
-        'ff' => 'ful',
-        'gd' => 'gla',
         'ga' => 'gle',
+        'gd' => 'gla',
         'gl' => 'glg',
-        'gv' => 'glv',
         'gn' => 'grn',
         'gu' => 'guj',
-        'ht' => 'hat',
+        'gv' => 'glv',
         'ha' => 'hau',
         'he' => 'heb',
-        'hz' => 'her',
         'hi' => 'hin',
         'ho' => 'hmo',
         'hr' => 'hrv',
+        'ht' => 'hat',
         'hu' => 'hun',
         'hy' => 'hye',
-        'ig' => 'ibo',
-        'io' => 'ido',
-        'ii' => 'iii',
-        'iu' => 'iku',
-        'ie' => 'ile',
+        'hz' => 'her',
         'ia' => 'ina',
         'id' => 'ind',
+        'ie' => 'ile',
+        'ig' => 'ibo',
+        'ii' => 'iii',
         'ik' => 'ipk',
+        'io' => 'ido',
         'is' => 'isl',
         'it' => 'ita',
-        'jv' => 'jav',
+        'iu' => 'iku',
         'ja' => 'jpn',
-        'kl' => 'kal',
-        'kn' => 'kan',
-        'ks' => 'kas',
+        'jv' => 'jav',
         'ka' => 'kat',
-        'kr' => 'kau',
-        'kk' => 'kaz',
-        'km' => 'khm',
-        'ki' => 'kik',
-        'rw' => 'kin',
-        'ky' => 'kir',
-        'kv' => 'kom',
         'kg' => 'kon',
-        'ko' => 'kor',
+        'ki' => 'kik',
         'kj' => 'kua',
+        'kk' => 'kaz',
+        'kl' => 'kal',
+        'km' => 'khm',
+        'kn' => 'kan',
+        'ko' => 'kor',
+        'kr' => 'kau',
+        'ks' => 'kas',
         'ku' => 'kur',
-        'lo' => 'lao',
+        'kv' => 'kom',
+        'kw' => 'cor',
+        'ky' => 'kir',
         'la' => 'lat',
-        'lv' => 'lav',
+        'lb' => 'ltz',
+        'lg' => 'lug',
         'li' => 'lim',
         'ln' => 'lin',
+        'lo' => 'lao',
         'lt' => 'lit',
-        'lb' => 'ltz',
         'lu' => 'lub',
-        'lg' => 'lug',
-        'mh' => 'mah',
-        'ml' => 'mal',
-        'mr' => 'mar',
-        'mk' => 'mkd',
+        'lv' => 'lav',
         'mg' => 'mlg',
-        'mt' => 'mlt',
-        'mn' => 'mon',
+        'mh' => 'mah',
         'mi' => 'mri',
+        'mk' => 'mkd',
+        'ml' => 'mal',
+        'mn' => 'mon',
+        'mr' => 'mar',
         'ms' => 'msa',
+        'mt' => 'mlt',
         'my' => 'mya',
         'na' => 'nau',
-        'nv' => 'nav',
-        'nr' => 'nbl',
+        'nb' => 'nob',
         'nd' => 'nde',
-        'ng' => 'ndo',
         'ne' => 'nep',
+        'ng' => 'ndo',
         'nl' => 'nld',
         'nn' => 'nno',
-        'nb' => 'nob',
+        'nr' => 'nbl',
+        'nv' => 'nav',
         'ny' => 'nya',
         'oc' => 'oci',
         'oj' => 'oji',
-        'or' => 'ori',
         'om' => 'orm',
+        'or' => 'ori',
         'os' => 'oss',
         'pa' => 'pan',
         'pi' => 'pli',
         'pl' => 'pol',
-        'pt' => 'por',
         'ps' => 'pus',
+        'pt' => 'por',
         'qu' => 'que',
         'rm' => 'roh',
-        'ro' => 'ron',
         'rn' => 'run',
+        'ro' => 'ron',
         'ru' => 'rus',
-        'sg' => 'sag',
+        'rw' => 'kin',
         'sa' => 'san',
+        'sc' => 'srd',
+        'sd' => 'snd',
+        'se' => 'sme',
+        'sg' => 'sag',
         'si' => 'sin',
         'sk' => 'slk',
         'sl' => 'slv',
-        'se' => 'sme',
         'sm' => 'smo',
         'sn' => 'sna',
-        'sd' => 'snd',
         'so' => 'som',
-        'st' => 'sot',
-        'es' => 'spa',
         'sq' => 'sqi',
-        'sc' => 'srd',
         'sr' => 'srp',
         'ss' => 'ssw',
+        'st' => 'sot',
         'su' => 'sun',
-        'sw' => 'swa',
         'sv' => 'swe',
-        'ty' => 'tah',
+        'sw' => 'swa',
         'ta' => 'tam',
-        'tt' => 'tat',
         'te' => 'tel',
         'tg' => 'tgk',
         'th' => 'tha',
         'ti' => 'tir',
-        'to' => 'ton',
-        'tn' => 'tsn',
-        'ts' => 'tso',
         'tk' => 'tuk',
+        'tn' => 'tsn',
+        'to' => 'ton',
         'tr' => 'tur',
+        'ts' => 'tso',
+        'tt' => 'tat',
+        'ty' => 'tah',
         'ug' => 'uig',
         'uk' => 'ukr',
         'ur' => 'urd',
@@ -826,13 +815,12 @@ abstract class AbstractLanguageDataProviderTest extends AbstractDataProviderTest
         'za' => 'zha',
         'zh' => 'zho',
         'zu' => 'zul',
-    ];
+    );
 
     /**
      * @var LanguageDataProvider
      */
     protected $dataProvider;
-    private $defaultLocale;
 
     protected function setUp()
     {
@@ -842,15 +830,6 @@ abstract class AbstractLanguageDataProviderTest extends AbstractDataProviderTest
             $this->getDataDirectory().'/'.Intl::LANGUAGE_DIR,
             $this->createEntryReader()
         );
-
-        $this->defaultLocale = \Locale::getDefault();
-    }
-
-    protected function tearDown()
-    {
-        parent::tearDown();
-
-        \Locale::setDefault($this->defaultLocale);
     }
 
     abstract protected function getDataDirectory();
@@ -869,13 +848,12 @@ abstract class AbstractLanguageDataProviderTest extends AbstractDataProviderTest
 
         sort($languages);
 
-        $this->assertNotEmpty($languages);
-        $this->assertEmpty(array_diff($languages, static::$languages));
+        $this->assertEquals(static::$languages, $languages);
     }
 
     public function testGetNamesDefaultLocale()
     {
-        \Locale::setDefault('de_AT');
+        Locale::setDefault('de_AT');
 
         $this->assertSame(
             $this->dataProvider->getNames('de_AT'),
@@ -911,7 +889,7 @@ abstract class AbstractLanguageDataProviderTest extends AbstractDataProviderTest
 
     public function testGetNameDefaultLocale()
     {
-        \Locale::setDefault('de_AT');
+        Locale::setDefault('de_AT');
 
         $names = $this->dataProvider->getNames('de_AT');
 
@@ -923,7 +901,7 @@ abstract class AbstractLanguageDataProviderTest extends AbstractDataProviderTest
     public function provideLanguagesWithAlpha3Equivalent()
     {
         return array_map(
-            function ($value) { return [$value]; },
+            function ($value) { return array($value); },
             array_keys(static::$alpha2ToAlpha3)
         );
     }
@@ -939,17 +917,17 @@ abstract class AbstractLanguageDataProviderTest extends AbstractDataProviderTest
     public function provideLanguagesWithoutAlpha3Equivalent()
     {
         return array_map(
-            function ($value) { return [$value]; },
+            function ($value) { return array($value); },
             array_diff(static::$languages, array_keys(static::$alpha2ToAlpha3))
         );
     }
 
     /**
      * @dataProvider provideLanguagesWithoutAlpha3Equivalent
+     * @expectedException \Symfony\Component\Intl\Exception\MissingResourceException
      */
     public function testGetAlpha3CodeFailsIfNoAlpha3Equivalent($currency)
     {
-        $this->expectException('Symfony\Component\Intl\Exception\MissingResourceException');
         $this->dataProvider->getAlpha3Code($currency);
     }
 }

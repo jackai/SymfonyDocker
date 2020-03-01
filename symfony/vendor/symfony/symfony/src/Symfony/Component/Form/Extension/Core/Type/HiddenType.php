@@ -21,13 +21,13 @@ class HiddenType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults([
+        $resolver->setDefaults(array(
             // hidden fields cannot have a required attribute
             'required' => false,
             // Pass errors to the parent
             'error_bubbling' => true,
             'compound' => false,
-        ]);
+        ));
     }
 
     /**

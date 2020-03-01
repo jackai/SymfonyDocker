@@ -1,5 +1,5 @@
 {
-    "Version": "36",
+    "Version": "2.1.13.23",
     "Names": {
         "CAD": [
             "CAD",
@@ -9,21 +9,13 @@
             "EUR",
             "euro"
         ],
-        "MWK": [
-            "MWK",
-            "kwacha malauí"
-        ],
         "THB": [
             "THB",
-            "baht tailandes"
+            "bat"
         ],
         "USD": [
             "USD",
             "dólar estadounidense"
-        ],
-        "UZS": [
-            "UZS",
-            "som uzbeko"
         ],
         "VND": [
             "VND",

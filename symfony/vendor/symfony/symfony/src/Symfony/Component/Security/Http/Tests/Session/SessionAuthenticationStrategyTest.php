@@ -11,10 +11,9 @@
 
 namespace Symfony\Component\Security\Http\Tests\Session;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategy;
 
-class SessionAuthenticationStrategyTest extends TestCase
+class SessionAuthenticationStrategyTest extends \PHPUnit_Framework_TestCase
 {
     public function testSessionIsNotChanged()
     {
@@ -25,10 +24,12 @@ class SessionAuthenticationStrategyTest extends TestCase
         $strategy->onAuthentication($request, $this->getToken());
     }
 
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage Invalid session authentication strategy "foo"
+     */
     public function testUnsupportedStrategy()
     {
-        $this->expectException('RuntimeException');
-        $this->expectExceptionMessage('Invalid session authentication strategy "foo"');
         $request = $this->getRequest();
         $request->expects($this->never())->method('getSession');
 
@@ -38,7 +39,7 @@ class SessionAuthenticationStrategyTest extends TestCase
 
     public function testSessionIsMigrated()
     {
-        $session = $this->getMockBuilder('Symfony\Component\HttpFoundation\Session\SessionInterface')->getMock();
+        $session = $this->getMock('Symfony\Component\HttpFoundation\Session\SessionInterface');
         $session->expects($this->once())->method('migrate')->with($this->equalTo(true));
 
         $strategy = new SessionAuthenticationStrategy(SessionAuthenticationStrategy::MIGRATE);
@@ -47,7 +48,7 @@ class SessionAuthenticationStrategyTest extends TestCase
 
     public function testSessionIsInvalidated()
     {
-        $session = $this->getMockBuilder('Symfony\Component\HttpFoundation\Session\SessionInterface')->getMock();
+        $session = $this->getMock('Symfony\Component\HttpFoundation\Session\SessionInterface');
         $session->expects($this->once())->method('invalidate');
 
         $strategy = new SessionAuthenticationStrategy(SessionAuthenticationStrategy::INVALIDATE);
@@ -56,10 +57,10 @@ class SessionAuthenticationStrategyTest extends TestCase
 
     private function getRequest($session = null)
     {
-        $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->getMock();
+        $request = $this->getMock('Symfony\Component\HttpFoundation\Request');
 
         if (null !== $session) {
-            $request->expects($this->any())->method('getSession')->willReturn($session);
+            $request->expects($this->any())->method('getSession')->will($this->returnValue($session));
         }
 
         return $request;
@@ -67,6 +68,6 @@ class SessionAuthenticationStrategyTest extends TestCase
 
     private function getToken()
     {
-        return $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
+        return $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
     }
 }

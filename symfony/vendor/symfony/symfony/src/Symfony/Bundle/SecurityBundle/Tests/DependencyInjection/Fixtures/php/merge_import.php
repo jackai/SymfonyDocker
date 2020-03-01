@@ -1,16 +1,15 @@
 <?php
 
-$container->loadFromExtension('security', [
-    'firewalls' => [
-        'main' => [
-            'form_login' => [
+$container->loadFromExtension('security', array(
+    'firewalls' => array(
+        'main' => array(
+            'form_login' => array(
                 'login_path' => '/login',
-            ],
-        'logout_on_user_change' => true,
-        ],
-    ],
-    'role_hierarchy' => [
+            ),
+        ),
+    ),
+    'role_hierarchy' => array(
         'FOO' => 'BAR',
         'ADMIN' => 'USER',
-    ],
-]);
+    ),
+));

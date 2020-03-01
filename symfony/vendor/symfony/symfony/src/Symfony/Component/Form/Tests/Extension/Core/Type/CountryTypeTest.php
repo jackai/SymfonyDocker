@@ -11,62 +11,43 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
+use Symfony\Component\Form\Test\TypeTestCase as TestCase;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
-use Symfony\Component\Form\Extension\Core\Type\CountryType;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 
-class CountryTypeTest extends BaseTypeTest
+class CountryTypeTest extends TestCase
 {
-    const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\CountryType';
-
     protected function setUp()
     {
-        IntlTestHelper::requireIntl($this, false);
+        IntlTestHelper::requireIntl($this);
 
         parent::setUp();
     }
 
     public function testCountriesAreSelectable()
     {
-        $choices = $this->factory->create(static::TESTED_TYPE)
-            ->createView()->vars['choices'];
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\CountryType');
+        $view = $form->createView();
+        $choices = $view->vars['choices'];
 
         // Don't check objects for identity
-        $this->assertContainsEquals(new ChoiceView('DE', 'DE', 'Germany'), $choices);
-        $this->assertContainsEquals(new ChoiceView('GB', 'GB', 'United Kingdom'), $choices);
-        $this->assertContainsEquals(new ChoiceView('US', 'US', 'United States'), $choices);
-        $this->assertContainsEquals(new ChoiceView('FR', 'FR', 'France'), $choices);
-        $this->assertContainsEquals(new ChoiceView('MY', 'MY', 'Malaysia'), $choices);
+        $this->assertContains(new ChoiceView('DE', 'DE', 'Germany'), $choices, '', false, false);
+        $this->assertContains(new ChoiceView('GB', 'GB', 'United Kingdom'), $choices, '', false, false);
+        $this->assertContains(new ChoiceView('US', 'US', 'United States'), $choices, '', false, false);
+        $this->assertContains(new ChoiceView('FR', 'FR', 'France'), $choices, '', false, false);
+        $this->assertContains(new ChoiceView('MY', 'MY', 'Malaysia'), $choices, '', false, false);
     }
 
     public function testUnknownCountryIsNotIncluded()
     {
-        $choices = $this->factory->create(static::TESTED_TYPE, 'country')
-            ->createView()->vars['choices'];
-
-        $countryCodes = [];
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\CountryType', 'Symfony\Component\Form\Extension\Core\Type\CountryType');
+        $view = $form->createView();
+        $choices = $view->vars['choices'];
 
         foreach ($choices as $choice) {
-            $countryCodes[] = $choice->value;
+            if ('ZZ' === $choice->value) {
+                $this->fail('Should not contain choice "ZZ"');
+            }
         }
-
-        $this->assertNotContains('ZZ', $countryCodes);
-    }
-
-    public function testSubmitNull($expected = null, $norm = null, $view = null)
-    {
-        parent::testSubmitNull($expected, $norm, '');
-    }
-
-    public function testSubmitNullUsesDefaultEmptyData($emptyData = 'FR', $expectedData = 'FR')
-    {
-        parent::testSubmitNullUsesDefaultEmptyData($emptyData, $expectedData);
-    }
-
-    public function testInvalidChoiceValuesAreDropped()
-    {
-        $type = new CountryType();
-
-        $this->assertSame([], $type->loadChoicesForValues(['foo']));
     }
 }

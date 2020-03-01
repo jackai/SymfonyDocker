@@ -12,10 +12,8 @@
 namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\DataTransformer\IntegerToLocalizedStringTransformer;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\FormView;
+use Symfony\Component\Form\Extension\Core\DataTransformer\IntegerToLocalizedStringTransformer;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class IntegerType extends AbstractType
@@ -36,28 +34,18 @@ class IntegerType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function buildView(FormView $view, FormInterface $form, array $options)
-    {
-        if ($options['grouping']) {
-            $view->vars['type'] = 'text';
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults([
+        $resolver->setDefaults(array(
             // default scale is locale specific (usually around 3)
             'scale' => null,
             'grouping' => false,
             // Integer cast rounds towards 0, so do the same when displaying fractions
             'rounding_mode' => IntegerToLocalizedStringTransformer::ROUND_DOWN,
             'compound' => false,
-        ]);
+        ));
 
-        $resolver->setAllowedValues('rounding_mode', [
+        $resolver->setAllowedValues('rounding_mode', array(
             IntegerToLocalizedStringTransformer::ROUND_FLOOR,
             IntegerToLocalizedStringTransformer::ROUND_DOWN,
             IntegerToLocalizedStringTransformer::ROUND_HALF_DOWN,
@@ -65,9 +53,9 @@ class IntegerType extends AbstractType
             IntegerToLocalizedStringTransformer::ROUND_HALF_UP,
             IntegerToLocalizedStringTransformer::ROUND_UP,
             IntegerToLocalizedStringTransformer::ROUND_CEILING,
-        ]);
+        ));
 
-        $resolver->setAllowedTypes('scale', ['null', 'int']);
+        $resolver->setAllowedTypes('scale', array('null', 'int'));
     }
 
     /**

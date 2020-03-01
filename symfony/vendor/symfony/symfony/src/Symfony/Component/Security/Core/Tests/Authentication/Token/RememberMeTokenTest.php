@@ -11,11 +11,10 @@
 
 namespace Symfony\Component\Security\Core\Tests\Authentication\Token;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
 use Symfony\Component\Security\Core\Role\Role;
 
-class RememberMeTokenTest extends TestCase
+class RememberMeTokenTest extends \PHPUnit_Framework_TestCase
 {
     public function testConstructor()
     {
@@ -24,14 +23,16 @@ class RememberMeTokenTest extends TestCase
 
         $this->assertEquals('fookey', $token->getProviderKey());
         $this->assertEquals('foo', $token->getSecret());
-        $this->assertEquals([new Role('ROLE_FOO')], $token->getRoles());
+        $this->assertEquals(array(new Role('ROLE_FOO')), $token->getRoles());
         $this->assertSame($user, $token->getUser());
         $this->assertTrue($token->isAuthenticated());
     }
 
+    /**
+     * @expectedException \InvalidArgumentException
+     */
     public function testConstructorSecretCannotBeNull()
     {
-        $this->expectException('InvalidArgumentException');
         new RememberMeToken(
             $this->getUser(),
             null,
@@ -39,9 +40,11 @@ class RememberMeTokenTest extends TestCase
         );
     }
 
+    /**
+     * @expectedException \InvalidArgumentException
+     */
     public function testConstructorSecretCannotBeEmptyString()
     {
-        $this->expectException('InvalidArgumentException');
         new RememberMeToken(
             $this->getUser(),
             '',
@@ -49,13 +52,13 @@ class RememberMeTokenTest extends TestCase
         );
     }
 
-    protected function getUser($roles = ['ROLE_FOO'])
+    protected function getUser($roles = array('ROLE_FOO'))
     {
-        $user = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock();
+        $user = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
         $user
             ->expects($this->once())
             ->method('getRoles')
-            ->willReturn($roles)
+            ->will($this->returnValue($roles))
         ;
 
         return $user;

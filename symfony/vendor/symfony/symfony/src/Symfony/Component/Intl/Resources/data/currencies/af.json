@@ -1,9 +1,9 @@
 {
-    "Version": "36",
+    "Version": "2.1.12.94",
     "Names": {
         "AED": [
             "AED",
-            "Verenigde Arabiese Emirate-dirham"
+            "Verenigde Arabiese Emirate dirham"
         ],
         "AFN": [
             "AFN",
@@ -91,22 +91,18 @@
         ],
         "BWP": [
             "BWP",
-            "Botswana-pula"
-        ],
-        "BYN": [
-            "BYN",
-            "Belarusiese roebel"
+            "Botswana pula"
         ],
         "BYR": [
             "BYR",
-            "Belo-Russiese roebel (2000–2016)"
+            "Belo-Russiese roebel"
         ],
         "BZD": [
             "BZD",
             "Beliziese dollar"
         ],
         "CAD": [
-            "CAD",
+            "CA$",
             "Kanadese dollar"
         ],
         "CDF": [
@@ -121,13 +117,9 @@
             "CLP",
             "Chileense peso"
         ],
-        "CNH": [
-            "CNH",
-            "Chinese joean (buiteland)"
-        ],
         "CNY": [
             "CN¥",
-            "Chinese joean"
+            "Sjinese joean renminbi"
         ],
         "COP": [
             "COP",
@@ -155,7 +147,7 @@
         ],
         "DJF": [
             "DJF",
-            "Djiboeti-frank"
+            "Djiboeti frank"
         ],
         "DKK": [
             "DKK",
@@ -183,7 +175,7 @@
         ],
         "EUR": [
             "€",
-            "euro"
+            "Euro"
         ],
         "FJD": [
             "FJD",
@@ -191,7 +183,7 @@
         ],
         "FKP": [
             "FKP",
-            "Falkland-eilandse pond"
+            "Falkland-eilande pond"
         ],
         "GBP": [
             "£",
@@ -235,7 +227,7 @@
         ],
         "HKD": [
             "HK$",
-            "Hongkongse dollar"
+            "Hong Kong dollar"
         ],
         "HNL": [
             "HNL",
@@ -323,7 +315,7 @@
         ],
         "KYD": [
             "KYD",
-            "Cayman-eilandse dollar"
+            "Cayman-eilande dollar"
         ],
         "KZT": [
             "KZT",
@@ -335,7 +327,7 @@
         ],
         "LBP": [
             "LBP",
-            "Libanese pond"
+            "Lebanese pond"
         ],
         "LKR": [
             "LKR",
@@ -391,15 +383,11 @@
         ],
         "MRO": [
             "MRO",
-            "Mauritaniese ouguiya (1973–2017)"
-        ],
-        "MRU": [
-            "MRU",
             "Mauritaniese ouguiya"
         ],
         "MUR": [
             "MUR",
-            "Mauritiaanse roepee"
+            "Mauritiaanse rupee"
         ],
         "MVR": [
             "MVR",
@@ -447,7 +435,7 @@
         ],
         "NZD": [
             "NZ$",
-            "Nieu-Seelandse dollar"
+            "Nieu-Seeland dollar"
         ],
         "OMR": [
             "OMR",
@@ -459,7 +447,7 @@
         ],
         "PEN": [
             "PEN",
-            "Peruaanse sol"
+            "Peruaanse nuwe sol"
         ],
         "PGK": [
             "PGK",
@@ -491,7 +479,7 @@
         ],
         "RSD": [
             "RSD",
-            "Serwiese dinar"
+            "Serbiese dinar"
         ],
         "RUB": [
             "RUB",
@@ -499,7 +487,7 @@
         ],
         "RWF": [
             "RWF",
-            "Rwandese frank"
+            "Rwandiese frank"
         ],
         "SAR": [
             "SAR",
@@ -507,11 +495,11 @@
         ],
         "SBD": [
             "SBD",
-            "Salomonseilandse dollar"
+            "Salomonseilande dollar"
         ],
         "SCR": [
             "SCR",
-            "Seychellese roepee"
+            "Seychellese rupee"
         ],
         "SDG": [
             "SDG",
@@ -527,11 +515,11 @@
         ],
         "SGD": [
             "SGD",
-            "Singapoer-dollar"
+            "Singapoer dollar"
         ],
         "SHP": [
             "SHP",
-            "Sint Helena-pond"
+            "Sint Helena pond"
         ],
         "SLL": [
             "SLL",
@@ -551,11 +539,7 @@
         ],
         "STD": [
             "STD",
-            "São Tomé en Príncipe dobra (1977–2017)"
-        ],
-        "STN": [
-            "STN",
-            "São Tomé en Príncipe-dobra"
+            "São Tomé en Príncipe dobra"
         ],
         "SYP": [
             "SYP",
@@ -571,7 +555,7 @@
         ],
         "TJS": [
             "TJS",
-            "Tadjikse somoni"
+            "Tadjikse roebel"
         ],
         "TMT": [
             "TMT",
@@ -591,11 +575,11 @@
         ],
         "TRY": [
             "TRY",
-            "Turkse lira"
+            "Turkse lier"
         ],
         "TTD": [
             "TTD",
-            "Trinidad en Tobago-dollar"
+            "Trinidad en Tobago dollar"
         ],
         "TWD": [
             "NT$",
@@ -614,8 +598,8 @@
             "Ugandese sjieling"
         ],
         "USD": [
-            "USD",
-            "VSA-dollar"
+            "US$",
+            "Amerikaanse dollar"
         ],
         "UYU": [
             "UYU",
@@ -628,10 +612,6 @@
         "VEF": [
             "VEF",
             "Venezolaanse bolivar"
-        ],
-        "VES": [
-            "VES",
-            "Venezolaanse bolívar"
         ],
         "VND": [
             "₫",
@@ -647,15 +627,15 @@
         ],
         "XAF": [
             "FCFA",
-            "Sentraal Afrikaanse CFA-frank"
+            "CFA frank BEAC"
         ],
         "XCD": [
             "EC$",
-            "Oos-Karibiese dollar"
+            "Oos-Karibbiese dollar"
         ],
         "XOF": [
             "CFA",
-            "Wes-Afrikaanse CFA-frank"
+            "CFA frank BCEAO"
         ],
         "XPF": [
             "CFPF",

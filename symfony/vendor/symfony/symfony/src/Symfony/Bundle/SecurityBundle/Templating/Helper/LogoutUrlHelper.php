@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\Templating\Helper;
 
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Http\Logout\LogoutUrlGenerator;
 use Symfony\Component\Templating\Helper\Helper;
 
@@ -23,6 +24,11 @@ class LogoutUrlHelper extends Helper
 {
     private $generator;
 
+    /**
+     * Constructor.
+     *
+     * @param LogoutUrlGenerator $generator A LogoutUrlGenerator instance
+     */
     public function __construct(LogoutUrlGenerator $generator)
     {
         $this->generator = $generator;
@@ -37,7 +43,7 @@ class LogoutUrlHelper extends Helper
      */
     public function getLogoutPath($key)
     {
-        return $this->generator->getLogoutPath($key);
+        return $this->generator->getLogoutPath($key, UrlGeneratorInterface::ABSOLUTE_PATH);
     }
 
     /**
@@ -49,7 +55,7 @@ class LogoutUrlHelper extends Helper
      */
     public function getLogoutUrl($key)
     {
-        return $this->generator->getLogoutUrl($key);
+        return $this->generator->getLogoutUrl($key, UrlGeneratorInterface::ABSOLUTE_URL);
     }
 
     /**

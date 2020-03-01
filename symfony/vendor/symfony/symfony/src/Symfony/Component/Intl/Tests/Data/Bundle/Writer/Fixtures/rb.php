@@ -1,7 +1,7 @@
 <?php
 
-return [
-    'Entry' => [
+return array(
+    'Entry' => array(
         'NestedEntry' => 'Value',
-    ],
-];
+    ),
+);

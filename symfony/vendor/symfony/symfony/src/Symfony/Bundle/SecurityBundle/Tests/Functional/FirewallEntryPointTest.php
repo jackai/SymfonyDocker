@@ -13,16 +13,16 @@ namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
 use Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\FirewallEntryPointBundle\Security\EntryPointStub;
 
-class FirewallEntryPointTest extends AbstractWebTestCase
+class FirewallEntryPointTest extends WebTestCase
 {
     public function testItUsesTheConfiguredEntryPointWhenUsingUnknownCredentials()
     {
-        $client = $this->createClient(['test_case' => 'FirewallEntryPoint']);
+        $client = $this->createClient(array('test_case' => 'FirewallEntryPoint'));
 
-        $client->request('GET', '/secure/resource', [], [], [
+        $client->request('GET', '/secure/resource', array(), array(), array(
             'PHP_AUTH_USER' => 'unknown',
             'PHP_AUTH_PW' => 'credentials',
-        ]);
+        ));
 
         $this->assertEquals(
             EntryPointStub::RESPONSE_TEXT,
@@ -33,7 +33,7 @@ class FirewallEntryPointTest extends AbstractWebTestCase
 
     public function testItUsesTheConfiguredEntryPointFromTheExceptionListenerWithFormLoginAndNoCredentials()
     {
-        $client = $this->createClient(['test_case' => 'FirewallEntryPoint', 'root_config' => 'config_form_login.yml']);
+        $client = $this->createClient(array('test_case' => 'FirewallEntryPoint', 'root_config' => 'config_form_login.yml'));
 
         $client->request('GET', '/secure/resource');
 
@@ -42,5 +42,15 @@ class FirewallEntryPointTest extends AbstractWebTestCase
             $client->getResponse()->getContent(),
             "Custom entry point wasn't started"
         );
+    }
+
+    public static function setUpBeforeClass()
+    {
+        parent::deleteTmpDir('FirewallEntryPoint');
+    }
+
+    public static function tearDownAfterClass()
+    {
+        parent::deleteTmpDir('FirewallEntryPoint');
     }
 }

@@ -11,11 +11,10 @@
 
 namespace Symfony\Component\Templating\Tests;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Templating\TemplateNameParser;
 use Symfony\Component\Templating\TemplateReference;
 
-class TemplateNameParserTest extends TestCase
+class TemplateNameParserTest extends \PHPUnit_Framework_TestCase
 {
     protected $parser;
 
@@ -42,10 +41,10 @@ class TemplateNameParserTest extends TestCase
 
     public function getLogicalNameToTemplateProvider()
     {
-        return [
-            ['/path/to/section/name.engine', new TemplateReference('/path/to/section/name.engine', 'engine')],
-            ['name.engine', new TemplateReference('name.engine', 'engine')],
-            ['name', new TemplateReference('name')],
-        ];
+        return array(
+            array('/path/to/section/name.engine', new TemplateReference('/path/to/section/name.engine', 'engine')),
+            array('name.engine', new TemplateReference('name.engine', 'engine')),
+            array('name', new TemplateReference('name')),
+        );
     }
 }

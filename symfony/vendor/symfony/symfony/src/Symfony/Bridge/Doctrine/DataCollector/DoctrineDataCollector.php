@@ -11,14 +11,12 @@
 
 namespace Symfony\Bridge\Doctrine\DataCollector;
 
-use Doctrine\Common\Persistence\ManagerRegistry as LegacyManagerRegistry;
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Logging\DebugStack;
-use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Types\Type;
-use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 
 /**
  * DoctrineDataCollector.
@@ -30,16 +28,9 @@ class DoctrineDataCollector extends DataCollector
     private $registry;
     private $connections;
     private $managers;
+    private $loggers = array();
 
-    /**
-     * @var DebugStack[]
-     */
-    private $loggers = [];
-
-    /**
-     * @param ManagerRegistry|LegacyManagerRegistry $registry
-     */
-    public function __construct($registry)
+    public function __construct(ManagerRegistry $registry)
     {
         $this->registry = $registry;
         $this->connections = $registry->getConnectionNames();
@@ -49,7 +40,8 @@ class DoctrineDataCollector extends DataCollector
     /**
      * Adds the stack logger for a connection.
      *
-     * @param string $name
+     * @param string     $name
+     * @param DebugStack $logger
      */
     public function addLogger($name, DebugStack $logger)
     {
@@ -61,26 +53,16 @@ class DoctrineDataCollector extends DataCollector
      */
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
-        $queries = [];
+        $queries = array();
         foreach ($this->loggers as $name => $logger) {
             $queries[$name] = $this->sanitizeQueries($name, $logger->queries);
         }
 
-        $this->data = [
+        $this->data = array(
             'queries' => $queries,
             'connections' => $this->connections,
             'managers' => $this->managers,
-        ];
-    }
-
-    public function reset()
-    {
-        $this->data = [];
-
-        foreach ($this->loggers as $logger) {
-            $logger->queries = [];
-            $logger->currentQuery = 0;
-        }
+        );
     }
 
     public function getManagers()
@@ -136,31 +118,21 @@ class DoctrineDataCollector extends DataCollector
     {
         $query['explainable'] = true;
         if (null === $query['params']) {
-            $query['params'] = [];
+            $query['params'] = array();
         }
-        if (!\is_array($query['params'])) {
-            $query['params'] = [$query['params']];
-        }
-        if (!\is_array($query['types'])) {
-            $query['types'] = [];
+        if (!is_array($query['params'])) {
+            $query['params'] = array($query['params']);
         }
         foreach ($query['params'] as $j => $param) {
             if (isset($query['types'][$j])) {
                 // Transform the param according to the type
                 $type = $query['types'][$j];
-                if (\is_string($type)) {
+                if (is_string($type)) {
                     $type = Type::getType($type);
                 }
                 if ($type instanceof Type) {
                     $query['types'][$j] = $type->getBindingType();
-                    try {
-                        $param = $type->convertToDatabaseValue($param, $this->registry->getConnection($connectionName)->getDatabasePlatform());
-                    } catch (\TypeError $e) {
-                        // Error thrown while processing params, query is not explainable.
-                        $query['explainable'] = false;
-                    } catch (ConversionException $e) {
-                        $query['explainable'] = false;
-                    }
+                    $param = $type->convertToDatabaseValue($param, $this->registry->getConnection($connectionName)->getDatabasePlatform());
                 }
             }
 
@@ -186,16 +158,12 @@ class DoctrineDataCollector extends DataCollector
      */
     private function sanitizeParam($var)
     {
-        if (\is_object($var)) {
-            $className = \get_class($var);
-
-            return method_exists($var, '__toString') ?
-                [sprintf('Object(%s): "%s"', $className, $var->__toString()), false] :
-                [sprintf('Object(%s)', $className), false];
+        if (is_object($var)) {
+            return array(sprintf('Object(%s)', get_class($var)), false);
         }
 
-        if (\is_array($var)) {
-            $a = [];
+        if (is_array($var)) {
+            $a = array();
             $original = true;
             foreach ($var as $k => $v) {
                 list($value, $orig) = $this->sanitizeParam($v);
@@ -203,13 +171,13 @@ class DoctrineDataCollector extends DataCollector
                 $a[$k] = $value;
             }
 
-            return [$a, $original];
+            return array($a, $original);
         }
 
-        if (\is_resource($var)) {
-            return [sprintf('Resource(%s)', get_resource_type($var)), false];
+        if (is_resource($var)) {
+            return array(sprintf('Resource(%s)', get_resource_type($var)), false);
         }
 
-        return [$var, true];
+        return array($var, true);
     }
 }

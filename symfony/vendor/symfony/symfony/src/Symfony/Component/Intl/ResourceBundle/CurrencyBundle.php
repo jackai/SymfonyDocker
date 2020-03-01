@@ -25,12 +25,17 @@ use Symfony\Component\Intl\Exception\MissingResourceException;
  */
 class CurrencyBundle extends CurrencyDataProvider implements CurrencyBundleInterface
 {
+    /**
+     * @var LocaleDataProvider
+     */
     private $localeProvider;
 
     /**
      * Creates a new currency bundle.
      *
-     * @param string $path
+     * @param string                     $path
+     * @param BundleEntryReaderInterface $reader
+     * @param LocaleDataProvider         $localeProvider
      */
     public function __construct($path, BundleEntryReaderInterface $reader, LocaleDataProvider $localeProvider)
     {
@@ -47,7 +52,7 @@ class CurrencyBundle extends CurrencyDataProvider implements CurrencyBundleInter
         try {
             return $this->getSymbol($currency, $displayLocale);
         } catch (MissingResourceException $e) {
-            return null;
+            return;
         }
     }
 
@@ -59,7 +64,7 @@ class CurrencyBundle extends CurrencyDataProvider implements CurrencyBundleInter
         try {
             return $this->getName($currency, $displayLocale);
         } catch (MissingResourceException $e) {
-            return null;
+            return;
         }
     }
 
@@ -71,7 +76,7 @@ class CurrencyBundle extends CurrencyDataProvider implements CurrencyBundleInter
         try {
             return $this->getNames($displayLocale);
         } catch (MissingResourceException $e) {
-            return [];
+            return array();
         }
     }
 
@@ -83,7 +88,7 @@ class CurrencyBundle extends CurrencyDataProvider implements CurrencyBundleInter
         try {
             return parent::getFractionDigits($currency);
         } catch (MissingResourceException $e) {
-            return null;
+            return;
         }
     }
 
@@ -95,7 +100,7 @@ class CurrencyBundle extends CurrencyDataProvider implements CurrencyBundleInter
         try {
             return parent::getRoundingIncrement($currency);
         } catch (MissingResourceException $e) {
-            return null;
+            return;
         }
     }
 
@@ -107,7 +112,7 @@ class CurrencyBundle extends CurrencyDataProvider implements CurrencyBundleInter
         try {
             return $this->localeProvider->getLocales();
         } catch (MissingResourceException $e) {
-            return [];
+            return array();
         }
     }
 }

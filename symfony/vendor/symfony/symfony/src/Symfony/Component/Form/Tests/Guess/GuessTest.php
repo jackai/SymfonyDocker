@@ -11,14 +11,13 @@
 
 namespace Symfony\Component\Form\Tests\Guess;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Guess\Guess;
 
 class TestGuess extends Guess
 {
 }
 
-class GuessTest extends TestCase
+class GuessTest extends \PHPUnit_Framework_TestCase
 {
     public function testGetBestGuessReturnsGuessWithHighestConfidence()
     {
@@ -26,12 +25,14 @@ class GuessTest extends TestCase
         $guess2 = new TestGuess(Guess::LOW_CONFIDENCE);
         $guess3 = new TestGuess(Guess::HIGH_CONFIDENCE);
 
-        $this->assertSame($guess3, Guess::getBestGuess([$guess1, $guess2, $guess3]));
+        $this->assertSame($guess3, Guess::getBestGuess(array($guess1, $guess2, $guess3)));
     }
 
+    /**
+     * @expectedException \InvalidArgumentException
+     */
     public function testGuessExpectsValidConfidence()
     {
-        $this->expectException('\InvalidArgumentException');
         new TestGuess(5);
     }
 }

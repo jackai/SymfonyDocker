@@ -12,9 +12,9 @@
 namespace Symfony\Component\Security\Http\EntryPoint;
 
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\HttpUtils;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
  * FormAuthenticationEntryPoint starts an authentication via a login form.
@@ -29,9 +29,12 @@ class FormAuthenticationEntryPoint implements AuthenticationEntryPointInterface
     private $httpUtils;
 
     /**
-     * @param HttpUtils $httpUtils  An HttpUtils instance
-     * @param string    $loginPath  The path to the login form
-     * @param bool      $useForward Whether to forward or redirect to the login form
+     * Constructor.
+     *
+     * @param HttpKernelInterface $kernel
+     * @param HttpUtils           $httpUtils  An HttpUtils instance
+     * @param string              $loginPath  The path to the login form
+     * @param bool                $useForward Whether to forward or redirect to the login form
      */
     public function __construct(HttpKernelInterface $kernel, HttpUtils $httpUtils, $loginPath, $useForward = false)
     {
@@ -51,7 +54,7 @@ class FormAuthenticationEntryPoint implements AuthenticationEntryPointInterface
 
             $response = $this->httpKernel->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
             if (200 === $response->getStatusCode()) {
-                $response->setStatusCode(401);
+                $response->headers->set('X-Status-Code', 401);
             }
 
             return $response;

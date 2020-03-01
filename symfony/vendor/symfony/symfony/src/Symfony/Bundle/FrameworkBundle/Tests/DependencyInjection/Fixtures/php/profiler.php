@@ -1,7 +1,7 @@
 <?php
 
-$container->loadFromExtension('framework', [
-    'profiler' => [
+$container->loadFromExtension('framework', array(
+    'profiler' => array(
         'enabled' => true,
-    ],
-]);
+    ),
+));

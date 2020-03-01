@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Test;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ResettableContainerInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -21,22 +20,14 @@ use Symfony\Component\HttpKernel\KernelInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-abstract class KernelTestCase extends TestCase
+abstract class KernelTestCase extends \PHPUnit_Framework_TestCase
 {
-    use ForwardCompatTestTrait;
-
     protected static $class;
 
     /**
      * @var KernelInterface
      */
     protected static $kernel;
-
-    private function doTearDown()
-    {
-        static::ensureKernelShutdown();
-        static::$kernel = null;
-    }
 
     /**
      * Finds the directory where the phpunit.xml(.dist) is stored.
@@ -47,21 +38,17 @@ abstract class KernelTestCase extends TestCase
      * @return string The directory where phpunit.xml(.dist) is stored
      *
      * @throws \RuntimeException
-     *
-     * @deprecated since 3.4 and will be removed in 4.0.
      */
     protected static function getPhpUnitXmlDir()
     {
-        @trigger_error(sprintf('The %s() method is deprecated since Symfony 3.4 and will be removed in 4.0.', __METHOD__), E_USER_DEPRECATED);
-
         if (!isset($_SERVER['argv']) || false === strpos($_SERVER['argv'][0], 'phpunit')) {
             throw new \RuntimeException('You must override the KernelTestCase::createKernel() method.');
         }
 
         $dir = static::getPhpUnitCliConfigArgument();
         if (null === $dir &&
-            (is_file(getcwd().\DIRECTORY_SEPARATOR.'phpunit.xml') ||
-            is_file(getcwd().\DIRECTORY_SEPARATOR.'phpunit.xml.dist'))) {
+            (is_file(getcwd().DIRECTORY_SEPARATOR.'phpunit.xml') ||
+            is_file(getcwd().DIRECTORY_SEPARATOR.'phpunit.xml.dist'))) {
             $dir = getcwd();
         }
 
@@ -71,7 +58,7 @@ abstract class KernelTestCase extends TestCase
         }
 
         if (!is_dir($dir)) {
-            $dir = \dirname($dir);
+            $dir = dirname($dir);
         }
 
         return $dir;
@@ -84,25 +71,21 @@ abstract class KernelTestCase extends TestCase
      * the last configuration argument.
      *
      * @return string The value of the PHPUnit CLI configuration option
-     *
-     * @deprecated since 3.4 and will be removed in 4.0.
      */
     private static function getPhpUnitCliConfigArgument()
     {
-        @trigger_error(sprintf('The %s() method is deprecated since Symfony 3.4 and will be removed in 4.0.', __METHOD__), E_USER_DEPRECATED);
-
         $dir = null;
         $reversedArgs = array_reverse($_SERVER['argv']);
         foreach ($reversedArgs as $argIndex => $testArg) {
-            if (preg_match('/^-[^ \-]*c$/', $testArg) || '--configuration' === $testArg) {
+            if (preg_match('/^-[^ \-]*c$/', $testArg) || $testArg === '--configuration') {
                 $dir = realpath($reversedArgs[$argIndex - 1]);
                 break;
             } elseif (0 === strpos($testArg, '--configuration=')) {
-                $argPath = substr($testArg, \strlen('--configuration='));
+                $argPath = substr($testArg, strlen('--configuration='));
                 $dir = realpath($argPath);
                 break;
             } elseif (0 === strpos($testArg, '-c')) {
-                $argPath = substr($testArg, \strlen('-c'));
+                $argPath = substr($testArg, strlen('-c'));
                 $dir = realpath($argPath);
                 break;
             }
@@ -122,19 +105,8 @@ abstract class KernelTestCase extends TestCase
      */
     protected static function getKernelClass()
     {
-        if (isset($_SERVER['KERNEL_CLASS']) || isset($_ENV['KERNEL_CLASS'])) {
-            $class = isset($_ENV['KERNEL_CLASS']) ? $_ENV['KERNEL_CLASS'] : $_SERVER['KERNEL_CLASS'];
-            if (!class_exists($class)) {
-                throw new \RuntimeException(sprintf('Class "%s" doesn\'t exist or cannot be autoloaded. Check that the KERNEL_CLASS value in phpunit.xml matches the fully-qualified class name of your Kernel or override the %s::createKernel() method.', $class, static::class));
-            }
-
-            return $class;
-        } else {
-            @trigger_error(sprintf('Using the KERNEL_DIR environment variable or the automatic guessing based on the phpunit.xml / phpunit.xml.dist file location is deprecated since Symfony 3.4. Set the KERNEL_CLASS environment variable to the fully-qualified class name of your Kernel instead. Not setting the KERNEL_CLASS environment variable will throw an exception on 4.0 unless you override the %1$::createKernel() or %1$::getKernelClass() method.', static::class), E_USER_DEPRECATED);
-        }
-
-        if (isset($_SERVER['KERNEL_DIR']) || isset($_ENV['KERNEL_DIR'])) {
-            $dir = isset($_ENV['KERNEL_DIR']) ? $_ENV['KERNEL_DIR'] : $_SERVER['KERNEL_DIR'];
+        if (isset($_SERVER['KERNEL_DIR'])) {
+            $dir = $_SERVER['KERNEL_DIR'];
 
             if (!is_dir($dir)) {
                 $phpUnitDir = static::getPhpUnitXmlDir();
@@ -149,7 +121,7 @@ abstract class KernelTestCase extends TestCase
         $finder = new Finder();
         $finder->name('*Kernel.php')->depth(0)->in($dir);
         $results = iterator_to_array($finder);
-        if (!\count($results)) {
+        if (!count($results)) {
             throw new \RuntimeException('Either set KERNEL_DIR in your phpunit.xml according to https://symfony.com/doc/current/book/testing.html#your-first-functional-test or override the WebTestCase::createKernel() method.');
         }
 
@@ -164,16 +136,14 @@ abstract class KernelTestCase extends TestCase
     /**
      * Boots the Kernel for this test.
      *
-     * @return KernelInterface A KernelInterface instance
+     * @param array $options
      */
-    protected static function bootKernel(array $options = [])
+    protected static function bootKernel(array $options = array())
     {
         static::ensureKernelShutdown();
 
         static::$kernel = static::createKernel($options);
         static::$kernel->boot();
-
-        return static::$kernel;
     }
 
     /**
@@ -184,39 +154,24 @@ abstract class KernelTestCase extends TestCase
      *  * environment
      *  * debug
      *
+     * @param array $options An array of options
+     *
      * @return KernelInterface A KernelInterface instance
      */
-    protected static function createKernel(array $options = [])
+    protected static function createKernel(array $options = array())
     {
         if (null === static::$class) {
             static::$class = static::getKernelClass();
         }
 
-        if (isset($options['environment'])) {
-            $env = $options['environment'];
-        } elseif (isset($_ENV['APP_ENV'])) {
-            $env = $_ENV['APP_ENV'];
-        } elseif (isset($_SERVER['APP_ENV'])) {
-            $env = $_SERVER['APP_ENV'];
-        } else {
-            $env = 'test';
-        }
-
-        if (isset($options['debug'])) {
-            $debug = $options['debug'];
-        } elseif (isset($_ENV['APP_DEBUG'])) {
-            $debug = $_ENV['APP_DEBUG'];
-        } elseif (isset($_SERVER['APP_DEBUG'])) {
-            $debug = $_SERVER['APP_DEBUG'];
-        } else {
-            $debug = true;
-        }
-
-        return new static::$class($env, $debug);
+        return new static::$class(
+            isset($options['environment']) ? $options['environment'] : 'test',
+            isset($options['debug']) ? $options['debug'] : true
+        );
     }
 
     /**
-     * Shuts the kernel down if it was used in the test - called by the tearDown method by default.
+     * Shuts the kernel down if it was used in the test.
      */
     protected static function ensureKernelShutdown()
     {
@@ -227,5 +182,13 @@ abstract class KernelTestCase extends TestCase
                 $container->reset();
             }
         }
+    }
+
+    /**
+     * Clean up Kernel usage in this test.
+     */
+    protected function tearDown()
+    {
+        static::ensureKernelShutdown();
     }
 }

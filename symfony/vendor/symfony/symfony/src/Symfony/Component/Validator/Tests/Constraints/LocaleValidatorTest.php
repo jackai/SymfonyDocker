@@ -13,9 +13,8 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\Locale;
 use Symfony\Component\Validator\Constraints\LocaleValidator;
-use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-class LocaleValidatorTest extends ConstraintValidatorTestCase
+class LocaleValidatorTest extends AbstractConstraintValidatorTest
 {
     protected function createValidator()
     {
@@ -36,9 +35,11 @@ class LocaleValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
+    /**
+     * @expectedException \Symfony\Component\Validator\Exception\UnexpectedTypeException
+     */
     public function testExpectsStringCompatibleType()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\UnexpectedTypeException');
         $this->validator->validate(new \stdClass(), new Locale());
     }
 
@@ -54,14 +55,14 @@ class LocaleValidatorTest extends ConstraintValidatorTestCase
 
     public function getValidLocales()
     {
-        return [
-            ['en'],
-            ['en_US'],
-            ['pt'],
-            ['pt_PT'],
-            ['zh_Hans'],
-            ['fil_PH'],
-        ];
+        return array(
+            array('en'),
+            array('en_US'),
+            array('pt'),
+            array('pt_PT'),
+            array('zh_Hans'),
+            array('fil_PH'),
+        );
     }
 
     /**
@@ -69,9 +70,9 @@ class LocaleValidatorTest extends ConstraintValidatorTestCase
      */
     public function testInvalidLocales($locale)
     {
-        $constraint = new Locale([
+        $constraint = new Locale(array(
             'message' => 'myMessage',
-        ]);
+        ));
 
         $this->validator->validate($locale, $constraint);
 
@@ -83,9 +84,9 @@ class LocaleValidatorTest extends ConstraintValidatorTestCase
 
     public function getInvalidLocales()
     {
-        return [
-            ['EN'],
-            ['foobar'],
-        ];
+        return array(
+            array('EN'),
+            array('foobar'),
+        );
     }
 }

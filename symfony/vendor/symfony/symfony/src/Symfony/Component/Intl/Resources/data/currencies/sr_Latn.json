@@ -1,5 +1,5 @@
 {
-    "Version": "36",
+    "Version": "2.1.13.24",
     "Names": {
         "ADP": [
             "ADP",
@@ -110,7 +110,7 @@
             "Bugarski tvrdi lev"
         ],
         "BGN": [
-            "BGN",
+            "[BGN]",
             "Bugarski lev"
         ],
         "BHD": [
@@ -131,7 +131,7 @@
         ],
         "BOB": [
             "BOB",
-            "Bolivijski bolivijano"
+            "Bolivijski Boliviano"
         ],
         "BOP": [
             "BOP",
@@ -185,13 +185,9 @@
             "BYB",
             "Beloruska nova rublja (1994–1999)"
         ],
-        "BYN": [
-            "BYN",
-            "Beloruska rublja"
-        ],
         "BYR": [
-            "BYR",
-            "Beloruska rublja (2000–2016)"
+            "[BYR]",
+            "Beloruska rublja"
         ],
         "BZD": [
             "BZD",
@@ -224,10 +220,6 @@
         "CLP": [
             "CLP",
             "Čileanski pezos"
-        ],
-        "CNH": [
-            "CNH",
-            "Kineski juan (ostrvski)"
         ],
         "CNY": [
             "CN¥",
@@ -283,7 +275,7 @@
         ],
         "DJF": [
             "DJF",
-            "Džibutski franak"
+            "Džibutanski franak"
         ],
         "DKK": [
             "DKK",
@@ -331,7 +323,7 @@
         ],
         "ETB": [
             "ETB",
-            "Etiopski bir"
+            "Etiopijski bir"
         ],
         "EUR": [
             "€",
@@ -515,7 +507,7 @@
         ],
         "KRW": [
             "KRW",
-            "Južnokorejski von"
+            "Južnokorejski Von"
         ],
         "KWD": [
             "KWD",
@@ -595,7 +587,7 @@
         ],
         "MGA": [
             "MGA",
-            "Madagaskarski ariari"
+            "Malagasijski ariari"
         ],
         "MGF": [
             "MGF",
@@ -619,15 +611,11 @@
         ],
         "MOP": [
             "MOP",
-            "Makaoska pataka"
+            "Makaniška pataka"
         ],
         "MRO": [
             "MRO",
-            "Mauritanijska ogija (1973–2017)"
-        ],
-        "MRU": [
-            "MRU",
-            "Mauritanska ogija"
+            "Mauritanijska ogija"
         ],
         "MTL": [
             "MTL",
@@ -663,7 +651,7 @@
         ],
         "MYR": [
             "MYR",
-            "Malezijski ringit"
+            "Malezijski ringgit"
         ],
         "MZE": [
             "MZE",
@@ -675,7 +663,7 @@
         ],
         "MZN": [
             "MZN",
-            "Mozambički metikal"
+            "Mozambijski metikal"
         ],
         "NAD": [
             "NAD",
@@ -723,11 +711,11 @@
         ],
         "PEN": [
             "PEN",
-            "Peruanski sol"
+            "Peruanski nuevo sol"
         ],
         "PES": [
             "PES",
-            "Peruanski sol (1863–1965)"
+            "Peruanski sol"
         ],
         "PGK": [
             "PGK",
@@ -767,11 +755,11 @@
         ],
         "ROL": [
             "ROL",
-            "Rumunski lej (1952–2006)"
+            "Rumunski lej"
         ],
         "RON": [
             "RON",
-            "Rumunski lej"
+            "Rumunski lej (1952–2006)"
         ],
         "RSD": [
             "RSD",
@@ -823,7 +811,7 @@
         ],
         "SHP": [
             "SHP",
-            "Svete Jelene funta"
+            "Sv. jelenska funta"
         ],
         "SIT": [
             "SIT",
@@ -835,7 +823,7 @@
         ],
         "SLL": [
             "SLL",
-            "Sijeraleonski leone"
+            "Sijera-leonški leone"
         ],
         "SOS": [
             "SOS",
@@ -855,11 +843,7 @@
         ],
         "STD": [
             "STD",
-            "Saotomska dobra (1977–2017)"
-        ],
-        "STN": [
-            "STN",
-            "Saotomska dobra"
+            "Sao Tome i Principe dobra"
         ],
         "SUR": [
             "SUR",
@@ -875,7 +859,7 @@
         ],
         "SZL": [
             "SZL",
-            "Svazilendski lilangeni"
+            "Svazi lilangeni"
         ],
         "THB": [
             "THB",
@@ -887,7 +871,7 @@
         ],
         "TJS": [
             "TJS",
-            "Tadžikistanski somon"
+            "Tadžihistanski somon"
         ],
         "TMM": [
             "TMM",
@@ -903,7 +887,7 @@
         ],
         "TOP": [
             "TOP",
-            "Tonganska panga"
+            "Tongonška Panga"
         ],
         "TPE": [
             "TPE",
@@ -931,7 +915,7 @@
         ],
         "UAH": [
             "UAH",
-            "Ukrajinska hrivnja"
+            "Ukrajinska grivna"
         ],
         "UAK": [
             "UAK",
@@ -979,10 +963,6 @@
         ],
         "VEF": [
             "VEF",
-            "Venecuelanski bolivar (2008–2018)"
-        ],
-        "VES": [
-            "VES",
             "Venecuelanski bolivar"
         ],
         "VND": [
@@ -1059,7 +1039,7 @@
         ],
         "ZAR": [
             "ZAR",
-            "Južnoafrički rand"
+            "Južno-afrički rand"
         ],
         "ZMK": [
             "ZMK",

@@ -18,11 +18,12 @@ use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
  * Lists available properties using Symfony Serializer Component metadata.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
- *
- * @final since version 3.3
  */
 class SerializerExtractor implements PropertyListExtractorInterface
 {
+    /**
+     * @var ClassMetadataFactoryInterface
+     */
     private $classMetadataFactory;
 
     public function __construct(ClassMetadataFactoryInterface $classMetadataFactory)
@@ -33,21 +34,21 @@ class SerializerExtractor implements PropertyListExtractorInterface
     /**
      * {@inheritdoc}
      */
-    public function getProperties($class, array $context = [])
+    public function getProperties($class, array $context = array())
     {
-        if (!isset($context['serializer_groups']) || !\is_array($context['serializer_groups'])) {
-            return null;
+        if (!isset($context['serializer_groups']) || !is_array($context['serializer_groups'])) {
+            return;
         }
 
         if (!$this->classMetadataFactory->getMetadataFor($class)) {
-            return null;
+            return;
         }
 
-        $properties = [];
+        $properties = array();
         $serializerClassMetadata = $this->classMetadataFactory->getMetadataFor($class);
 
         foreach ($serializerClassMetadata->getAttributesMetadata() as $serializerAttributeMetadata) {
-            if (array_intersect($context['serializer_groups'], $serializerAttributeMetadata->getGroups())) {
+            if (count(array_intersect($context['serializer_groups'], $serializerAttributeMetadata->getGroups())) > 0) {
                 $properties[] = $serializerAttributeMetadata->getName();
             }
         }

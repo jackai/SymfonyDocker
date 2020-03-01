@@ -19,58 +19,25 @@ use Symfony\Component\Console\Tester\CommandTester;
 /**
  * @group functional
  */
-class ConfigDumpReferenceCommandTest extends AbstractWebTestCase
+class ConfigDumpReferenceCommandTest extends WebTestCase
 {
     private $application;
 
     protected function setUp()
     {
-        $kernel = static::createKernel(['test_case' => 'ConfigDump', 'root_config' => 'config.yml']);
+        $kernel = static::createKernel(array('test_case' => 'ConfigDump', 'root_config' => 'config.yml'));
         $this->application = new Application($kernel);
-        $this->application->doRun(new ArrayInput([]), new NullOutput());
+        $this->application->doRun(new ArrayInput(array()), new NullOutput());
     }
 
     public function testDumpBundleName()
     {
         $tester = $this->createCommandTester();
-        $ret = $tester->execute(['name' => 'TestBundle']);
+        $ret = $tester->execute(array('name' => 'TestBundle'));
 
         $this->assertSame(0, $ret, 'Returns 0 in case of success');
-        $this->assertStringContainsString('test:', $tester->getDisplay());
-        $this->assertStringContainsString('    custom:', $tester->getDisplay());
-    }
-
-    public function testDumpAtPath()
-    {
-        $tester = $this->createCommandTester();
-        $ret = $tester->execute([
-            'name' => 'test',
-            'path' => 'array',
-        ]);
-
-        $this->assertSame(0, $ret, 'Returns 0 in case of success');
-        $this->assertSame(<<<'EOL'
-# Default configuration for extension with alias: "test" at path "array"
-array:
-    child1:               ~
-    child2:               ~
-
-
-EOL
-            , $tester->getDisplay(true));
-    }
-
-    public function testDumpAtPathXml()
-    {
-        $tester = $this->createCommandTester();
-        $ret = $tester->execute([
-            'name' => 'test',
-            'path' => 'array',
-            '--format' => 'xml',
-        ]);
-
-        $this->assertSame(1, $ret);
-        $this->assertStringContainsString('[ERROR] The "path" option is only available for the "yaml" format.', $tester->getDisplay());
+        $this->assertContains('test:', $tester->getDisplay());
+        $this->assertContains('    custom:', $tester->getDisplay());
     }
 
     /**

@@ -14,7 +14,6 @@ namespace Symfony\Component\Form\Extension\Validator\Type;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Validator\Constraints\GroupSequence;
 
 /**
  * Encapsulates common logic of {@link FormTypeValidatorExtension} and
@@ -32,27 +31,23 @@ abstract class BaseValidatorExtension extends AbstractTypeExtension
         // Make sure that validation groups end up as null, closure or array
         $validationGroupsNormalizer = function (Options $options, $groups) {
             if (false === $groups) {
-                return [];
+                return array();
             }
 
             if (empty($groups)) {
-                return null;
+                return;
             }
 
-            if (\is_callable($groups)) {
-                return $groups;
-            }
-
-            if ($groups instanceof GroupSequence) {
+            if (is_callable($groups)) {
                 return $groups;
             }
 
             return (array) $groups;
         };
 
-        $resolver->setDefaults([
+        $resolver->setDefaults(array(
             'validation_groups' => null,
-        ]);
+        ));
 
         $resolver->setNormalizer('validation_groups', $validationGroupsNormalizer);
     }

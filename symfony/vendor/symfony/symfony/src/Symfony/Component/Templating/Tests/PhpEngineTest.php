@@ -11,16 +11,15 @@
 
 namespace Symfony\Component\Templating\Tests;
 
-use PHPUnit\Framework\TestCase;
-use Symfony\Component\Templating\Helper\SlotsHelper;
-use Symfony\Component\Templating\Loader\Loader;
 use Symfony\Component\Templating\PhpEngine;
+use Symfony\Component\Templating\Loader\Loader;
 use Symfony\Component\Templating\Storage\StringStorage;
+use Symfony\Component\Templating\Helper\SlotsHelper;
 use Symfony\Component\Templating\TemplateNameParser;
-use Symfony\Component\Templating\TemplateReference;
 use Symfony\Component\Templating\TemplateReferenceInterface;
+use Symfony\Component\Templating\TemplateReference;
 
-class PhpEngineTest extends TestCase
+class PhpEngineTest extends \PHPUnit_Framework_TestCase
 {
     protected $loader;
 
@@ -65,7 +64,7 @@ class PhpEngineTest extends TestCase
         $engine[$foo] = 'bar';
         $this->assertEquals($foo, $engine->get('bar'), '->set() takes an alias as a second argument');
 
-        $this->assertArrayHasKey('bar', $engine);
+        $this->assertTrue(isset($engine['bar']));
 
         try {
             $engine->get('foobar');
@@ -75,7 +74,7 @@ class PhpEngineTest extends TestCase
             $this->assertEquals('The helper "foobar" is not defined.', $e->getMessage(), '->get() throws an InvalidArgumentException if the helper is not defined');
         }
 
-        $this->assertArrayHasKey('bar', $engine);
+        $this->assertTrue(isset($engine['bar']));
         $this->assertTrue($engine->has('foo'), '->has() returns true if the helper exists');
         $this->assertFalse($engine->has('foobar'), '->has() returns false if the helper does not exist');
     }
@@ -86,14 +85,14 @@ class PhpEngineTest extends TestCase
         $foo = new \Symfony\Component\Templating\Tests\Fixtures\SimpleHelper('foo');
         $engine->set($foo);
 
-        $this->expectException('\LogicException');
+        $this->setExpectedException('\LogicException');
 
         unset($engine['foo']);
     }
 
     public function testExtendRender()
     {
-        $engine = new ProjectTemplateEngine(new TemplateNameParser(), $this->loader, []);
+        $engine = new ProjectTemplateEngine(new TemplateNameParser(), $this->loader, array(), array(new SlotsHelper()));
         try {
             $engine->render('name');
             $this->fail('->render() throws an InvalidArgumentException if the template does not exist');
@@ -102,44 +101,44 @@ class PhpEngineTest extends TestCase
             $this->assertEquals('The template "name" does not exist.', $e->getMessage(), '->render() throws an InvalidArgumentException if the template does not exist');
         }
 
-        $engine = new ProjectTemplateEngine(new TemplateNameParser(), $this->loader, [new SlotsHelper()]);
+        $engine = new ProjectTemplateEngine(new TemplateNameParser(), $this->loader, array(new SlotsHelper()));
         $engine->set(new \Symfony\Component\Templating\Tests\Fixtures\SimpleHelper('bar'));
         $this->loader->setTemplate('foo.php', '<?php $this->extend("layout.php"); echo $this[\'foo\'].$foo ?>');
         $this->loader->setTemplate('layout.php', '-<?php echo $this[\'slots\']->get("_content") ?>-');
-        $this->assertEquals('-barfoo-', $engine->render('foo.php', ['foo' => 'foo']), '->render() uses the decorator to decorate the template');
+        $this->assertEquals('-barfoo-', $engine->render('foo.php', array('foo' => 'foo')), '->render() uses the decorator to decorate the template');
 
-        $engine = new ProjectTemplateEngine(new TemplateNameParser(), $this->loader, [new SlotsHelper()]);
+        $engine = new ProjectTemplateEngine(new TemplateNameParser(), $this->loader, array(new SlotsHelper()));
         $engine->set(new \Symfony\Component\Templating\Tests\Fixtures\SimpleHelper('bar'));
         $this->loader->setTemplate('bar.php', 'bar');
         $this->loader->setTemplate('foo.php', '<?php $this->extend("layout.php"); echo $foo ?>');
         $this->loader->setTemplate('layout.php', '<?php echo $this->render("bar.php") ?>-<?php echo $this[\'slots\']->get("_content") ?>-');
-        $this->assertEquals('bar-foo-', $engine->render('foo.php', ['foo' => 'foo', 'bar' => 'bar']), '->render() supports render() calls in templates');
+        $this->assertEquals('bar-foo-', $engine->render('foo.php', array('foo' => 'foo', 'bar' => 'bar')), '->render() supports render() calls in templates');
     }
 
     public function testRenderParameter()
     {
         $engine = new ProjectTemplateEngine(new TemplateNameParser(), $this->loader);
         $this->loader->setTemplate('foo.php', '<?php echo $template . $parameters ?>');
-        $this->assertEquals('foobar', $engine->render('foo.php', ['template' => 'foo', 'parameters' => 'bar']), '->render() extract variables');
+        $this->assertEquals('foobar', $engine->render('foo.php', array('template' => 'foo', 'parameters' => 'bar')), '->render() extract variables');
     }
 
     /**
+     * @expectedException \InvalidArgumentException
      * @dataProvider forbiddenParameterNames
      */
     public function testRenderForbiddenParameter($name)
     {
-        $this->expectException('InvalidArgumentException');
         $engine = new ProjectTemplateEngine(new TemplateNameParser(), $this->loader);
         $this->loader->setTemplate('foo.php', 'bar');
-        $engine->render('foo.php', [$name => 'foo']);
+        $engine->render('foo.php', array($name => 'foo'));
     }
 
     public function forbiddenParameterNames()
     {
-        return [
-            ['this'],
-            ['view'],
-        ];
+        return array(
+            array('this'),
+            array('view'),
+        );
     }
 
     public function testEscape()
@@ -153,7 +152,7 @@ class PhpEngineTest extends TestCase
     public function testGetSetCharset()
     {
         $helper = new SlotsHelper();
-        $engine = new ProjectTemplateEngine(new TemplateNameParser(), $this->loader, [$helper]);
+        $engine = new ProjectTemplateEngine(new TemplateNameParser(), $this->loader, array($helper));
         $this->assertEquals('UTF-8', $engine->getCharset(), 'EngineInterface::getCharset() returns UTF-8 by default');
         $this->assertEquals('UTF-8', $helper->getCharset(), 'HelperInterface::getCharset() returns UTF-8 by default');
 
@@ -167,9 +166,9 @@ class PhpEngineTest extends TestCase
         $engine = new ProjectTemplateEngine(new TemplateNameParser(), $this->loader);
         $engine->addGlobal('global_variable', 'lorem ipsum');
 
-        $this->assertEquals([
+        $this->assertEquals(array(
             'global_variable' => 'lorem ipsum',
-        ], $engine->getGlobals());
+        ), $engine->getGlobals());
     }
 
     public function testGlobalsGetPassedToTemplate()
@@ -181,7 +180,7 @@ class PhpEngineTest extends TestCase
 
         $this->assertEquals($engine->render('global.php'), 'global variable');
 
-        $this->assertEquals($engine->render('global.php', ['global' => 'overwritten']), 'overwritten');
+        $this->assertEquals($engine->render('global.php', array('global' => 'overwritten')), 'overwritten');
     }
 
     public function testGetLoader()
@@ -202,7 +201,7 @@ class ProjectTemplateEngine extends PhpEngine
 
 class ProjectTemplateLoader extends Loader
 {
-    public $templates = [];
+    public $templates = array();
 
     public function setTemplate($name, $content)
     {

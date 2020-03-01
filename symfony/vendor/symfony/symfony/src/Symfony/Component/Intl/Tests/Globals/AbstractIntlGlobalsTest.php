@@ -11,24 +11,22 @@
 
 namespace Symfony\Component\Intl\Tests\Globals;
 
-use PHPUnit\Framework\TestCase;
-
 /**
  * Test case for intl function implementations.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-abstract class AbstractIntlGlobalsTest extends TestCase
+abstract class AbstractIntlGlobalsTest extends \PHPUnit_Framework_TestCase
 {
     public function errorNameProvider()
     {
-        return [
-            [-129, '[BOGUS UErrorCode]'],
-            [0, 'U_ZERO_ERROR'],
-            [1, 'U_ILLEGAL_ARGUMENT_ERROR'],
-            [9, 'U_PARSE_ERROR'],
-            [129, '[BOGUS UErrorCode]'],
-        ];
+        return array(
+            array(-129, '[BOGUS UErrorCode]'),
+            array(0, 'U_ZERO_ERROR'),
+            array(1, 'U_ILLEGAL_ARGUMENT_ERROR'),
+            array(9, 'U_PARSE_ERROR'),
+            array(129, '[BOGUS UErrorCode]'),
+        );
     }
 
     /**

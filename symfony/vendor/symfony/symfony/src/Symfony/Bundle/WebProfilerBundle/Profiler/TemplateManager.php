@@ -12,13 +12,8 @@
 namespace Symfony\Bundle\WebProfilerBundle\Profiler;
 
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\HttpKernel\Profiler\Profile;
 use Symfony\Component\HttpKernel\Profiler\Profiler;
-use Twig\Environment;
-use Twig\Error\LoaderError;
-use Twig\Loader\ExistsLoaderInterface;
-use Twig\Loader\SourceContextLoaderInterface;
-use Twig\Template;
+use Symfony\Component\HttpKernel\Profiler\Profile;
 
 /**
  * Profiler Templates Manager.
@@ -32,7 +27,14 @@ class TemplateManager
     protected $templates;
     protected $profiler;
 
-    public function __construct(Profiler $profiler, Environment $twig, array $templates)
+    /**
+     * Constructor.
+     *
+     * @param Profiler          $profiler
+     * @param \Twig_Environment $twig
+     * @param array             $templates
+     */
+    public function __construct(Profiler $profiler, \Twig_Environment $twig, array $templates)
     {
         $this->profiler = $profiler;
         $this->twig = $twig;
@@ -42,7 +44,8 @@ class TemplateManager
     /**
      * Gets the template name for a given panel.
      *
-     * @param string $panel
+     * @param Profile $profile
+     * @param string  $panel
      *
      * @return mixed
      *
@@ -62,9 +65,9 @@ class TemplateManager
     /**
      * Gets the templates for a given profile.
      *
-     * @return Template[]
+     * @param Profile $profile
      *
-     * @deprecated not used anymore internally
+     * @return array
      */
     public function getTemplates(Profile $profile)
     {
@@ -80,13 +83,15 @@ class TemplateManager
     /**
      * Gets template names of templates that are present in the viewed profile.
      *
+     * @param Profile $profile
+     *
      * @return array
      *
      * @throws \UnexpectedValueException
      */
-    public function getNames(Profile $profile)
+    protected function getNames(Profile $profile)
     {
-        $templates = [];
+        $templates = array();
 
         foreach ($this->templates as $arguments) {
             if (null === $arguments) {
@@ -117,22 +122,17 @@ class TemplateManager
     protected function templateExists($template)
     {
         $loader = $this->twig->getLoader();
-
-        if (1 === Environment::MAJOR_VERSION && !$loader instanceof ExistsLoaderInterface) {
-            try {
-                if ($loader instanceof SourceContextLoaderInterface) {
-                    $loader->getSourceContext($template);
-                } else {
-                    $loader->getSource($template);
-                }
-
-                return true;
-            } catch (LoaderError $e) {
-            }
-
-            return false;
+        if ($loader instanceof \Twig_ExistsLoaderInterface) {
+            return $loader->exists($template);
         }
 
-        return $loader->exists($template);
+        try {
+            $loader->getSource($template);
+
+            return true;
+        } catch (\Twig_Error_Loader $e) {
+        }
+
+        return false;
     }
 }

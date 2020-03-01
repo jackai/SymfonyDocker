@@ -12,15 +12,15 @@
 namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\DataTransformer\MoneyToLocalizedStringTransformer;
-use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\Extension\Core\DataTransformer\MoneyToLocalizedStringTransformer;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class MoneyType extends AbstractType
 {
-    protected static $patterns = [];
+    protected static $patterns = array();
 
     /**
      * {@inheritdoc}
@@ -50,13 +50,13 @@ class MoneyType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults([
+        $resolver->setDefaults(array(
             'scale' => 2,
             'grouping' => false,
             'divisor' => 1,
             'currency' => 'EUR',
             'compound' => false,
-        ]);
+        ));
 
         $resolver->setAllowedTypes('scale', 'int');
     }
@@ -70,7 +70,7 @@ class MoneyType extends AbstractType
     }
 
     /**
-     * Returns the pattern for this locale in UTF-8.
+     * Returns the pattern for this locale.
      *
      * The pattern contains the placeholder "{{ widget }}" where the HTML tag should
      * be inserted
@@ -84,7 +84,7 @@ class MoneyType extends AbstractType
         $locale = \Locale::getDefault();
 
         if (!isset(self::$patterns[$locale])) {
-            self::$patterns[$locale] = [];
+            self::$patterns[$locale] = array();
         }
 
         if (!isset(self::$patterns[$locale][$currency])) {

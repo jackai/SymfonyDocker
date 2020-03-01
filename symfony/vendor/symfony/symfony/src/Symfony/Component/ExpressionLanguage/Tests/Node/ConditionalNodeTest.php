@@ -18,25 +18,17 @@ class ConditionalNodeTest extends AbstractNodeTest
 {
     public function getEvaluateData()
     {
-        return [
-            [1, new ConditionalNode(new ConstantNode(true), new ConstantNode(1), new ConstantNode(2))],
-            [2, new ConditionalNode(new ConstantNode(false), new ConstantNode(1), new ConstantNode(2))],
-        ];
+        return array(
+            array(1, new ConditionalNode(new ConstantNode(true), new ConstantNode(1), new ConstantNode(2))),
+            array(2, new ConditionalNode(new ConstantNode(false), new ConstantNode(1), new ConstantNode(2))),
+        );
     }
 
     public function getCompileData()
     {
-        return [
-            ['((true) ? (1) : (2))', new ConditionalNode(new ConstantNode(true), new ConstantNode(1), new ConstantNode(2))],
-            ['((false) ? (1) : (2))', new ConditionalNode(new ConstantNode(false), new ConstantNode(1), new ConstantNode(2))],
-        ];
-    }
-
-    public function getDumpData()
-    {
-        return [
-            ['(true ? 1 : 2)', new ConditionalNode(new ConstantNode(true), new ConstantNode(1), new ConstantNode(2))],
-            ['(false ? 1 : 2)', new ConditionalNode(new ConstantNode(false), new ConstantNode(1), new ConstantNode(2))],
-        ];
+        return array(
+            array('((true) ? (1) : (2))', new ConditionalNode(new ConstantNode(true), new ConstantNode(1), new ConstantNode(2))),
+            array('((false) ? (1) : (2))', new ConditionalNode(new ConstantNode(false), new ConstantNode(1), new ConstantNode(2))),
+        );
     }
 }

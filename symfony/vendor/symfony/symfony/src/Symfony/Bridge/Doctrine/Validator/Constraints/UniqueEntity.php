@@ -28,19 +28,18 @@ class UniqueEntity extends Constraint
     public $message = 'This value is already used.';
     public $service = 'doctrine.orm.validator.unique';
     public $em = null;
-    public $entityClass = null;
     public $repositoryMethod = 'findBy';
-    public $fields = [];
+    public $fields = array();
     public $errorPath = null;
     public $ignoreNull = true;
 
-    protected static $errorNames = [
+    protected static $errorNames = array(
         self::NOT_UNIQUE_ERROR => 'NOT_UNIQUE_ERROR',
-    ];
+    );
 
     public function getRequiredOptions()
     {
-        return ['fields'];
+        return array('fields');
     }
 
     /**

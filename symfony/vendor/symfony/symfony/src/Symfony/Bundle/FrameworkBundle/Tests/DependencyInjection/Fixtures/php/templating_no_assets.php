@@ -1,7 +1,7 @@
 <?php
 
-$container->loadFromExtension('framework', [
-    'templating' => [
-        'engines' => ['php', 'twig'],
-    ],
-]);
+$container->loadFromExtension('framework', array(
+    'templating' => array(
+        'engines' => array('php', 'twig'),
+    ),
+));

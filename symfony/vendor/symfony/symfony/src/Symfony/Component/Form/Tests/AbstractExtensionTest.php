@@ -11,11 +11,10 @@
 
 namespace Symfony\Component\Form\Tests;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\AbstractExtension;
 use Symfony\Component\Form\Tests\Fixtures\FooType;
 
-class AbstractExtensionTest extends TestCase
+class AbstractExtensionTest extends \PHPUnit_Framework_TestCase
 {
     public function testHasType()
     {
@@ -35,7 +34,7 @@ class ConcreteExtension extends AbstractExtension
 {
     protected function loadTypes()
     {
-        return [new FooType()];
+        return array(new FooType());
     }
 
     protected function loadTypeGuesser()

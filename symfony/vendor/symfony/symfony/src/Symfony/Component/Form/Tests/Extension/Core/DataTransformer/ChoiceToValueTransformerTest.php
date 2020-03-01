@@ -11,19 +11,18 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\DataTransformer;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
 use Symfony\Component\Form\Extension\Core\DataTransformer\ChoiceToValueTransformer;
 
-class ChoiceToValueTransformerTest extends TestCase
+class ChoiceToValueTransformerTest extends \PHPUnit_Framework_TestCase
 {
     protected $transformer;
     protected $transformerWithNull;
 
     protected function setUp()
     {
-        $list = new ArrayChoiceList(['', false, 'X', true]);
-        $listWithNull = new ArrayChoiceList(['', false, 'X', null]);
+        $list = new ArrayChoiceList(array('', false, 'X', true));
+        $listWithNull = new ArrayChoiceList(array('', false, 'X', null));
 
         $this->transformer = new ChoiceToValueTransformer($list);
         $this->transformerWithNull = new ChoiceToValueTransformer($listWithNull);
@@ -37,13 +36,13 @@ class ChoiceToValueTransformerTest extends TestCase
 
     public function transformProvider()
     {
-        return [
+        return array(
             // more extensive test set can be found in FormUtilTest
-            ['', '', '', '0'],
-            [false, '0', false, '1'],
-            ['X', 'X', 'X', '2'],
-            [true, '1', null, '3'],
-        ];
+            array('', '', '', '0'),
+            array(false, '0', false, '1'),
+            array('X', 'X', 'X', '2'),
+            array(true, '1', null, '3'),
+        );
     }
 
     /**
@@ -57,14 +56,14 @@ class ChoiceToValueTransformerTest extends TestCase
 
     public function reverseTransformProvider()
     {
-        return [
+        return array(
             // values are expected to be valid choice keys already and stay
             // the same
-            ['', '', '0', ''],
-            ['0', false, '1', false],
-            ['X', 'X', '2', 'X'],
-            ['1', true, '3', null],
-        ];
+            array('', '', '0', ''),
+            array('0', false, '1', false),
+            array('X', 'X', '2', 'X'),
+            array('1', true, '3', null),
+        );
     }
 
     /**
@@ -78,20 +77,20 @@ class ChoiceToValueTransformerTest extends TestCase
 
     public function reverseTransformExpectsStringOrNullProvider()
     {
-        return [
-            [0],
-            [true],
-            [false],
-            [[]],
-        ];
+        return array(
+            array(0),
+            array(true),
+            array(false),
+            array(array()),
+        );
     }
 
     /**
      * @dataProvider reverseTransformExpectsStringOrNullProvider
+     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
      */
     public function testReverseTransformExpectsStringOrNull($value)
     {
-        $this->expectException('Symfony\Component\Form\Exception\TransformationFailedException');
         $this->transformer->reverseTransform($value);
     }
 }

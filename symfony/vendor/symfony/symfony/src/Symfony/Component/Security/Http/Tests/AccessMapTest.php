@@ -11,41 +11,40 @@
 
 namespace Symfony\Component\Security\Http\Tests;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Http\AccessMap;
 
-class AccessMapTest extends TestCase
+class AccessMapTest extends \PHPUnit_Framework_TestCase
 {
     public function testReturnsFirstMatchedPattern()
     {
-        $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->getMock();
+        $request = $this->getMock('Symfony\Component\HttpFoundation\Request');
         $requestMatcher1 = $this->getRequestMatcher($request, false);
         $requestMatcher2 = $this->getRequestMatcher($request, true);
 
         $map = new AccessMap();
-        $map->add($requestMatcher1, ['ROLE_ADMIN'], 'http');
-        $map->add($requestMatcher2, ['ROLE_USER'], 'https');
+        $map->add($requestMatcher1, array('ROLE_ADMIN'), 'http');
+        $map->add($requestMatcher2, array('ROLE_USER'), 'https');
 
-        $this->assertSame([['ROLE_USER'], 'https'], $map->getPatterns($request));
+        $this->assertSame(array(array('ROLE_USER'), 'https'), $map->getPatterns($request));
     }
 
     public function testReturnsEmptyPatternIfNoneMatched()
     {
-        $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->getMock();
+        $request = $this->getMock('Symfony\Component\HttpFoundation\Request');
         $requestMatcher = $this->getRequestMatcher($request, false);
 
         $map = new AccessMap();
-        $map->add($requestMatcher, ['ROLE_USER'], 'https');
+        $map->add($requestMatcher, array('ROLE_USER'), 'https');
 
-        $this->assertSame([null, null], $map->getPatterns($request));
+        $this->assertSame(array(null, null), $map->getPatterns($request));
     }
 
     private function getRequestMatcher($request, $matches)
     {
-        $requestMatcher = $this->getMockBuilder('Symfony\Component\HttpFoundation\RequestMatcherInterface')->getMock();
+        $requestMatcher = $this->getMock('Symfony\Component\HttpFoundation\RequestMatcherInterface');
         $requestMatcher->expects($this->once())
             ->method('matches')->with($request)
-            ->willReturn($matches);
+            ->will($this->returnValue($matches));
 
         return $requestMatcher;
     }

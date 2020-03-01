@@ -20,11 +20,37 @@ use Symfony\Component\Form\Exception\BadMethodCallException;
  */
 class FormError implements \Serializable
 {
+    /**
+     * @var string
+     */
+    private $message;
+
+    /**
+     * The template for the error message.
+     *
+     * @var string
+     */
     protected $messageTemplate;
+
+    /**
+     * The parameters that should be substituted in the message template.
+     *
+     * @var array
+     */
     protected $messageParameters;
+
+    /**
+     * The value for error message pluralization.
+     *
+     * @var int|null
+     */
     protected $messagePluralization;
 
-    private $message;
+    /**
+     * The cause for this error.
+     *
+     * @var mixed
+     */
     private $cause;
 
     /**
@@ -35,6 +61,8 @@ class FormError implements \Serializable
     private $origin;
 
     /**
+     * Constructor.
+     *
      * Any array key in $messageParameters will be used as a placeholder in
      * $messageTemplate.
      *
@@ -47,9 +75,9 @@ class FormError implements \Serializable
      *
      * @see \Symfony\Component\Translation\Translator
      */
-    public function __construct($message, $messageTemplate = null, array $messageParameters = [], $messagePluralization = null, $cause = null)
+    public function __construct($message, $messageTemplate = null, array $messageParameters = array(), $messagePluralization = null, $cause = null)
     {
-        $this->message = (string) $message;
+        $this->message = $message;
         $this->messageTemplate = $messageTemplate ?: $message;
         $this->messageParameters = $messageParameters;
         $this->messagePluralization = $messagePluralization;
@@ -127,7 +155,7 @@ class FormError implements \Serializable
     /**
      * Returns the form that caused this error.
      *
-     * @return FormInterface|null The form that caused this error
+     * @return FormInterface The form that caused this error
      */
     public function getOrigin()
     {
@@ -135,28 +163,28 @@ class FormError implements \Serializable
     }
 
     /**
-     * @internal
+     * Serializes this error.
+     *
+     * @return string The serialized error
      */
     public function serialize()
     {
-        return serialize([
+        return serialize(array(
             $this->message,
             $this->messageTemplate,
             $this->messageParameters,
             $this->messagePluralization,
             $this->cause,
-        ]);
+        ));
     }
 
     /**
-     * @internal
+     * Unserializes a serialized error.
+     *
+     * @param string $serialized The serialized error
      */
     public function unserialize($serialized)
     {
-        if (\PHP_VERSION_ID >= 70000) {
-            list($this->message, $this->messageTemplate, $this->messageParameters, $this->messagePluralization, $this->cause) = unserialize($serialized, ['allowed_classes' => false]);
-        } else {
-            list($this->message, $this->messageTemplate, $this->messageParameters, $this->messagePluralization, $this->cause) = unserialize($serialized);
-        }
+        list($this->message, $this->messageTemplate, $this->messageParameters, $this->messagePluralization, $this->cause) = unserialize($serialized);
     }
 }

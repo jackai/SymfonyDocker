@@ -11,14 +11,13 @@
 
 namespace Symfony\Component\Intl\Tests\Data\Bundle\Writer;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Intl\Data\Bundle\Writer\PhpBundleWriter;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class PhpBundleWriterTest extends TestCase
+class PhpBundleWriterTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var PhpBundleWriter
@@ -48,18 +47,18 @@ class PhpBundleWriterTest extends TestCase
 
     public function testWrite()
     {
-        $this->writer->write($this->directory, 'en', [
-            'Entry1' => [
-                'Array' => ['foo', 'bar'],
+        $this->writer->write($this->directory, 'en', array(
+            'Entry1' => array(
+                'Array' => array('foo', 'bar'),
                 'Integer' => 5,
                 'Boolean' => false,
                 'Float' => 1.23,
-            ],
+            ),
             'Entry2' => 'String',
-            'Traversable' => new \ArrayIterator([
+            'Traversable' => new \ArrayIterator(array(
                 'Foo' => 'Bar',
-            ]),
-        ]);
+            )),
+        ));
 
         $this->assertFileEquals(__DIR__.'/Fixtures/en.php', $this->directory.'/en.php');
     }

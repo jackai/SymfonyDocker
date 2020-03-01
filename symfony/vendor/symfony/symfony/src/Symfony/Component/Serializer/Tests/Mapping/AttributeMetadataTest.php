@@ -11,13 +11,12 @@
 
 namespace Symfony\Component\Serializer\Tests\Mapping;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Mapping\AttributeMetadata;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class AttributeMetadataTest extends TestCase
+class AttributeMetadataTest extends \PHPUnit_Framework_TestCase
 {
     public function testInterface()
     {
@@ -38,15 +37,7 @@ class AttributeMetadataTest extends TestCase
         $attributeMetadata->addGroup('a');
         $attributeMetadata->addGroup('b');
 
-        $this->assertEquals(['a', 'b'], $attributeMetadata->getGroups());
-    }
-
-    public function testMaxDepth()
-    {
-        $attributeMetadata = new AttributeMetadata('name');
-        $attributeMetadata->setMaxDepth(69);
-
-        $this->assertEquals(69, $attributeMetadata->getMaxDepth());
+        $this->assertEquals(array('a', 'b'), $attributeMetadata->getGroups());
     }
 
     public function testMerge()
@@ -58,12 +49,10 @@ class AttributeMetadataTest extends TestCase
         $attributeMetadata2 = new AttributeMetadata('a2');
         $attributeMetadata2->addGroup('a');
         $attributeMetadata2->addGroup('c');
-        $attributeMetadata2->setMaxDepth(2);
 
         $attributeMetadata1->merge($attributeMetadata2);
 
-        $this->assertEquals(['a', 'b', 'c'], $attributeMetadata1->getGroups());
-        $this->assertEquals(2, $attributeMetadata1->getMaxDepth());
+        $this->assertEquals(array('a', 'b', 'c'), $attributeMetadata1->getGroups());
     }
 
     public function testSerialize()
@@ -71,7 +60,6 @@ class AttributeMetadataTest extends TestCase
         $attributeMetadata = new AttributeMetadata('attribute');
         $attributeMetadata->addGroup('a');
         $attributeMetadata->addGroup('b');
-        $attributeMetadata->setMaxDepth(3);
 
         $serialized = serialize($attributeMetadata);
         $this->assertEquals($attributeMetadata, unserialize($serialized));

@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\Intl\Data\Generator;
 
-use Symfony\Component\Intl\Data\Bundle\Compiler\BundleCompilerInterface;
-use Symfony\Component\Intl\Data\Bundle\Reader\BundleEntryReaderInterface;
+use Symfony\Component\Intl\Data\Bundle\Reader\BundleReaderInterface;
 use Symfony\Component\Intl\Data\Util\ArrayAccessibleResourceBundle;
+use Symfony\Component\Intl\Data\Bundle\Compiler\GenrbCompiler;
 use Symfony\Component\Intl\Data\Util\LocaleScanner;
 
 /**
@@ -21,46 +21,50 @@ use Symfony\Component\Intl\Data\Util\LocaleScanner;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
- * @see http://source.icu-project.org/repos/icu/icu4j/trunk/main/classes/core/src/com/ibm/icu/util/Region.java
+ * @link http://source.icu-project.org/repos/icu/icu4j/trunk/main/classes/core/src/com/ibm/icu/util/Region.java
  *
  * @internal
  */
 class RegionDataGenerator extends AbstractDataGenerator
 {
-    private static $blacklist = [
+    const UNKNOWN_REGION_ID = 'ZZ';
+
+    const OUTLYING_OCEANIA_REGION_ID = 'QO';
+
+    const EUROPEAN_UNION_ID = 'EU';
+
+    const NETHERLANDS_ANTILLES_ID = 'AN';
+
+    const BOUVET_ISLAND_ID = 'BV';
+
+    const HEARD_MCDONALD_ISLANDS_ID = 'HM';
+
+    const CLIPPERTON_ISLAND_ID = 'CP';
+
+    /**
+     * Regions excluded from generation.
+     *
+     * @var array
+     */
+    private static $blacklist = array(
+        self::UNKNOWN_REGION_ID => true,
         // Look like countries, but are sub-continents
-        'QO' => true, // Outlying Oceania
-        'EU' => true, // European Union
-        'EZ' => true, // Eurozone
-        'UN' => true, // United Nations
+        self::OUTLYING_OCEANIA_REGION_ID => true,
+        self::EUROPEAN_UNION_ID => true,
+        // No longer exists
+        self::NETHERLANDS_ANTILLES_ID => true,
         // Uninhabited islands
-        'BV' => true, // Bouvet Island
-        'HM' => true, // Heard & McDonald Islands
-        'CP' => true, // Clipperton Island
-        // Misc
-        'ZZ' => true, // Unknown Region
-    ];
+        self::BOUVET_ISLAND_ID => true,
+        self::HEARD_MCDONALD_ISLANDS_ID => true,
+        self::CLIPPERTON_ISLAND_ID => true,
+    );
 
     /**
      * Collects all available language codes.
      *
      * @var string[]
      */
-    private $regionCodes = [];
-
-    public static function isValidCountryCode($region)
-    {
-        if (isset(self::$blacklist[$region])) {
-            return false;
-        }
-
-        // WORLD/CONTINENT/SUBCONTINENT/GROUPING
-        if (ctype_digit($region) || \is_int($region)) {
-            return false;
-        }
-
-        return true;
-    }
+    private $regionCodes = array();
 
     /**
      * {@inheritdoc}
@@ -73,7 +77,7 @@ class RegionDataGenerator extends AbstractDataGenerator
     /**
      * {@inheritdoc}
      */
-    protected function compileTemporaryBundles(BundleCompilerInterface $compiler, $sourceDir, $tempDir)
+    protected function compileTemporaryBundles(GenrbCompiler $compiler, $sourceDir, $tempDir)
     {
         $compiler->compile($sourceDir.'/region', $tempDir);
     }
@@ -83,42 +87,40 @@ class RegionDataGenerator extends AbstractDataGenerator
      */
     protected function preGenerate()
     {
-        $this->regionCodes = [];
+        $this->regionCodes = array();
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function generateDataForLocale(BundleEntryReaderInterface $reader, $tempDir, $displayLocale)
+    protected function generateDataForLocale(BundleReaderInterface $reader, $tempDir, $displayLocale)
     {
         $localeBundle = $reader->read($tempDir, $displayLocale);
 
         // isset() on \ResourceBundle returns true even if the value is null
         if (isset($localeBundle['Countries']) && null !== $localeBundle['Countries']) {
-            $data = [
+            $data = array(
                 'Version' => $localeBundle['Version'],
                 'Names' => $this->generateRegionNames($localeBundle),
-            ];
+            );
 
             $this->regionCodes = array_merge($this->regionCodes, array_keys($data['Names']));
 
             return $data;
         }
-
-        return null;
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function generateDataForRoot(BundleEntryReaderInterface $reader, $tempDir)
+    protected function generateDataForRoot(BundleReaderInterface $reader, $tempDir)
     {
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function generateDataForMeta(BundleEntryReaderInterface $reader, $tempDir)
+    protected function generateDataForMeta(BundleReaderInterface $reader, $tempDir)
     {
         $rootBundle = $reader->read($tempDir, 'root');
 
@@ -126,22 +128,29 @@ class RegionDataGenerator extends AbstractDataGenerator
 
         sort($this->regionCodes);
 
-        return [
+        return array(
             'Version' => $rootBundle['Version'],
             'Regions' => $this->regionCodes,
-        ];
+        );
     }
 
     /**
+     * @param ArrayAccessibleResourceBundle $localeBundle
+     *
      * @return array
      */
     protected function generateRegionNames(ArrayAccessibleResourceBundle $localeBundle)
     {
         $unfilteredRegionNames = iterator_to_array($localeBundle['Countries']);
-        $regionNames = [];
+        $regionNames = array();
 
         foreach ($unfilteredRegionNames as $region => $regionName) {
-            if (!self::isValidCountryCode($region)) {
+            if (isset(self::$blacklist[$region])) {
+                continue;
+            }
+
+            // WORLD/CONTINENT/SUBCONTINENT/GROUPING
+            if (ctype_digit($region) || is_int($region)) {
                 continue;
             }
 

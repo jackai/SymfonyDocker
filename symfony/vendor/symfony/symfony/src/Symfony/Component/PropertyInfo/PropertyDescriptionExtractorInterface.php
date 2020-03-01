@@ -12,7 +12,7 @@
 namespace Symfony\Component\PropertyInfo;
 
 /**
- * Guesses the property's human readable description.
+ * Description extractor Interface.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
@@ -23,18 +23,20 @@ interface PropertyDescriptionExtractorInterface
      *
      * @param string $class
      * @param string $property
+     * @param array  $context
      *
      * @return string|null
      */
-    public function getShortDescription($class, $property, array $context = []);
+    public function getShortDescription($class, $property, array $context = array());
 
     /**
      * Gets the long description of the property.
      *
      * @param string $class
      * @param string $property
+     * @param array  $context
      *
      * @return string|null
      */
-    public function getLongDescription($class, $property, array $context = []);
+    public function getLongDescription($class, $property, array $context = array());
 }

@@ -12,7 +12,7 @@
 namespace Symfony\Component\Security\Guard\Token;
 
 use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
-use Symfony\Component\Security\Core\Role\Role;
+use Symfony\Component\Security\Core\Role\RoleInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
@@ -21,16 +21,16 @@ use Symfony\Component\Security\Core\User\UserInterface;
  * If you're using Guard authentication, you *must* use a class that implements
  * GuardTokenInterface as your authenticated token (like this class).
  *
- * @author Ryan Weaver <ryan@knpuniversity.com>
+ * @author Ryan Weaver <ryan@knpuniversity.com>n@gmail.com>
  */
 class PostAuthenticationGuardToken extends AbstractToken implements GuardTokenInterface
 {
     private $providerKey;
 
     /**
-     * @param UserInterface   $user        The user!
-     * @param string          $providerKey The provider (firewall) key
-     * @param (Role|string)[] $roles       An array of roles
+     * @param UserInterface            $user        The user!
+     * @param string                   $providerKey The provider (firewall) key
+     * @param RoleInterface[]|string[] $roles       An array of roles
      *
      * @throws \InvalidArgumentException
      */
@@ -47,7 +47,7 @@ class PostAuthenticationGuardToken extends AbstractToken implements GuardTokenIn
 
         // this token is meant to be used after authentication success, so it is always authenticated
         // you could set it as non authenticated later if you need to
-        $this->setAuthenticated(true);
+        parent::setAuthenticated(true);
     }
 
     /**
@@ -58,7 +58,7 @@ class PostAuthenticationGuardToken extends AbstractToken implements GuardTokenIn
      */
     public function getCredentials()
     {
-        return [];
+        return array();
     }
 
     /**
@@ -76,9 +76,7 @@ class PostAuthenticationGuardToken extends AbstractToken implements GuardTokenIn
      */
     public function serialize()
     {
-        $serialized = [$this->providerKey, parent::serialize(true)];
-
-        return $this->doSerialize($serialized, \func_num_args() ? func_get_arg(0) : null);
+        return serialize(array($this->providerKey, parent::serialize()));
     }
 
     /**
@@ -86,7 +84,7 @@ class PostAuthenticationGuardToken extends AbstractToken implements GuardTokenIn
      */
     public function unserialize($serialized)
     {
-        list($this->providerKey, $parentStr) = \is_array($serialized) ? $serialized : unserialize($serialized);
+        list($this->providerKey, $parentStr) = unserialize($serialized);
         parent::unserialize($parentStr);
     }
 }

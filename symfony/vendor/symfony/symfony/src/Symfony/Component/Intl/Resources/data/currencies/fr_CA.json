@@ -1,5 +1,5 @@
 {
-    "Version": "36",
+    "Version": "2.1.13.23",
     "Names": {
         "ARS": [
             "ARS",
@@ -9,10 +9,6 @@
             "$ AU",
             "dollar australien"
         ],
-        "AZN": [
-            "AZN",
-            "manat azerbaïdjanais"
-        ],
         "BMD": [
             "BMD",
             "dollar bermudien"
@@ -20,6 +16,10 @@
         "BND": [
             "BND",
             "dollar brunéien"
+        ],
+        "BSD": [
+            "BSD",
+            "dollar bahaméen"
         ],
         "BZD": [
             "BZD",
@@ -40,10 +40,6 @@
         "COP": [
             "COP",
             "peso colombien"
-        ],
-        "CVE": [
-            "CVE",
-            "escudo cap-verdien"
         ],
         "FJD": [
             "FJD",
@@ -73,10 +69,6 @@
             "INR",
             "roupie indienne"
         ],
-        "IRR": [
-            "IRR",
-            "rial iranien"
-        ],
         "JPY": [
             "¥",
             "yen japonais"
@@ -84,10 +76,6 @@
         "KRW": [
             "KRW",
             "won sud-coréen"
-        ],
-        "LAK": [
-            "LAK",
-            "kip laotien"
         ],
         "LBP": [
             "LBP",
@@ -105,26 +93,6 @@
             "$ NZ",
             "dollar néo-zélandais"
         ],
-        "OMR": [
-            "OMR",
-            "rial omanais"
-        ],
-        "PEN": [
-            "PEN",
-            "nouveau sol péruvien"
-        ],
-        "PGK": [
-            "PGK",
-            "kina papou-néo-guinéen"
-        ],
-        "QAR": [
-            "QAR",
-            "riyal du Qatar"
-        ],
-        "SAR": [
-            "SAR",
-            "rial saoudien"
-        ],
         "SBD": [
             "SBD",
             "dollar des îles Salomon"
@@ -133,13 +101,9 @@
             "$ SG",
             "dollar de Singapour"
         ],
-        "SRD": [
-            "SRD",
-            "dollar du Suriname"
-        ],
-        "TOP": [
-            "TOP",
-            "pa’anga"
+        "THB": [
+            "THB",
+            "baht thaïlandais"
         ],
         "TTD": [
             "TTD",
@@ -157,14 +121,6 @@
             "VND",
             "dông vietnamien"
         ],
-        "VUV": [
-            "VUV",
-            "vatu"
-        ],
-        "WST": [
-            "WST",
-            "tala"
-        ],
         "XAF": [
             "XAF",
             "franc CFA (BEAC)"
@@ -176,10 +132,6 @@
         "XPF": [
             "XPF",
             "franc CFP"
-        ],
-        "YER": [
-            "YER",
-            "rial yéménite"
         ]
     }
 }

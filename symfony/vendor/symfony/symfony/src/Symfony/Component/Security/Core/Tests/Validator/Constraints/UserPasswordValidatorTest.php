@@ -16,14 +16,15 @@ use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 use Symfony\Component\Security\Core\Validator\Constraints\UserPassword;
 use Symfony\Component\Security\Core\Validator\Constraints\UserPasswordValidator;
-use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
+use Symfony\Component\Validator\Tests\Constraints\AbstractConstraintValidatorTest;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-abstract class UserPasswordValidatorTest extends ConstraintValidatorTestCase
+abstract class UserPasswordValidatorTest extends AbstractConstraintValidatorTest
 {
     const PASSWORD = 's3Cr3t';
+
     const SALT = '^S4lt$';
 
     /**
@@ -58,14 +59,14 @@ abstract class UserPasswordValidatorTest extends ConstraintValidatorTestCase
 
     public function testPasswordIsValid()
     {
-        $constraint = new UserPassword([
+        $constraint = new UserPassword(array(
             'message' => 'myMessage',
-        ]);
+        ));
 
         $this->encoder->expects($this->once())
             ->method('isPasswordValid')
             ->with(static::PASSWORD, 'secret', static::SALT)
-            ->willReturn(true);
+            ->will($this->returnValue(true));
 
         $this->validator->validate('secret', $constraint);
 
@@ -74,14 +75,14 @@ abstract class UserPasswordValidatorTest extends ConstraintValidatorTestCase
 
     public function testPasswordIsNotValid()
     {
-        $constraint = new UserPassword([
+        $constraint = new UserPassword(array(
             'message' => 'myMessage',
-        ]);
+        ));
 
         $this->encoder->expects($this->once())
             ->method('isPasswordValid')
             ->with(static::PASSWORD, 'secret', static::SALT)
-            ->willReturn(false);
+            ->will($this->returnValue(false));
 
         $this->validator->validate('secret', $constraint);
 
@@ -90,32 +91,11 @@ abstract class UserPasswordValidatorTest extends ConstraintValidatorTestCase
     }
 
     /**
-     * @dataProvider emptyPasswordData
+     * @expectedException \Symfony\Component\Validator\Exception\ConstraintDefinitionException
      */
-    public function testEmptyPasswordsAreNotValid($password)
-    {
-        $constraint = new UserPassword([
-            'message' => 'myMessage',
-        ]);
-
-        $this->validator->validate($password, $constraint);
-
-        $this->buildViolation('myMessage')
-            ->assertRaised();
-    }
-
-    public function emptyPasswordData()
-    {
-        return [
-            [null],
-            [''],
-        ];
-    }
-
     public function testUserIsNotValid()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
-        $user = $this->getMockBuilder('Foo\Bar\User')->getMock();
+        $user = $this->getMock('Foo\Bar\User');
 
         $this->tokenStorage = $this->createTokenStorage($user);
         $this->validator = $this->createValidator();
@@ -126,18 +106,18 @@ abstract class UserPasswordValidatorTest extends ConstraintValidatorTestCase
 
     protected function createUser()
     {
-        $mock = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock();
+        $mock = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
 
         $mock
             ->expects($this->any())
             ->method('getPassword')
-            ->willReturn(static::PASSWORD)
+            ->will($this->returnValue(static::PASSWORD))
         ;
 
         $mock
             ->expects($this->any())
             ->method('getSalt')
-            ->willReturn(static::SALT)
+            ->will($this->returnValue(static::SALT))
         ;
 
         return $mock;
@@ -145,17 +125,17 @@ abstract class UserPasswordValidatorTest extends ConstraintValidatorTestCase
 
     protected function createPasswordEncoder($isPasswordValid = true)
     {
-        return $this->getMockBuilder('Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface')->getMock();
+        return $this->getMock('Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface');
     }
 
     protected function createEncoderFactory($encoder = null)
     {
-        $mock = $this->getMockBuilder('Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface')->getMock();
+        $mock = $this->getMock('Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface');
 
         $mock
             ->expects($this->any())
             ->method('getEncoder')
-            ->willReturn($encoder)
+            ->will($this->returnValue($encoder))
         ;
 
         return $mock;
@@ -165,11 +145,11 @@ abstract class UserPasswordValidatorTest extends ConstraintValidatorTestCase
     {
         $token = $this->createAuthenticationToken($user);
 
-        $mock = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')->getMock();
+        $mock = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface');
         $mock
             ->expects($this->any())
             ->method('getToken')
-            ->willReturn($token)
+            ->will($this->returnValue($token))
         ;
 
         return $mock;
@@ -177,11 +157,11 @@ abstract class UserPasswordValidatorTest extends ConstraintValidatorTestCase
 
     protected function createAuthenticationToken($user = null)
     {
-        $mock = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
+        $mock = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
         $mock
             ->expects($this->any())
             ->method('getUser')
-            ->willReturn($user)
+            ->will($this->returnValue($user))
         ;
 
         return $mock;

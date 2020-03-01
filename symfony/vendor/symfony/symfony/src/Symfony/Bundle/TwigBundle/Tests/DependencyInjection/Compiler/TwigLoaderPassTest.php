@@ -11,15 +11,13 @@
 
 namespace Symfony\Bundle\TwigBundle\Tests\DependencyInjection\Compiler;
 
-use PHPUnit\Framework\TestCase;
-use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\TwigLoaderPass;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\TwigLoaderPass;
 
-class TwigLoaderPassTest extends TestCase
+class TwigLoaderPassTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var ContainerBuilder
+     * @var \PHPUnit_Framework_MockObject_MockObject
      */
     private $builder;
     /**
@@ -33,33 +31,65 @@ class TwigLoaderPassTest extends TestCase
 
     protected function setUp()
     {
-        $this->builder = new ContainerBuilder();
-        $this->builder->register('twig');
+        $this->builder = $this->getMock(
+            'Symfony\Component\DependencyInjection\ContainerBuilder',
+            array('hasDefinition', 'findTaggedServiceIds', 'setAlias', 'getDefinition')
+        );
         $this->chainLoader = new Definition('loader');
         $this->pass = new TwigLoaderPass();
     }
 
-    public function testMapperPassWithOneTaggedLoader()
+    public function testMapperPassWithOneTaggedLoaders()
     {
-        $this->builder->register('test_loader_1')
-            ->addTag('twig.loader');
+        $serviceIds = array(
+            'test_loader_1' => array(
+                array(),
+            ),
+        );
+
+        $this->builder->expects($this->once())
+            ->method('hasDefinition')
+            ->with('twig')
+            ->will($this->returnValue(true));
+        $this->builder->expects($this->once())
+            ->method('findTaggedServiceIds')
+            ->with('twig.loader')
+            ->will($this->returnValue($serviceIds));
+        $this->builder->expects($this->once())
+            ->method('setAlias')
+            ->with('twig.loader', 'test_loader_1');
 
         $this->pass->process($this->builder);
-
-        $this->assertSame('test_loader_1', (string) $this->builder->getAlias('twig.loader'));
     }
 
     public function testMapperPassWithTwoTaggedLoaders()
     {
-        $this->builder->setDefinition('twig.loader.chain', $this->chainLoader);
-        $this->builder->register('test_loader_1')
-            ->addTag('twig.loader');
-        $this->builder->register('test_loader_2')
-            ->addTag('twig.loader');
+        $serviceIds = array(
+            'test_loader_1' => array(
+                array(),
+            ),
+            'test_loader_2' => array(
+                array(),
+            ),
+        );
+
+        $this->builder->expects($this->once())
+            ->method('hasDefinition')
+            ->with('twig')
+            ->will($this->returnValue(true));
+        $this->builder->expects($this->once())
+            ->method('findTaggedServiceIds')
+            ->with('twig.loader')
+            ->will($this->returnValue($serviceIds));
+        $this->builder->expects($this->once())
+            ->method('getDefinition')
+            ->with('twig.loader.chain')
+            ->will($this->returnValue($this->chainLoader));
+        $this->builder->expects($this->once())
+            ->method('setAlias')
+            ->with('twig.loader', 'twig.loader.chain');
 
         $this->pass->process($this->builder);
-
-        $this->assertSame('twig.loader.chain', (string) $this->builder->getAlias('twig.loader'));
         $calls = $this->chainLoader->getMethodCalls();
         $this->assertCount(2, $calls);
         $this->assertEquals('addLoader', $calls[0][0]);
@@ -70,15 +100,32 @@ class TwigLoaderPassTest extends TestCase
 
     public function testMapperPassWithTwoTaggedLoadersWithPriority()
     {
-        $this->builder->setDefinition('twig.loader.chain', $this->chainLoader);
-        $this->builder->register('test_loader_1')
-            ->addTag('twig.loader', ['priority' => 100]);
-        $this->builder->register('test_loader_2')
-            ->addTag('twig.loader', ['priority' => 200]);
+        $serviceIds = array(
+            'test_loader_1' => array(
+                array('priority' => 100),
+            ),
+            'test_loader_2' => array(
+                array('priority' => 200),
+            ),
+        );
+
+        $this->builder->expects($this->once())
+            ->method('hasDefinition')
+            ->with('twig')
+            ->will($this->returnValue(true));
+        $this->builder->expects($this->once())
+            ->method('findTaggedServiceIds')
+            ->with('twig.loader')
+            ->will($this->returnValue($serviceIds));
+        $this->builder->expects($this->once())
+            ->method('getDefinition')
+            ->with('twig.loader.chain')
+            ->will($this->returnValue($this->chainLoader));
+        $this->builder->expects($this->once())
+            ->method('setAlias')
+            ->with('twig.loader', 'twig.loader.chain');
 
         $this->pass->process($this->builder);
-
-        $this->assertSame('twig.loader.chain', (string) $this->builder->getAlias('twig.loader'));
         $calls = $this->chainLoader->getMethodCalls();
         $this->assertCount(2, $calls);
         $this->assertEquals('addLoader', $calls[0][0]);
@@ -87,9 +134,20 @@ class TwigLoaderPassTest extends TestCase
         $this->assertEquals('test_loader_1', (string) $calls[1][1][0]);
     }
 
+    /**
+     * @expectedException \Symfony\Component\DependencyInjection\Exception\LogicException
+     */
     public function testMapperPassWithZeroTaggedLoaders()
     {
-        $this->expectException('Symfony\Component\DependencyInjection\Exception\LogicException');
+        $this->builder->expects($this->once())
+            ->method('hasDefinition')
+            ->with('twig')
+            ->will($this->returnValue(true));
+        $this->builder->expects($this->once())
+            ->method('findTaggedServiceIds')
+            ->with('twig.loader')
+            ->will($this->returnValue(array()));
+
         $this->pass->process($this->builder);
     }
 }

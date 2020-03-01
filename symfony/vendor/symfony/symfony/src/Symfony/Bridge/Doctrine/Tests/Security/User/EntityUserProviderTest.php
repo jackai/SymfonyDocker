@@ -11,17 +11,12 @@
 
 namespace Symfony\Bridge\Doctrine\Tests\Security\User;
 
-use Doctrine\Common\Persistence\ManagerRegistry as LegacyManagerRegistry;
-use Doctrine\Common\Persistence\ObjectManager as LegacyObjectManager;
-use Doctrine\ORM\Tools\SchemaTool;
-use Doctrine\Persistence\ManagerRegistry;
-use Doctrine\Persistence\ObjectManager;
-use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\Doctrine\Security\User\EntityUserProvider;
 use Symfony\Bridge\Doctrine\Test\DoctrineTestHelper;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\User;
+use Symfony\Bridge\Doctrine\Security\User\EntityUserProvider;
+use Doctrine\ORM\Tools\SchemaTool;
 
-class EntityUserProviderTest extends TestCase
+class EntityUserProviderTest extends \PHPUnit_Framework_TestCase
 {
     public function testRefreshUserGetsUserByPrimaryKey()
     {
@@ -43,63 +38,6 @@ class EntityUserProviderTest extends TestCase
         $this->assertSame($user1, $provider->refreshUser($user1));
     }
 
-    public function testLoadUserByUsername()
-    {
-        $em = DoctrineTestHelper::createTestEntityManager();
-        $this->createSchema($em);
-
-        $user = new User(1, 1, 'user1');
-
-        $em->persist($user);
-        $em->flush();
-
-        $provider = new EntityUserProvider($this->getManager($em), 'Symfony\Bridge\Doctrine\Tests\Fixtures\User', 'name');
-
-        $this->assertSame($user, $provider->loadUserByUsername('user1'));
-    }
-
-    public function testLoadUserByUsernameWithUserLoaderRepositoryAndWithoutProperty()
-    {
-        $user = new User(1, 1, 'user1');
-
-        $repository = $this->getMockBuilder('Symfony\Bridge\Doctrine\Security\User\UserLoaderInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $repository
-            ->expects($this->once())
-            ->method('loadUserByUsername')
-            ->with('user1')
-            ->willReturn($user);
-
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $em
-            ->expects($this->once())
-            ->method('getRepository')
-            ->with('Symfony\Bridge\Doctrine\Tests\Fixtures\User')
-            ->willReturn($repository);
-
-        $provider = new EntityUserProvider($this->getManager($em), 'Symfony\Bridge\Doctrine\Tests\Fixtures\User');
-        $this->assertSame($user, $provider->loadUserByUsername('user1'));
-    }
-
-    public function testLoadUserByUsernameWithNonUserLoaderRepositoryAndWithoutProperty()
-    {
-        $this->expectException('InvalidArgumentException');
-        $this->expectExceptionMessage('You must either make the "Symfony\Bridge\Doctrine\Tests\Fixtures\User" entity Doctrine Repository ("Doctrine\ORM\EntityRepository") implement "Symfony\Bridge\Doctrine\Security\User\UserLoaderInterface" or set the "property" option in the corresponding entity provider configuration.');
-        $em = DoctrineTestHelper::createTestEntityManager();
-        $this->createSchema($em);
-
-        $user = new User(1, 1, 'user1');
-
-        $em->persist($user);
-        $em->flush();
-
-        $provider = new EntityUserProvider($this->getManager($em), 'Symfony\Bridge\Doctrine\Tests\Fixtures\User');
-        $provider->loadUserByUsername('user1');
-    }
-
     public function testRefreshUserRequiresId()
     {
         $em = DoctrineTestHelper::createTestEntityManager();
@@ -107,9 +45,10 @@ class EntityUserProviderTest extends TestCase
         $user1 = new User(null, null, 'user1');
         $provider = new EntityUserProvider($this->getManager($em), 'Symfony\Bridge\Doctrine\Tests\Fixtures\User', 'name');
 
-        $this->expectException('InvalidArgumentException');
-        $this->expectExceptionMessage('You cannot refresh a user from the EntityUserProvider that does not contain an identifier. The user object has to be serialized with its own identifier mapped by Doctrine');
-
+        $this->setExpectedException(
+            'InvalidArgumentException',
+            'You cannot refresh a user from the EntityUserProvider that does not contain an identifier. The user object has to be serialized with its own identifier mapped by Doctrine'
+        );
         $provider->refreshUser($user1);
     }
 
@@ -126,9 +65,10 @@ class EntityUserProviderTest extends TestCase
         $provider = new EntityUserProvider($this->getManager($em), 'Symfony\Bridge\Doctrine\Tests\Fixtures\User', 'name');
 
         $user2 = new User(1, 2, 'user2');
-        $this->expectException('Symfony\Component\Security\Core\Exception\UsernameNotFoundException');
-        $this->expectExceptionMessage('User with id {"id1":1,"id2":2} not found');
-
+        $this->setExpectedException(
+            'Symfony\Component\Security\Core\Exception\UsernameNotFoundException',
+            'User with id {"id1":1,"id2":2} not found'
+        );
         $provider->refreshUser($user2);
     }
 
@@ -145,18 +85,18 @@ class EntityUserProviderTest extends TestCase
 
         $provider = new EntityUserProvider($this->getManager($em), 'Symfony\Bridge\Doctrine\Tests\Fixtures\User', 'name');
 
-        $user2 = $em->getReference('Symfony\Bridge\Doctrine\Tests\Fixtures\User', ['id1' => 1, 'id2' => 1]);
-        $this->assertTrue($provider->supportsClass(\get_class($user2)));
+        $user2 = $em->getReference('Symfony\Bridge\Doctrine\Tests\Fixtures\User', array('id1' => 1, 'id2' => 1));
+        $this->assertTrue($provider->supportsClass(get_class($user2)));
     }
 
     public function testLoadUserByUserNameShouldLoadUserWhenProperInterfaceProvided()
     {
-        $repository = $this->getMockBuilder('\Symfony\Bridge\Doctrine\Security\User\UserLoaderInterface')->getMock();
+        $repository = $this->getMock('\Symfony\Bridge\Doctrine\Security\User\UserLoaderInterface');
         $repository->expects($this->once())
             ->method('loadUserByUsername')
             ->with('name')
             ->willReturn(
-                $this->getMockBuilder('\Symfony\Component\Security\Core\User\UserInterface')->getMock()
+                $this->getMock('\Symfony\Component\Security\Core\User\UserInterface')
             );
 
         $provider = new EntityUserProvider(
@@ -167,10 +107,12 @@ class EntityUserProviderTest extends TestCase
         $provider->loadUserByUsername('name');
     }
 
+    /**
+     * @expectedException \InvalidArgumentException
+     */
     public function testLoadUserByUserNameShouldDeclineInvalidInterface()
     {
-        $this->expectException('InvalidArgumentException');
-        $repository = $this->getMockBuilder('\Symfony\Component\Security\Core\User\AdvancedUserInterface')->getMock();
+        $repository = $this->getMock('\Symfony\Component\Security\Core\User\AdvancedUserInterface');
 
         $provider = new EntityUserProvider(
             $this->getManager($this->getObjectManager($repository)),
@@ -182,19 +124,19 @@ class EntityUserProviderTest extends TestCase
 
     private function getManager($em, $name = null)
     {
-        $manager = $this->getMockBuilder(interface_exists(ManagerRegistry::class) ? ManagerRegistry::class : LegacyManagerRegistry::class)->getMock();
+        $manager = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
         $manager->expects($this->any())
             ->method('getManager')
             ->with($this->equalTo($name))
-            ->willReturn($em);
+            ->will($this->returnValue($em));
 
         return $manager;
     }
 
     private function getObjectManager($repository)
     {
-        $em = $this->getMockBuilder(interface_exists(ObjectManager::class) ? ObjectManager::class : LegacyObjectManager::class)
-            ->setMethods(['getClassMetadata', 'getRepository'])
+        $em = $this->getMockBuilder('\Doctrine\Common\Persistence\ObjectManager')
+            ->setMethods(array('getClassMetadata', 'getRepository'))
             ->getMockForAbstractClass();
         $em->expects($this->any())
             ->method('getRepository')
@@ -206,8 +148,8 @@ class EntityUserProviderTest extends TestCase
     private function createSchema($em)
     {
         $schemaTool = new SchemaTool($em);
-        $schemaTool->createSchema([
+        $schemaTool->createSchema(array(
             $em->getClassMetadata('Symfony\Bridge\Doctrine\Tests\Fixtures\User'),
-        ]);
+        ));
     }
 }

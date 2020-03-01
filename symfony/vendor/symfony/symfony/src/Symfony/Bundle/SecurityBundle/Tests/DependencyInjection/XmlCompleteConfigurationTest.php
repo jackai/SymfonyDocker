@@ -11,19 +11,15 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection;
 
-use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Component\Config\FileLocator;
 
 class XmlCompleteConfigurationTest extends CompleteConfigurationTest
 {
-    protected function getLoader(ContainerBuilder $container)
+    protected function loadFromFile(ContainerBuilder $container, $file)
     {
-        return new XmlFileLoader($container, new FileLocator(__DIR__.'/Fixtures/xml'));
-    }
-
-    protected function getFileExtension()
-    {
-        return 'xml';
+        $loadXml = new XmlFileLoader($container, new FileLocator(__DIR__.'/Fixtures/xml'));
+        $loadXml->load($file.'.xml');
     }
 }

@@ -11,29 +11,35 @@
 
 namespace Symfony\Component\Form;
 
+use Symfony\Component\Form\Extension\Core\CoreExtension;
+
 /**
  * Entry point of the Form component.
  *
  * Use this class to conveniently create new form factories:
  *
- *     use Symfony\Component\Form\Forms;
+ * <code>
+ * use Symfony\Component\Form\Forms;
  *
- *     $formFactory = Forms::createFormFactory();
+ * $formFactory = Forms::createFormFactory();
  *
- *     $form = $formFactory->createBuilder()
- *         ->add('firstName', 'Symfony\Component\Form\Extension\Core\Type\TextType')
- *         ->add('lastName', 'Symfony\Component\Form\Extension\Core\Type\TextType')
- *         ->add('age', 'Symfony\Component\Form\Extension\Core\Type\IntegerType')
- *         ->add('color', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', [
- *             'choices' => ['Red' => 'r', 'Blue' => 'b'],
- *         ])
- *         ->getForm();
+ * $form = $formFactory->createBuilder()
+ *     ->add('firstName', 'Symfony\Component\Form\Extension\Core\Type\TextType')
+ *     ->add('lastName', 'Symfony\Component\Form\Extension\Core\Type\TextType')
+ *     ->add('age', 'Symfony\Component\Form\Extension\Core\Type\IntegerType')
+ *     ->add('gender', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', array(
+ *         'choices' => array('Male' => 'm', 'Female' => 'f'),
+ *     ))
+ *     ->getForm();
+ * </code>
  *
  * You can also add custom extensions to the form factory:
  *
- *     $formFactory = Forms::createFormFactoryBuilder()
- *         ->addExtension(new AcmeExtension())
- *         ->getFormFactory();
+ * <code>
+ * $formFactory = Forms::createFormFactoryBuilder()
+ *     ->addExtension(new AcmeExtension())
+ *     ->getFormFactory();
+ * </code>
  *
  * If you create custom form types or type extensions, it is
  * generally recommended to create your own extensions that lazily
@@ -41,46 +47,54 @@ namespace Symfony\Component\Form;
  * does not matter that much, you can also pass them directly to the
  * form factory:
  *
- *     $formFactory = Forms::createFormFactoryBuilder()
- *         ->addType(new PersonType())
- *         ->addType(new PhoneNumberType())
- *         ->addTypeExtension(new FormTypeHelpTextExtension())
- *         ->getFormFactory();
+ * <code>
+ * $formFactory = Forms::createFormFactoryBuilder()
+ *     ->addType(new PersonType())
+ *     ->addType(new PhoneNumberType())
+ *     ->addTypeExtension(new FormTypeHelpTextExtension())
+ *     ->getFormFactory();
+ * </code>
  *
  * Support for the Validator component is provided by ValidatorExtension.
  * This extension needs a validator object to function properly:
  *
- *     use Symfony\Component\Validator\Validation;
- *     use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
+ * <code>
+ * use Symfony\Component\Validator\Validation;
+ * use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
  *
- *     $validator = Validation::createValidator();
- *     $formFactory = Forms::createFormFactoryBuilder()
- *         ->addExtension(new ValidatorExtension($validator))
- *         ->getFormFactory();
+ * $validator = Validation::createValidator();
+ * $formFactory = Forms::createFormFactoryBuilder()
+ *     ->addExtension(new ValidatorExtension($validator))
+ *     ->getFormFactory();
+ * </code>
  *
  * Support for the Templating component is provided by TemplatingExtension.
  * This extension needs a PhpEngine object for rendering forms. As second
  * argument you should pass the names of the default themes. Here is an
  * example for using the default layout with "<div>" tags:
  *
- *     use Symfony\Component\Form\Extension\Templating\TemplatingExtension;
+ * <code>
+ * use Symfony\Component\Form\Extension\Templating\TemplatingExtension;
  *
- *     $formFactory = Forms::createFormFactoryBuilder()
- *         ->addExtension(new TemplatingExtension($engine, null, [
- *             'FrameworkBundle:Form',
- *         ]))
- *         ->getFormFactory();
+ * $formFactory = Forms::createFormFactoryBuilder()
+ *     ->addExtension(new TemplatingExtension($engine, null, array(
+ *         'FrameworkBundle:Form',
+ *     )))
+ *     ->getFormFactory();
+ * </code>
  *
  * The next example shows how to include the "<table>" layout:
  *
- *     use Symfony\Component\Form\Extension\Templating\TemplatingExtension;
+ * <code>
+ * use Symfony\Component\Form\Extension\Templating\TemplatingExtension;
  *
- *     $formFactory = Forms::createFormFactoryBuilder()
- *         ->addExtension(new TemplatingExtension($engine, null, [
- *             'FrameworkBundle:Form',
- *             'FrameworkBundle:FormTable',
- *         ]))
- *         ->getFormFactory();
+ * $formFactory = Forms::createFormFactoryBuilder()
+ *     ->addExtension(new TemplatingExtension($engine, null, array(
+ *         'FrameworkBundle:Form',
+ *         'FrameworkBundle:FormTable',
+ *     )))
+ *     ->getFormFactory();
+ * </code>
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
@@ -103,7 +117,10 @@ final class Forms
      */
     public static function createFormFactoryBuilder()
     {
-        return new FormFactoryBuilder(true);
+        $builder = new FormFactoryBuilder();
+        $builder->addExtension(new CoreExtension());
+
+        return $builder;
     }
 
     /**

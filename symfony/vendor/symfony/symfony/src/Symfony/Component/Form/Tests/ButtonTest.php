@@ -11,14 +11,13 @@
 
 namespace Symfony\Component\Form\Tests;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\ButtonBuilder;
 use Symfony\Component\Form\FormBuilder;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class ButtonTest extends TestCase
+class ButtonTest extends \PHPUnit_Framework_TestCase
 {
     private $dispatcher;
 
@@ -26,20 +25,8 @@ class ButtonTest extends TestCase
 
     protected function setUp()
     {
-        $this->dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock();
-        $this->factory = $this->getMockBuilder('Symfony\Component\Form\FormFactoryInterface')->getMock();
-    }
-
-    public function testSetParentOnSubmittedButton()
-    {
-        $this->expectException('Symfony\Component\Form\Exception\AlreadySubmittedException');
-        $button = $this->getButtonBuilder('button')
-            ->getForm()
-        ;
-
-        $button->submit('');
-
-        $button->setParent($this->getFormBuilder()->getForm());
+        $this->dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        $this->factory = $this->getMock('Symfony\Component\Form\FormFactoryInterface');
     }
 
     /**
@@ -47,15 +34,13 @@ class ButtonTest extends TestCase
      */
     public function testDisabledIfParentIsDisabled($parentDisabled, $buttonDisabled, $result)
     {
-        $form = $this->getFormBuilder()
+        $form = $this->getFormBuilder('form')
             ->setDisabled($parentDisabled)
-            ->getForm()
-        ;
+            ->getForm();
 
         $button = $this->getButtonBuilder('button')
             ->setDisabled($buttonDisabled)
-            ->getForm()
-        ;
+            ->getForm();
 
         $button->setParent($form);
 
@@ -64,13 +49,13 @@ class ButtonTest extends TestCase
 
     public function getDisabledStates()
     {
-        return [
+        return array(
             // parent, button, result
-            [true, true, true],
-            [true, false, true],
-            [false, true, true],
-            [false, false, false],
-        ];
+            array(true, true, true),
+            array(true, false, true),
+            array(false, true, true),
+            array(false, false, false),
+        );
     }
 
     private function getButtonBuilder($name)
@@ -78,8 +63,8 @@ class ButtonTest extends TestCase
         return new ButtonBuilder($name);
     }
 
-    private function getFormBuilder()
+    private function getFormBuilder($name)
     {
-        return new FormBuilder('form', null, $this->dispatcher, $this->factory);
+        return new FormBuilder($name, null, $this->dispatcher, $this->factory);
     }
 }

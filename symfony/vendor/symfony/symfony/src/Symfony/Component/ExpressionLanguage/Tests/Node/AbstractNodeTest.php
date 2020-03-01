@@ -11,15 +11,14 @@
 
 namespace Symfony\Component\ExpressionLanguage\Tests\Node;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\ExpressionLanguage\Compiler;
 
-abstract class AbstractNodeTest extends TestCase
+abstract class AbstractNodeTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @dataProvider getEvaluateData
      */
-    public function testEvaluate($expected, $node, $variables = [], $functions = [])
+    public function testEvaluate($expected, $node, $variables = array(), $functions = array())
     {
         $this->assertSame($expected, $node->evaluate($functions, $variables));
     }
@@ -29,7 +28,7 @@ abstract class AbstractNodeTest extends TestCase
     /**
      * @dataProvider getCompileData
      */
-    public function testCompile($expected, $node, $functions = [])
+    public function testCompile($expected, $node, $functions = array())
     {
         $compiler = new Compiler($functions);
         $node->compile($compiler);
@@ -37,14 +36,4 @@ abstract class AbstractNodeTest extends TestCase
     }
 
     abstract public function getCompileData();
-
-    /**
-     * @dataProvider getDumpData
-     */
-    public function testDump($expected, $node)
-    {
-        $this->assertSame($expected, $node->dump());
-    }
-
-    abstract public function getDumpData();
 }

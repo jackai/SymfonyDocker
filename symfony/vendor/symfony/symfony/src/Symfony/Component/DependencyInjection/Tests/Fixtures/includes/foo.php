@@ -11,14 +11,14 @@ class FooClass
     public $initialized = false;
     public $configured = false;
     public $called = false;
-    public $arguments = [];
+    public $arguments = array();
 
-    public function __construct($arguments = [])
+    public function __construct($arguments = array())
     {
         $this->arguments = $arguments;
     }
 
-    public static function getInstance($arguments = [])
+    public static function getInstance($arguments = array())
     {
         $obj = new self($arguments);
         $obj->called = true;

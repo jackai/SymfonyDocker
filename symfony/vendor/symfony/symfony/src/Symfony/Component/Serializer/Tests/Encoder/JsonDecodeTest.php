@@ -11,11 +11,10 @@
 
 namespace Symfony\Component\Serializer\Tests\Encoder;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Encoder\JsonDecode;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 
-class JsonDecodeTest extends TestCase
+class JsonDecodeTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \Symfony\Component\Serializer\Encoder\JsonDecode */
     private $decode;
@@ -47,29 +46,29 @@ class JsonDecodeTest extends TestCase
         $stdClass = new \stdClass();
         $stdClass->foo = 'bar';
 
-        $assoc = ['foo' => 'bar'];
+        $assoc = array('foo' => 'bar');
 
-        return [
-            ['{"foo": "bar"}', $stdClass, []],
-            ['{"foo": "bar"}', $assoc, ['json_decode_associative' => true]],
-        ];
+        return array(
+            array('{"foo": "bar"}', $stdClass, array()),
+            array('{"foo": "bar"}', $assoc, array('json_decode_associative' => true)),
+        );
     }
 
     /**
      * @requires function json_last_error_msg
      * @dataProvider decodeProviderException
+     * @expectedException Symfony\Component\Serializer\Exception\UnexpectedValueException
      */
     public function testDecodeWithException($value)
     {
-        $this->expectException('Symfony\Component\Serializer\Exception\UnexpectedValueException');
-        $this->decode->decode($value, JsonEncoder::FORMAT);
+        $this->decode->decode($value,  JsonEncoder::FORMAT);
     }
 
     public function decodeProviderException()
     {
-        return [
-            ["{'foo': 'bar'}"],
-            ['kaboom!'],
-        ];
+        return array(
+            array("{'foo': 'bar'}"),
+            array('kaboom!'),
+        );
     }
 }

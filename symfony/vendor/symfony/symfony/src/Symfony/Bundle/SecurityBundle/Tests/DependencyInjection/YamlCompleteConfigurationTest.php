@@ -11,19 +11,15 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection;
 
-use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
+use Symfony\Component\Config\FileLocator;
 
 class YamlCompleteConfigurationTest extends CompleteConfigurationTest
 {
-    protected function getLoader(ContainerBuilder $container)
+    protected function loadFromFile(ContainerBuilder $container, $file)
     {
-        return new YamlFileLoader($container, new FileLocator(__DIR__.'/Fixtures/yml'));
-    }
-
-    protected function getFileExtension()
-    {
-        return 'yml';
+        $loadXml = new YamlFileLoader($container, new FileLocator(__DIR__.'/Fixtures/yml'));
+        $loadXml->load($file.'.yml');
     }
 }

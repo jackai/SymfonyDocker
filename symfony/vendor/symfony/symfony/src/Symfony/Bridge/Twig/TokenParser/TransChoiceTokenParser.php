@@ -12,11 +12,6 @@
 namespace Symfony\Bridge\Twig\TokenParser;
 
 use Symfony\Bridge\Twig\Node\TransNode;
-use Twig\Error\SyntaxError;
-use Twig\Node\Expression\AbstractExpression;
-use Twig\Node\Expression\ArrayExpression;
-use Twig\Node\TextNode;
-use Twig\Token;
 
 /**
  * Token Parser for the 'transchoice' tag.
@@ -26,14 +21,20 @@ use Twig\Token;
 class TransChoiceTokenParser extends TransTokenParser
 {
     /**
-     * {@inheritdoc}
+     * Parses a token and returns a node.
+     *
+     * @param \Twig_Token $token A Twig_Token instance
+     *
+     * @return \Twig_Node A Twig_Node instance
+     *
+     * @throws \Twig_Error_Syntax
      */
-    public function parse(Token $token)
+    public function parse(\Twig_Token $token)
     {
         $lineno = $token->getLine();
         $stream = $this->parser->getStream();
 
-        $vars = new ArrayExpression([], $lineno);
+        $vars = new \Twig_Node_Expression_Array(array(), $lineno);
 
         $count = $this->parser->getExpressionParser()->parseExpression();
 
@@ -58,26 +59,28 @@ class TransChoiceTokenParser extends TransTokenParser
             $locale = $this->parser->getExpressionParser()->parseExpression();
         }
 
-        $stream->expect(Token::BLOCK_END_TYPE);
+        $stream->expect(\Twig_Token::BLOCK_END_TYPE);
 
-        $body = $this->parser->subparse([$this, 'decideTransChoiceFork'], true);
+        $body = $this->parser->subparse(array($this, 'decideTransChoiceFork'), true);
 
-        if (!$body instanceof TextNode && !$body instanceof AbstractExpression) {
-            throw new SyntaxError('A message inside a transchoice tag must be a simple text.', $body->getTemplateLine(), $stream->getSourceContext());
+        if (!$body instanceof \Twig_Node_Text && !$body instanceof \Twig_Node_Expression) {
+            throw new \Twig_Error_Syntax('A message inside a transchoice tag must be a simple text.', $body->getLine(), $stream->getFilename());
         }
 
-        $stream->expect(Token::BLOCK_END_TYPE);
+        $stream->expect(\Twig_Token::BLOCK_END_TYPE);
 
         return new TransNode($body, $domain, $count, $vars, $locale, $lineno, $this->getTag());
     }
 
     public function decideTransChoiceFork($token)
     {
-        return $token->test(['endtranschoice']);
+        return $token->test(array('endtranschoice'));
     }
 
     /**
-     * {@inheritdoc}
+     * Gets the tag name associated with this token parser.
+     *
+     * @return string The tag name
      */
     public function getTag()
     {

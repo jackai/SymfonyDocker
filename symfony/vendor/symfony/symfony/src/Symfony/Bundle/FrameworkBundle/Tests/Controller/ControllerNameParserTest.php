@@ -11,10 +11,9 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Controller;
 
-use Composer\Autoload\ClassLoader;
-use Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
-use Symfony\Component\HttpKernel\Kernel;
+use Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser;
+use Symfony\Component\ClassLoader\ClassLoader;
 
 class ControllerNameParserTest extends TestCase
 {
@@ -23,14 +22,17 @@ class ControllerNameParserTest extends TestCase
     protected function setUp()
     {
         $this->loader = new ClassLoader();
-        $this->loader->add('TestBundle', __DIR__.'/../Fixtures');
-        $this->loader->add('TestApplication', __DIR__.'/../Fixtures');
+        $this->loader->addPrefixes(array(
+            'TestBundle' => __DIR__.'/../Fixtures',
+            'TestApplication' => __DIR__.'/../Fixtures',
+        ));
         $this->loader->register();
     }
 
     protected function tearDown()
     {
-        $this->loader->unregister();
+        spl_autoload_unregister(array($this->loader, 'loadClass'));
+
         $this->loader = null;
     }
 
@@ -91,7 +93,7 @@ class ControllerNameParserTest extends TestCase
 
         try {
             $parser->parse($name);
-            $this->fail('->parse() throws a \InvalidArgumentException if the class is found but does not exist');
+            $this->fail('->parse() throws a \InvalidArgumentException if the string is in the valid format, but not matching class can be found');
         } catch (\Exception $e) {
             $this->assertInstanceOf('\InvalidArgumentException', $e, '->parse() throws a \InvalidArgumentException if the class is found but does not exist');
         }
@@ -99,20 +101,14 @@ class ControllerNameParserTest extends TestCase
 
     public function getMissingControllersTest()
     {
-        // a normal bundle
-        $bundles = [
-            ['FooBundle:Fake:index'],
-        ];
-
-        // a bundle with children
-        if (Kernel::VERSION_ID < 40000) {
-            $bundles[] = ['SensioFooBundle:Fake:index'];
-        }
-
-        return $bundles;
+        return array(
+            array('FooBundle:Fake:index'),          // a normal bundle
+            array('SensioFooBundle:Fake:index'),    // a bundle with children
+        );
     }
 
     /**
+     * @expectedException
      * @dataProvider getInvalidBundleNameTests
      */
     public function testInvalidBundleName($bundleName, $suggestedBundleName)
@@ -121,61 +117,60 @@ class ControllerNameParserTest extends TestCase
 
         try {
             $parser->parse($bundleName);
-            $this->fail('->parse() throws a \InvalidArgumentException if the bundle does not exist');
         } catch (\Exception $e) {
             $this->assertInstanceOf('\InvalidArgumentException', $e, '->parse() throws a \InvalidArgumentException if the bundle does not exist');
 
             if (false === $suggestedBundleName) {
                 // make sure we don't have a suggestion
-                $this->assertStringNotContainsString('Did you mean', $e->getMessage());
+                $this->assertNotContains('Did you mean', $e->getMessage());
             } else {
-                $this->assertStringContainsString(sprintf('Did you mean "%s"', $suggestedBundleName), $e->getMessage());
+                $this->assertContains(sprintf('Did you mean "%s"', $suggestedBundleName), $e->getMessage());
             }
         }
     }
 
     public function getInvalidBundleNameTests()
     {
-        return [
-            'Alternative will be found using levenshtein' => ['FoodBundle:Default:index', 'FooBundle:Default:index'],
-            'Alternative will be found using partial match' => ['FabpotFooBund:Default:index', 'FabpotFooBundle:Default:index'],
-            'Bundle does not exist at all' => ['CrazyBundle:Default:index', false],
-        ];
+        return array(
+            'Alternative will be found using levenshtein' => array('FoodBundle:Default:index', 'FooBundle:Default:index'),
+            'Alternative will be found using partial match' => array('FabpotFooBund:Default:index', 'FabpotFooBundle:Default:index'),
+            'Bundle does not exist at all' => array('CrazyBundle:Default:index', false),
+        );
     }
 
     private function createParser()
     {
-        $bundles = [
-            'SensioFooBundle' => [$this->getBundle('TestBundle\Fabpot\FooBundle', 'FabpotFooBundle'), $this->getBundle('TestBundle\Sensio\FooBundle', 'SensioFooBundle')],
-            'SensioCmsFooBundle' => [$this->getBundle('TestBundle\Sensio\Cms\FooBundle', 'SensioCmsFooBundle')],
-            'FooBundle' => [$this->getBundle('TestBundle\FooBundle', 'FooBundle')],
-            'FabpotFooBundle' => [$this->getBundle('TestBundle\Fabpot\FooBundle', 'FabpotFooBundle'), $this->getBundle('TestBundle\Sensio\FooBundle', 'SensioFooBundle')],
-        ];
+        $bundles = array(
+            'SensioFooBundle' => array($this->getBundle('TestBundle\Fabpot\FooBundle', 'FabpotFooBundle'), $this->getBundle('TestBundle\Sensio\FooBundle', 'SensioFooBundle')),
+            'SensioCmsFooBundle' => array($this->getBundle('TestBundle\Sensio\Cms\FooBundle', 'SensioCmsFooBundle')),
+            'FooBundle' => array($this->getBundle('TestBundle\FooBundle', 'FooBundle')),
+            'FabpotFooBundle' => array($this->getBundle('TestBundle\Fabpot\FooBundle', 'FabpotFooBundle'), $this->getBundle('TestBundle\Sensio\FooBundle', 'SensioFooBundle')),
+        );
 
-        $kernel = $this->getMockBuilder('Symfony\Component\HttpKernel\KernelInterface')->getMock();
+        $kernel = $this->getMock('Symfony\Component\HttpKernel\KernelInterface');
         $kernel
             ->expects($this->any())
             ->method('getBundle')
-            ->willReturnCallback(function ($bundle) use ($bundles) {
+            ->will($this->returnCallback(function ($bundle) use ($bundles) {
                 if (!isset($bundles[$bundle])) {
                     throw new \InvalidArgumentException(sprintf('Invalid bundle name "%s"', $bundle));
                 }
 
                 return $bundles[$bundle];
-            })
+            }))
         ;
 
-        $bundles = [
+        $bundles = array(
             'SensioFooBundle' => $this->getBundle('TestBundle\Fabpot\FooBundle', 'FabpotFooBundle'),
             'SensioCmsFooBundle' => $this->getBundle('TestBundle\Sensio\Cms\FooBundle', 'SensioCmsFooBundle'),
             'FoooooBundle' => $this->getBundle('TestBundle\FooBundle', 'FoooooBundle'),
             'FooBundle' => $this->getBundle('TestBundle\FooBundle', 'FooBundle'),
             'FabpotFooBundle' => $this->getBundle('TestBundle\Fabpot\FooBundle', 'FabpotFooBundle'),
-        ];
+        );
         $kernel
             ->expects($this->any())
             ->method('getBundles')
-            ->willReturn($bundles)
+            ->will($this->returnValue($bundles))
         ;
 
         return new ControllerNameParser($kernel);
@@ -183,9 +178,9 @@ class ControllerNameParserTest extends TestCase
 
     private function getBundle($namespace, $name)
     {
-        $bundle = $this->getMockBuilder('Symfony\Component\HttpKernel\Bundle\BundleInterface')->getMock();
-        $bundle->expects($this->any())->method('getName')->willReturn($name);
-        $bundle->expects($this->any())->method('getNamespace')->willReturn($namespace);
+        $bundle = $this->getMock('Symfony\Component\HttpKernel\Bundle\BundleInterface');
+        $bundle->expects($this->any())->method('getName')->will($this->returnValue($name));
+        $bundle->expects($this->any())->method('getNamespace')->will($this->returnValue($namespace));
 
         return $bundle;
     }

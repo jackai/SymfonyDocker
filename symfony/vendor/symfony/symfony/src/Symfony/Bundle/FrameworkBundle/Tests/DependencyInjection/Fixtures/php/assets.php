@@ -1,32 +1,29 @@
 <?php
 
-$container->loadFromExtension('framework', [
-    'assets' => [
+$container->loadFromExtension('framework', array(
+    'assets' => array(
         'version' => 'SomeVersionScheme',
         'base_urls' => 'http://cdn.example.com',
         'version_format' => '%%s?version=%%s',
-        'packages' => [
-            'images_path' => [
+        'packages' => array(
+            'images_path' => array(
                 'base_path' => '/foo',
-            ],
-            'images' => [
+            ),
+            'images' => array(
                 'version' => '1.0.0',
-                'base_urls' => ['http://images1.example.com', 'http://images2.example.com'],
-            ],
-            'foo' => [
+                'base_urls' => array('http://images1.example.com', 'http://images2.example.com'),
+            ),
+            'foo' => array(
                 'version' => '1.0.0',
                 'version_format' => '%%s-%%s',
-            ],
-            'bar' => [
-                'base_urls' => ['https://bar2.example.com'],
-            ],
-            'bar_version_strategy' => [
-                'base_urls' => ['https://bar2.example.com'],
-                'version_strategy' => 'assets.custom_version_strategy',
-            ],
-            'json_manifest_strategy' => [
-                'json_manifest_path' => '/path/to/manifest.json',
-            ],
-        ],
-    ],
-]);
+            ),
+            'bar' => array(
+                'base_urls' => array('https://bar2.example.com'),
+            ),
+            'bar_null_version' => array(
+                'version' => null,
+                'base_urls' => array('https://bar3.example.com'),
+            ),
+        ),
+    ),
+));

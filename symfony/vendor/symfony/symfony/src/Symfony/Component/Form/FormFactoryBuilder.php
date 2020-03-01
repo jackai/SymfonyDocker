@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Form;
 
-use Symfony\Component\Form\Extension\Core\CoreExtension;
-
 /**
  * The default implementation of FormFactoryBuilderInterface.
  *
@@ -20,8 +18,6 @@ use Symfony\Component\Form\Extension\Core\CoreExtension;
  */
 class FormFactoryBuilder implements FormFactoryBuilderInterface
 {
-    private $forceCoreExtension;
-
     /**
      * @var ResolvedFormTypeFactoryInterface
      */
@@ -30,30 +26,22 @@ class FormFactoryBuilder implements FormFactoryBuilderInterface
     /**
      * @var FormExtensionInterface[]
      */
-    private $extensions = [];
+    private $extensions = array();
 
     /**
      * @var FormTypeInterface[]
      */
-    private $types = [];
+    private $types = array();
 
     /**
      * @var FormTypeExtensionInterface[]
      */
-    private $typeExtensions = [];
+    private $typeExtensions = array();
 
     /**
      * @var FormTypeGuesserInterface[]
      */
-    private $typeGuessers = [];
-
-    /**
-     * @param bool $forceCoreExtension
-     */
-    public function __construct($forceCoreExtension = false)
-    {
-        $this->forceCoreExtension = $forceCoreExtension;
-    }
+    private $typeGuessers = array();
 
     /**
      * {@inheritdoc}
@@ -156,23 +144,8 @@ class FormFactoryBuilder implements FormFactoryBuilderInterface
     {
         $extensions = $this->extensions;
 
-        if ($this->forceCoreExtension) {
-            $hasCoreExtension = false;
-
-            foreach ($extensions as $extension) {
-                if ($extension instanceof CoreExtension) {
-                    $hasCoreExtension = true;
-                    break;
-                }
-            }
-
-            if (!$hasCoreExtension) {
-                array_unshift($extensions, new CoreExtension());
-            }
-        }
-
-        if (\count($this->types) > 0 || \count($this->typeExtensions) > 0 || \count($this->typeGuessers) > 0) {
-            if (\count($this->typeGuessers) > 1) {
+        if (count($this->types) > 0 || count($this->typeExtensions) > 0 || count($this->typeGuessers) > 0) {
+            if (count($this->typeGuessers) > 1) {
                 $typeGuesser = new FormTypeGuesserChain($this->typeGuessers);
             } else {
                 $typeGuesser = isset($this->typeGuessers[0]) ? $this->typeGuessers[0] : null;
@@ -181,8 +154,9 @@ class FormFactoryBuilder implements FormFactoryBuilderInterface
             $extensions[] = new PreloadedExtension($this->types, $this->typeExtensions, $typeGuesser);
         }
 
-        $registry = new FormRegistry($extensions, $this->resolvedTypeFactory ?: new ResolvedFormTypeFactory());
+        $resolvedTypeFactory = $this->resolvedTypeFactory ?: new ResolvedFormTypeFactory();
+        $registry = new FormRegistry($extensions, $resolvedTypeFactory);
 
-        return new FormFactory($registry);
+        return new FormFactory($registry, $resolvedTypeFactory);
     }
 }

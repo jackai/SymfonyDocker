@@ -11,56 +11,89 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler;
 
-use PHPUnit\Framework\TestCase;
-use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddCacheWarmerPass;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddCacheWarmerPass;
 
-/**
- * @group legacy
- */
-class AddCacheWarmerPassTest extends TestCase
+class AddCacheWarmerPassTest extends \PHPUnit_Framework_TestCase
 {
     public function testThatCacheWarmersAreProcessedInPriorityOrder()
     {
-        $container = new ContainerBuilder();
-        $cacheWarmerDefinition = $container->register('cache_warmer')->addArgument([]);
-        $container->register('my_cache_warmer_service1')->addTag('kernel.cache_warmer', ['priority' => 100]);
-        $container->register('my_cache_warmer_service2')->addTag('kernel.cache_warmer', ['priority' => 200]);
-        $container->register('my_cache_warmer_service3')->addTag('kernel.cache_warmer');
+        $services = array(
+            'my_cache_warmer_service1' => array(0 => array('priority' => 100)),
+            'my_cache_warmer_service2' => array(0 => array('priority' => 200)),
+            'my_cache_warmer_service3' => array(),
+        );
 
-        $addCacheWarmerPass = new AddCacheWarmerPass();
-        $addCacheWarmerPass->process($container);
+        $definition = $this->getMock('Symfony\Component\DependencyInjection\Definition');
+        $container = $this->getMock(
+            'Symfony\Component\DependencyInjection\ContainerBuilder',
+            array('findTaggedServiceIds', 'getDefinition', 'hasDefinition')
+        );
 
-        $this->assertEquals(
-            [
+        $container->expects($this->atLeastOnce())
+            ->method('findTaggedServiceIds')
+            ->will($this->returnValue($services));
+        $container->expects($this->atLeastOnce())
+            ->method('getDefinition')
+            ->with('cache_warmer')
+            ->will($this->returnValue($definition));
+        $container->expects($this->atLeastOnce())
+            ->method('hasDefinition')
+            ->with('cache_warmer')
+            ->will($this->returnValue(true));
+
+        $definition->expects($this->once())
+            ->method('replaceArgument')
+            ->with(0, array(
                 new Reference('my_cache_warmer_service2'),
                 new Reference('my_cache_warmer_service1'),
                 new Reference('my_cache_warmer_service3'),
-            ],
-            $cacheWarmerDefinition->getArgument(0)
-        );
+            ));
+
+        $addCacheWarmerPass = new AddCacheWarmerPass();
+        $addCacheWarmerPass->process($container);
     }
 
     public function testThatCompilerPassIsIgnoredIfThereIsNoCacheWarmerDefinition()
     {
-        $container = new ContainerBuilder();
+        $definition = $this->getMock('Symfony\Component\DependencyInjection\Definition');
+        $container = $this->getMock(
+            'Symfony\Component\DependencyInjection\ContainerBuilder',
+            array('hasDefinition', 'findTaggedServiceIds', 'getDefinition')
+        );
+
+        $container->expects($this->never())->method('findTaggedServiceIds');
+        $container->expects($this->never())->method('getDefinition');
+        $container->expects($this->atLeastOnce())
+            ->method('hasDefinition')
+            ->with('cache_warmer')
+            ->will($this->returnValue(false));
+        $definition->expects($this->never())->method('replaceArgument');
 
         $addCacheWarmerPass = new AddCacheWarmerPass();
         $addCacheWarmerPass->process($container);
-
-        // we just check that the pass does not break if no cache warmer is registered
-        $this->addToAssertionCount(1);
     }
 
     public function testThatCacheWarmersMightBeNotDefined()
     {
-        $container = new ContainerBuilder();
-        $cacheWarmerDefinition = $container->register('cache_warmer')->addArgument([]);
+        $definition = $this->getMock('Symfony\Component\DependencyInjection\Definition');
+        $container = $this->getMock(
+            'Symfony\Component\DependencyInjection\ContainerBuilder',
+            array('hasDefinition', 'findTaggedServiceIds', 'getDefinition')
+        );
+
+        $container->expects($this->atLeastOnce())
+            ->method('findTaggedServiceIds')
+            ->will($this->returnValue(array()));
+        $container->expects($this->never())->method('getDefinition');
+        $container->expects($this->atLeastOnce())
+            ->method('hasDefinition')
+            ->with('cache_warmer')
+            ->will($this->returnValue(true));
+
+        $definition->expects($this->never())->method('replaceArgument');
 
         $addCacheWarmerPass = new AddCacheWarmerPass();
         $addCacheWarmerPass->process($container);
-
-        $this->assertSame([], $cacheWarmerDefinition->getArgument(0));
     }
 }

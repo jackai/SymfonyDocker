@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\DependencyInjection;
 
-use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
@@ -26,9 +25,7 @@ class TestExtension extends Extension implements PrependExtensionInterface
     public function load(array $configs, ContainerBuilder $container)
     {
         $configuration = $this->getConfiguration($configs, $container);
-        $this->processConfiguration($configuration, $configs);
-
-        $container->setAlias('test.annotation_reader', new Alias('annotation_reader', true));
+        $config = $this->processConfiguration($configuration, $configs);
     }
 
     /**
@@ -36,7 +33,7 @@ class TestExtension extends Extension implements PrependExtensionInterface
      */
     public function prepend(ContainerBuilder $container)
     {
-        $container->prependExtensionConfig('test', ['custom' => 'foo']);
+        $container->prependExtensionConfig('test', array('custom' => 'foo'));
     }
 
     /**

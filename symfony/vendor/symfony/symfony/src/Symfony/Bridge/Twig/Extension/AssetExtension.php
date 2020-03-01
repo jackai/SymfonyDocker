@@ -12,15 +12,13 @@
 namespace Symfony\Bridge\Twig\Extension;
 
 use Symfony\Component\Asset\Packages;
-use Twig\Extension\AbstractExtension;
-use Twig\TwigFunction;
 
 /**
  * Twig extension for the Symfony Asset component.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class AssetExtension extends AbstractExtension
+class AssetExtension extends \Twig_Extension
 {
     private $packages;
 
@@ -34,10 +32,10 @@ class AssetExtension extends AbstractExtension
      */
     public function getFunctions()
     {
-        return [
-            new TwigFunction('asset', [$this, 'getAssetUrl']),
-            new TwigFunction('asset_version', [$this, 'getAssetVersion']),
-        ];
+        return array(
+            new \Twig_SimpleFunction('asset', array($this, 'getAssetUrl')),
+            new \Twig_SimpleFunction('asset_version', array($this, 'getAssetVersion')),
+        );
     }
 
     /**

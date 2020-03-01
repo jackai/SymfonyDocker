@@ -11,11 +11,10 @@
 
 namespace Symfony\Component\PropertyAccess\Tests;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
-abstract class PropertyAccessorArrayAccessTest extends TestCase
+abstract class PropertyAccessorArrayAccessTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var PropertyAccessor
@@ -31,10 +30,10 @@ abstract class PropertyAccessorArrayAccessTest extends TestCase
 
     public function getValidPropertyPaths()
     {
-        return [
-            [$this->getContainer(['firstName' => 'Bernhard']), '[firstName]', 'Bernhard'],
-            [$this->getContainer(['person' => $this->getContainer(['firstName' => 'Bernhard'])]), '[person][firstName]', 'Bernhard'],
-        ];
+        return array(
+            array($this->getContainer(array('firstName' => 'Bernhard')), '[firstName]', 'Bernhard'),
+            array($this->getContainer(array('person' => $this->getContainer(array('firstName' => 'Bernhard')))), '[person][firstName]', 'Bernhard'),
+        );
     }
 
     /**
@@ -45,14 +44,16 @@ abstract class PropertyAccessorArrayAccessTest extends TestCase
         $this->assertSame($value, $this->propertyAccessor->getValue($collection, $path));
     }
 
+    /**
+     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchIndexException
+     */
     public function testGetValueFailsIfNoSuchIndex()
     {
-        $this->expectException('Symfony\Component\PropertyAccess\Exception\NoSuchIndexException');
         $this->propertyAccessor = PropertyAccess::createPropertyAccessorBuilder()
             ->enableExceptionOnInvalidIndex()
             ->getPropertyAccessor();
 
-        $object = $this->getContainer(['firstName' => 'Bernhard']);
+        $object = $this->getContainer(array('firstName' => 'Bernhard'));
 
         $this->propertyAccessor->getValue($object, '[lastName]');
     }

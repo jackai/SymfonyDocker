@@ -24,14 +24,16 @@ class UsernamePasswordToken extends AbstractToken
     private $providerKey;
 
     /**
+     * Constructor.
+     *
      * @param string|object            $user        The username (like a nickname, email address, etc.), or a UserInterface instance or an object implementing a __toString method
-     * @param mixed                    $credentials This usually is the password of the user
+     * @param string                   $credentials This usually is the password of the user
      * @param string                   $providerKey The provider key
-     * @param (RoleInterface|string)[] $roles       An array of roles
+     * @param RoleInterface[]|string[] $roles       An array of roles
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct($user, $credentials, $providerKey, array $roles = [])
+    public function __construct($user, $credentials, $providerKey, array $roles = array())
     {
         parent::__construct($roles);
 
@@ -43,7 +45,7 @@ class UsernamePasswordToken extends AbstractToken
         $this->credentials = $credentials;
         $this->providerKey = $providerKey;
 
-        parent::setAuthenticated(\count($roles) > 0);
+        parent::setAuthenticated(count($roles) > 0);
     }
 
     /**
@@ -91,9 +93,7 @@ class UsernamePasswordToken extends AbstractToken
      */
     public function serialize()
     {
-        $serialized = [$this->credentials, $this->providerKey, parent::serialize(true)];
-
-        return $this->doSerialize($serialized, \func_num_args() ? func_get_arg(0) : null);
+        return serialize(array($this->credentials, $this->providerKey, parent::serialize()));
     }
 
     /**
@@ -101,7 +101,7 @@ class UsernamePasswordToken extends AbstractToken
      */
     public function unserialize($serialized)
     {
-        list($this->credentials, $this->providerKey, $parentStr) = \is_array($serialized) ? $serialized : unserialize($serialized);
+        list($this->credentials, $this->providerKey, $parentStr) = unserialize($serialized);
         parent::unserialize($parentStr);
     }
 }

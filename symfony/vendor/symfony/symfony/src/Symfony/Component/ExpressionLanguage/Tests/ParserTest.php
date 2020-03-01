@@ -11,38 +11,41 @@
 
 namespace Symfony\Component\ExpressionLanguage\Tests;
 
-use PHPUnit\Framework\TestCase;
+use Symfony\Component\ExpressionLanguage\Parser;
 use Symfony\Component\ExpressionLanguage\Lexer;
 use Symfony\Component\ExpressionLanguage\Node;
-use Symfony\Component\ExpressionLanguage\Parser;
 
-class ParserTest extends TestCase
+class ParserTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @expectedException        \Symfony\Component\ExpressionLanguage\SyntaxError
+     * @expectedExceptionMessage Variable "foo" is not valid around position 1.
+     */
     public function testParseWithInvalidName()
     {
-        $this->expectException('Symfony\Component\ExpressionLanguage\SyntaxError');
-        $this->expectExceptionMessage('Variable "foo" is not valid around position 1 for expression `foo`.');
         $lexer = new Lexer();
-        $parser = new Parser([]);
+        $parser = new Parser(array());
         $parser->parse($lexer->tokenize('foo'));
     }
 
+    /**
+     * @expectedException        \Symfony\Component\ExpressionLanguage\SyntaxError
+     * @expectedExceptionMessage Variable "foo" is not valid around position 1.
+     */
     public function testParseWithZeroInNames()
     {
-        $this->expectException('Symfony\Component\ExpressionLanguage\SyntaxError');
-        $this->expectExceptionMessage('Variable "foo" is not valid around position 1 for expression `foo`.');
         $lexer = new Lexer();
-        $parser = new Parser([]);
-        $parser->parse($lexer->tokenize('foo'), [0]);
+        $parser = new Parser(array());
+        $parser->parse($lexer->tokenize('foo'), array(0));
     }
 
     /**
      * @dataProvider getParseData
      */
-    public function testParse($node, $expression, $names = [])
+    public function testParse($node, $expression, $names = array())
     {
         $lexer = new Lexer();
-        $parser = new Parser([]);
+        $parser = new Parser(array());
         $this->assertEquals($node, $parser->parse($lexer->tokenize($expression), $names));
     }
 
@@ -53,88 +56,88 @@ class ParserTest extends TestCase
         $arguments->addElement(new Node\ConstantNode(2));
         $arguments->addElement(new Node\ConstantNode(true));
 
-        return [
-            [
+        return array(
+            array(
                 new Node\NameNode('a'),
                 'a',
-                ['a'],
-            ],
-            [
+                array('a'),
+            ),
+            array(
                 new Node\ConstantNode('a'),
                 '"a"',
-            ],
-            [
+            ),
+            array(
                 new Node\ConstantNode(3),
                 '3',
-            ],
-            [
+            ),
+            array(
                 new Node\ConstantNode(false),
                 'false',
-            ],
-            [
+            ),
+            array(
                 new Node\ConstantNode(true),
                 'true',
-            ],
-            [
+            ),
+            array(
                 new Node\ConstantNode(null),
                 'null',
-            ],
-            [
+            ),
+            array(
                 new Node\UnaryNode('-', new Node\ConstantNode(3)),
                 '-3',
-            ],
-            [
+            ),
+            array(
                 new Node\BinaryNode('-', new Node\ConstantNode(3), new Node\ConstantNode(3)),
                 '3 - 3',
-            ],
-            [
+            ),
+            array(
                 new Node\BinaryNode('*',
                     new Node\BinaryNode('-', new Node\ConstantNode(3), new Node\ConstantNode(3)),
                     new Node\ConstantNode(2)
                 ),
                 '(3 - 3) * 2',
-            ],
-            [
-                new Node\GetAttrNode(new Node\NameNode('foo'), new Node\ConstantNode('bar', true), new Node\ArgumentsNode(), Node\GetAttrNode::PROPERTY_CALL),
+            ),
+            array(
+                new Node\GetAttrNode(new Node\NameNode('foo'), new Node\ConstantNode('bar'), new Node\ArgumentsNode(), Node\GetAttrNode::PROPERTY_CALL),
                 'foo.bar',
-                ['foo'],
-            ],
-            [
-                new Node\GetAttrNode(new Node\NameNode('foo'), new Node\ConstantNode('bar', true), new Node\ArgumentsNode(), Node\GetAttrNode::METHOD_CALL),
+                array('foo'),
+            ),
+            array(
+                new Node\GetAttrNode(new Node\NameNode('foo'), new Node\ConstantNode('bar'), new Node\ArgumentsNode(), Node\GetAttrNode::METHOD_CALL),
                 'foo.bar()',
-                ['foo'],
-            ],
-            [
-                new Node\GetAttrNode(new Node\NameNode('foo'), new Node\ConstantNode('not', true), new Node\ArgumentsNode(), Node\GetAttrNode::METHOD_CALL),
+                array('foo'),
+            ),
+            array(
+                new Node\GetAttrNode(new Node\NameNode('foo'), new Node\ConstantNode('not'), new Node\ArgumentsNode(), Node\GetAttrNode::METHOD_CALL),
                 'foo.not()',
-                ['foo'],
-            ],
-            [
+                array('foo'),
+            ),
+            array(
                 new Node\GetAttrNode(
                     new Node\NameNode('foo'),
-                    new Node\ConstantNode('bar', true),
+                    new Node\ConstantNode('bar'),
                     $arguments,
                     Node\GetAttrNode::METHOD_CALL
                 ),
                 'foo.bar("arg1", 2, true)',
-                ['foo'],
-            ],
-            [
+                array('foo'),
+            ),
+            array(
                 new Node\GetAttrNode(new Node\NameNode('foo'), new Node\ConstantNode(3), new Node\ArgumentsNode(), Node\GetAttrNode::ARRAY_CALL),
                 'foo[3]',
-                ['foo'],
-            ],
-            [
+                array('foo'),
+            ),
+            array(
                 new Node\ConditionalNode(new Node\ConstantNode(true), new Node\ConstantNode(true), new Node\ConstantNode(false)),
                 'true ? true : false',
-            ],
-            [
+            ),
+            array(
                 new Node\BinaryNode('matches', new Node\ConstantNode('foo'), new Node\ConstantNode('/foo/')),
                 '"foo" matches "/foo/"',
-            ],
+            ),
 
             // chained calls
-            [
+            array(
                 $this->createGetAttrNode(
                     $this->createGetAttrNode(
                         $this->createGetAttrNode(
@@ -143,62 +146,52 @@ class ParserTest extends TestCase
                         'baz', Node\GetAttrNode::PROPERTY_CALL),
                     '3', Node\GetAttrNode::ARRAY_CALL),
                 'foo.bar().foo().baz[3]',
-                ['foo'],
-            ],
+                array('foo'),
+            ),
 
-            [
+            array(
                 new Node\NameNode('foo'),
                 'bar',
-                ['foo' => 'bar'],
-            ],
-        ];
+                array('foo' => 'bar'),
+            ),
+        );
     }
 
     private function createGetAttrNode($node, $item, $type)
     {
-        return new Node\GetAttrNode($node, new Node\ConstantNode($item, Node\GetAttrNode::ARRAY_CALL !== $type), new Node\ArgumentsNode(), $type);
+        return new Node\GetAttrNode($node, new Node\ConstantNode($item), new Node\ArgumentsNode(), $type);
     }
 
     /**
      * @dataProvider getInvalidPostfixData
+     * @expectedException \Symfony\Component\ExpressionLanguage\SyntaxError
      */
-    public function testParseWithInvalidPostfixData($expr, $names = [])
+    public function testParseWithInvalidPostfixData($expr, $names = array())
     {
-        $this->expectException('Symfony\Component\ExpressionLanguage\SyntaxError');
         $lexer = new Lexer();
-        $parser = new Parser([]);
+        $parser = new Parser(array());
         $parser->parse($lexer->tokenize($expr), $names);
     }
 
     public function getInvalidPostfixData()
     {
-        return [
-            [
+        return array(
+            array(
                 'foo."#"',
-                ['foo'],
-            ],
-            [
+                array('foo'),
+            ),
+            array(
                 'foo."bar"',
-                ['foo'],
-            ],
-            [
+                array('foo'),
+            ),
+            array(
                 'foo.**',
-                ['foo'],
-            ],
-            [
+                array('foo'),
+            ),
+            array(
                 'foo.123',
-                ['foo'],
-            ],
-        ];
-    }
-
-    public function testNameProposal()
-    {
-        $this->expectException('Symfony\Component\ExpressionLanguage\SyntaxError');
-        $this->expectExceptionMessage('Did you mean "baz"?');
-        $lexer = new Lexer();
-        $parser = new Parser([]);
-
-        $parser->parse($lexer->tokenize('foo > bar'), ['foo', 'baz']);
+                array('foo'),
+            ),
+        );
     }
 }

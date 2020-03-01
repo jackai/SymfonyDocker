@@ -11,41 +11,40 @@
 
 namespace Symfony\Component\Security\Core\Tests\Authentication;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\AuthenticationProviderManager;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
-use Symfony\Component\Security\Core\AuthenticationEvents;
-use Symfony\Component\Security\Core\Event\AuthenticationEvent;
-use Symfony\Component\Security\Core\Event\AuthenticationFailureEvent;
-use Symfony\Component\Security\Core\Exception\AccountStatusException;
-use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\ProviderNotFoundException;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\Exception\AccountStatusException;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
-class AuthenticationProviderManagerTest extends TestCase
+class AuthenticationProviderManagerTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @expectedException \InvalidArgumentException
+     */
     public function testAuthenticateWithoutProviders()
     {
-        $this->expectException('InvalidArgumentException');
-        new AuthenticationProviderManager([]);
+        new AuthenticationProviderManager(array());
     }
 
+    /**
+     * @expectedException \InvalidArgumentException
+     */
     public function testAuthenticateWithProvidersWithIncorrectInterface()
     {
-        $this->expectException('InvalidArgumentException');
-        (new AuthenticationProviderManager([
+        new AuthenticationProviderManager(array(
             new \stdClass(),
-        ]))->authenticate($this->getMockBuilder(TokenInterface::class)->getMock());
+        ));
     }
 
     public function testAuthenticateWhenNoProviderSupportsToken()
     {
-        $manager = new AuthenticationProviderManager([
+        $manager = new AuthenticationProviderManager(array(
             $this->getAuthenticationProvider(false),
-        ]);
+        ));
 
         try {
-            $manager->authenticate($token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock());
+            $manager->authenticate($token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface'));
             $this->fail();
         } catch (ProviderNotFoundException $e) {
             $this->assertSame($token, $e->getToken());
@@ -54,12 +53,12 @@ class AuthenticationProviderManagerTest extends TestCase
 
     public function testAuthenticateWhenProviderReturnsAccountStatusException()
     {
-        $manager = new AuthenticationProviderManager([
+        $manager = new AuthenticationProviderManager(array(
             $this->getAuthenticationProvider(true, null, 'Symfony\Component\Security\Core\Exception\AccountStatusException'),
-        ]);
+        ));
 
         try {
-            $manager->authenticate($token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock());
+            $manager->authenticate($token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface'));
             $this->fail();
         } catch (AccountStatusException $e) {
             $this->assertSame($token, $e->getToken());
@@ -68,12 +67,12 @@ class AuthenticationProviderManagerTest extends TestCase
 
     public function testAuthenticateWhenProviderReturnsAuthenticationException()
     {
-        $manager = new AuthenticationProviderManager([
+        $manager = new AuthenticationProviderManager(array(
             $this->getAuthenticationProvider(true, null, 'Symfony\Component\Security\Core\Exception\AuthenticationException'),
-        ]);
+        ));
 
         try {
-            $manager->authenticate($token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock());
+            $manager->authenticate($token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface'));
             $this->fail();
         } catch (AuthenticationException $e) {
             $this->assertSame($token, $e->getToken());
@@ -82,109 +81,65 @@ class AuthenticationProviderManagerTest extends TestCase
 
     public function testAuthenticateWhenOneReturnsAuthenticationExceptionButNotAll()
     {
-        $manager = new AuthenticationProviderManager([
+        $manager = new AuthenticationProviderManager(array(
             $this->getAuthenticationProvider(true, null, 'Symfony\Component\Security\Core\Exception\AuthenticationException'),
-            $this->getAuthenticationProvider(true, $expected = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock()),
-        ]);
+            $this->getAuthenticationProvider(true, $expected = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')),
+        ));
 
-        $token = $manager->authenticate($this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock());
+        $token = $manager->authenticate($this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface'));
         $this->assertSame($expected, $token);
     }
 
     public function testAuthenticateReturnsTokenOfTheFirstMatchingProvider()
     {
-        $second = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface')->getMock();
+        $second = $this->getMock('Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface');
         $second
             ->expects($this->never())
             ->method('supports')
         ;
-        $manager = new AuthenticationProviderManager([
-            $this->getAuthenticationProvider(true, $expected = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock()),
+        $manager = new AuthenticationProviderManager(array(
+            $this->getAuthenticationProvider(true, $expected = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')),
             $second,
-        ]);
+        ));
 
-        $token = $manager->authenticate($this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock());
+        $token = $manager->authenticate($this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface'));
         $this->assertSame($expected, $token);
     }
 
     public function testEraseCredentialFlag()
     {
-        $manager = new AuthenticationProviderManager([
+        $manager = new AuthenticationProviderManager(array(
             $this->getAuthenticationProvider(true, $token = new UsernamePasswordToken('foo', 'bar', 'key')),
-        ]);
+        ));
 
-        $token = $manager->authenticate($this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock());
+        $token = $manager->authenticate($this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface'));
         $this->assertEquals('', $token->getCredentials());
 
-        $manager = new AuthenticationProviderManager([
+        $manager = new AuthenticationProviderManager(array(
             $this->getAuthenticationProvider(true, $token = new UsernamePasswordToken('foo', 'bar', 'key')),
-        ], false);
+        ), false);
 
-        $token = $manager->authenticate($this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock());
+        $token = $manager->authenticate($this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface'));
         $this->assertEquals('bar', $token->getCredentials());
-    }
-
-    public function testAuthenticateDispatchesAuthenticationFailureEvent()
-    {
-        $token = new UsernamePasswordToken('foo', 'bar', 'key');
-        $provider = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface')->getMock();
-        $provider->expects($this->once())->method('supports')->willReturn(true);
-        $provider->expects($this->once())->method('authenticate')->willThrowException($exception = new AuthenticationException());
-
-        $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock();
-        $dispatcher
-            ->expects($this->once())
-            ->method('dispatch')
-            ->with(AuthenticationEvents::AUTHENTICATION_FAILURE, $this->equalTo(new AuthenticationFailureEvent($token, $exception)));
-
-        $manager = new AuthenticationProviderManager([$provider]);
-        $manager->setEventDispatcher($dispatcher);
-
-        try {
-            $manager->authenticate($token);
-            $this->fail('->authenticate() should rethrow exceptions');
-        } catch (AuthenticationException $e) {
-            $this->assertSame($token, $exception->getToken());
-        }
-    }
-
-    public function testAuthenticateDispatchesAuthenticationSuccessEvent()
-    {
-        $token = new UsernamePasswordToken('foo', 'bar', 'key');
-
-        $provider = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface')->getMock();
-        $provider->expects($this->once())->method('supports')->willReturn(true);
-        $provider->expects($this->once())->method('authenticate')->willReturn($token);
-
-        $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock();
-        $dispatcher
-            ->expects($this->once())
-            ->method('dispatch')
-            ->with(AuthenticationEvents::AUTHENTICATION_SUCCESS, $this->equalTo(new AuthenticationEvent($token)));
-
-        $manager = new AuthenticationProviderManager([$provider]);
-        $manager->setEventDispatcher($dispatcher);
-
-        $this->assertSame($token, $manager->authenticate($token));
     }
 
     protected function getAuthenticationProvider($supports, $token = null, $exception = null)
     {
-        $provider = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface')->getMock();
+        $provider = $this->getMock('Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface');
         $provider->expects($this->once())
                  ->method('supports')
-                 ->willReturn($supports)
+                 ->will($this->returnValue($supports))
         ;
 
         if (null !== $token) {
             $provider->expects($this->once())
                      ->method('authenticate')
-                     ->willReturn($token)
+                     ->will($this->returnValue($token))
             ;
         } elseif (null !== $exception) {
             $provider->expects($this->once())
                      ->method('authenticate')
-                     ->willThrowException($this->getMockBuilder($exception)->setMethods(null)->getMock())
+                     ->will($this->throwException($this->getMock($exception, null, array(), '')))
             ;
         }
 

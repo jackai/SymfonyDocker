@@ -2,16 +2,12 @@
 
 namespace Symfony\Component\Security\Http\Tests\Firewall;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Http\EntryPoint\DigestAuthenticationEntryPoint;
 use Symfony\Component\Security\Http\Firewall\DigestAuthenticationListener;
 
-/**
- * @group legacy
- */
-class DigestAuthenticationListenerTest extends TestCase
+class DigestAuthenticationListenerTest extends \PHPUnit_Framework_TestCase
 {
     public function testHandleWithValidDigest()
     {
@@ -34,20 +30,20 @@ class DigestAuthenticationListenerTest extends TestCase
             'response="'.$serverDigest.'"'
         ;
 
-        $request = new Request([], [], [], [], [], ['PHP_AUTH_DIGEST' => $digestData]);
+        $request = new Request(array(), array(), array(), array(), array(), array('PHP_AUTH_DIGEST' => $digestData));
 
         $entryPoint = new DigestAuthenticationEntryPoint($realm, $secret);
 
-        $user = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')->getMock();
+        $user = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
         $user->method('getPassword')->willReturn($password);
 
         $providerKey = 'TheProviderKey';
 
-        $tokenStorage = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')->getMock();
+        $tokenStorage = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface');
         $tokenStorage
             ->expects($this->once())
             ->method('getToken')
-            ->willReturn(null)
+            ->will($this->returnValue(null))
         ;
         $tokenStorage
             ->expects($this->once())
@@ -55,16 +51,16 @@ class DigestAuthenticationListenerTest extends TestCase
             ->with($this->equalTo(new UsernamePasswordToken($user, $password, $providerKey)))
         ;
 
-        $userProvider = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserProviderInterface')->getMock();
+        $userProvider = $this->getMock('Symfony\Component\Security\Core\User\UserProviderInterface');
         $userProvider->method('loadUserByUsername')->willReturn($user);
 
         $listener = new DigestAuthenticationListener($tokenStorage, $userProvider, $providerKey, $entryPoint);
 
-        $event = $this->getMockBuilder('Symfony\Component\HttpKernel\Event\GetResponseEvent')->disableOriginalConstructor()->getMock();
+        $event = $this->getMock('Symfony\Component\HttpKernel\Event\GetResponseEvent', array(), array(), '', false);
         $event
             ->expects($this->any())
             ->method('getRequest')
-            ->willReturn($request)
+            ->will($this->returnValue($request))
         ;
 
         $listener->handle($event);

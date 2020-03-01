@@ -11,25 +11,24 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\GroupSequence;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class GroupSequenceTest extends TestCase
+class GroupSequenceTest extends \PHPUnit_Framework_TestCase
 {
     public function testCreate()
     {
-        $sequence = new GroupSequence(['Group 1', 'Group 2']);
+        $sequence = new GroupSequence(array('Group 1', 'Group 2'));
 
-        $this->assertSame(['Group 1', 'Group 2'], $sequence->groups);
+        $this->assertSame(array('Group 1', 'Group 2'), $sequence->groups);
     }
 
     public function testCreateDoctrineStyle()
     {
-        $sequence = new GroupSequence(['value' => ['Group 1', 'Group 2']]);
+        $sequence = new GroupSequence(array('value' => array('Group 1', 'Group 2')));
 
-        $this->assertSame(['Group 1', 'Group 2'], $sequence->groups);
+        $this->assertSame(array('Group 1', 'Group 2'), $sequence->groups);
     }
 }

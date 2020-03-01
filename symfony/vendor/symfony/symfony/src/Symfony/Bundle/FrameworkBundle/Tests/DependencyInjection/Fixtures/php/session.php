@@ -1,7 +1,7 @@
 <?php
 
-$container->loadFromExtension('framework', [
-    'session' => [
+$container->loadFromExtension('framework', array(
+    'session' => array(
         'handler_id' => null,
-    ],
-]);
+    ),
+));

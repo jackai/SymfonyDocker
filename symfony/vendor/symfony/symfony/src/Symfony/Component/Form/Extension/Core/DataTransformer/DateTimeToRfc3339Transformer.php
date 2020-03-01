@@ -53,23 +53,19 @@ class DateTimeToRfc3339Transformer extends BaseDateTimeTransformer
      *
      * @param string $rfc3339 Formatted string
      *
-     * @return \DateTime|null Normalized date
+     * @return \DateTime Normalized date
      *
      * @throws TransformationFailedException If the given value is not a string,
      *                                       if the value could not be transformed
      */
     public function reverseTransform($rfc3339)
     {
-        if (!\is_string($rfc3339)) {
+        if (!is_string($rfc3339)) {
             throw new TransformationFailedException('Expected a string.');
         }
 
         if ('' === $rfc3339) {
-            return null;
-        }
-
-        if (!preg_match('/^(\d{4})-(\d{2})-(\d{2})T\d{2}:\d{2}(?::\d{2})?(?:\.\d+)?(?:Z|(?:(?:\+|-)\d{2}:\d{2}))$/', $rfc3339, $matches)) {
-            throw new TransformationFailedException(sprintf('The date "%s" is not a valid date.', $rfc3339));
+            return;
         }
 
         try {
@@ -82,8 +78,15 @@ class DateTimeToRfc3339Transformer extends BaseDateTimeTransformer
             $dateTime->setTimezone(new \DateTimeZone($this->inputTimezone));
         }
 
-        if (!checkdate($matches[2], $matches[3], $matches[1])) {
-            throw new TransformationFailedException(sprintf('The date "%s-%s-%s" is not a valid date.', $matches[1], $matches[2], $matches[3]));
+        if (preg_match('/(\d{4})-(\d{2})-(\d{2})/', $rfc3339, $matches)) {
+            if (!checkdate($matches[2], $matches[3], $matches[1])) {
+                throw new TransformationFailedException(sprintf(
+                    'The date "%s-%s-%s" is not a valid date.',
+                    $matches[1],
+                    $matches[2],
+                    $matches[3]
+                ));
+            }
         }
 
         return $dateTime;

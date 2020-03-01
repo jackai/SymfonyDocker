@@ -22,6 +22,8 @@ class FormEvent extends Event
     protected $data;
 
     /**
+     * Constructs an event.
+     *
      * @param FormInterface $form The associated form
      * @param mixed         $data The data
      */

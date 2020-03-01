@@ -12,11 +12,10 @@
 namespace Symfony\Bridge\Monolog\Tests\Processor;
 
 use Monolog\Logger;
-use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Monolog\Processor\WebProcessor;
 use Symfony\Component\HttpFoundation\Request;
 
-class WebProcessorTest extends TestCase
+class WebProcessorTest extends \PHPUnit_Framework_TestCase
 {
     public function testUsesRequestServerData()
     {
@@ -36,8 +35,8 @@ class WebProcessorTest extends TestCase
 
     public function testUseRequestClientIp()
     {
-        Request::setTrustedProxies(['192.168.0.1'], Request::HEADER_X_FORWARDED_ALL);
-        list($event, $server) = $this->createRequestEvent(['X_FORWARDED_FOR' => '192.168.0.2']);
+        Request::setTrustedProxies(array('192.168.0.1'));
+        list($event, $server) = $this->createRequestEvent(array('X_FORWARDED_FOR' => '192.168.0.2'));
 
         $processor = new WebProcessor();
         $processor->onKernelRequest($event);
@@ -49,8 +48,6 @@ class WebProcessorTest extends TestCase
         $this->assertEquals($server['REQUEST_METHOD'], $record['extra']['http_method']);
         $this->assertEquals($server['SERVER_NAME'], $record['extra']['server']);
         $this->assertEquals($server['HTTP_REFERER'], $record['extra']['referrer']);
-
-        Request::setTrustedProxies([], -1);
     }
 
     public function testCanBeConstructedWithExtraFields()
@@ -61,7 +58,7 @@ class WebProcessorTest extends TestCase
 
         list($event, $server) = $this->createRequestEvent();
 
-        $processor = new WebProcessor(['url', 'referrer']);
+        $processor = new WebProcessor(array('url', 'referrer'));
         $processor->onKernelRequest($event);
         $record = $processor($this->getRecord());
 
@@ -73,16 +70,16 @@ class WebProcessorTest extends TestCase
     /**
      * @return array
      */
-    private function createRequestEvent($additionalServerParameters = [])
+    private function createRequestEvent($additionalServerParameters = array())
     {
         $server = array_merge(
-            [
+            array(
                 'REQUEST_URI' => 'A',
                 'REMOTE_ADDR' => '192.168.0.1',
                 'REQUEST_METHOD' => 'C',
                 'SERVER_NAME' => 'D',
                 'HTTP_REFERER' => 'E',
-            ],
+            ),
             $additionalServerParameters
         );
 
@@ -95,12 +92,12 @@ class WebProcessorTest extends TestCase
             ->getMock();
         $event->expects($this->any())
             ->method('isMasterRequest')
-            ->willReturn(true);
+            ->will($this->returnValue(true));
         $event->expects($this->any())
             ->method('getRequest')
-            ->willReturn($request);
+            ->will($this->returnValue($request));
 
-        return [$event, $server];
+        return array($event, $server);
     }
 
     /**
@@ -111,15 +108,15 @@ class WebProcessorTest extends TestCase
      */
     private function getRecord($level = Logger::WARNING, $message = 'test')
     {
-        return [
+        return array(
             'message' => $message,
-            'context' => [],
+            'context' => array(),
             'level' => $level,
             'level_name' => Logger::getLevelName($level),
             'channel' => 'test',
             'datetime' => new \DateTime(),
-            'extra' => [],
-        ];
+            'extra' => array(),
+        );
     }
 
     private function isExtraFieldsSupported()

@@ -21,12 +21,14 @@ class DelegatingEngine implements EngineInterface, StreamingEngineInterface
     /**
      * @var EngineInterface[]
      */
-    protected $engines = [];
+    protected $engines = array();
 
     /**
+     * Constructor.
+     *
      * @param EngineInterface[] $engines An array of EngineInterface instances to add
      */
-    public function __construct(array $engines = [])
+    public function __construct(array $engines = array())
     {
         foreach ($engines as $engine) {
             $this->addEngine($engine);
@@ -36,7 +38,7 @@ class DelegatingEngine implements EngineInterface, StreamingEngineInterface
     /**
      * {@inheritdoc}
      */
-    public function render($name, array $parameters = [])
+    public function render($name, array $parameters = array())
     {
         return $this->getEngine($name)->render($name, $parameters);
     }
@@ -44,7 +46,7 @@ class DelegatingEngine implements EngineInterface, StreamingEngineInterface
     /**
      * {@inheritdoc}
      */
-    public function stream($name, array $parameters = [])
+    public function stream($name, array $parameters = array())
     {
         $engine = $this->getEngine($name);
         if (!$engine instanceof StreamingEngineInterface) {
@@ -62,6 +64,11 @@ class DelegatingEngine implements EngineInterface, StreamingEngineInterface
         return $this->getEngine($name)->exists($name);
     }
 
+    /**
+     * Adds an engine.
+     *
+     * @param EngineInterface $engine An EngineInterface instance
+     */
     public function addEngine(EngineInterface $engine)
     {
         $this->engines[] = $engine;

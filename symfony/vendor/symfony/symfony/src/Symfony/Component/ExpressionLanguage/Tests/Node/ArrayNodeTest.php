@@ -30,31 +30,16 @@ class ArrayNodeTest extends AbstractNodeTest
 
     public function getEvaluateData()
     {
-        return [
-            [['b' => 'a', 'b'], $this->getArrayNode()],
-        ];
+        return array(
+            array(array('b' => 'a', 'b'), $this->getArrayNode()),
+        );
     }
 
     public function getCompileData()
     {
-        return [
-            ['["b" => "a", 0 => "b"]', $this->getArrayNode()],
-        ];
-    }
-
-    public function getDumpData()
-    {
-        yield ['{"b": "a", 0: "b"}', $this->getArrayNode()];
-
-        $array = $this->createArrayNode();
-        $array->addElement(new ConstantNode('c'), new ConstantNode('a"b'));
-        $array->addElement(new ConstantNode('d'), new ConstantNode('a\b'));
-        yield ['{"a\\"b": "c", "a\\\\b": "d"}', $array];
-
-        $array = $this->createArrayNode();
-        $array->addElement(new ConstantNode('c'));
-        $array->addElement(new ConstantNode('d'));
-        yield ['["c", "d"]', $array];
+        return array(
+            array('array("b" => "a", 0 => "b")', $this->getArrayNode()),
+        );
     }
 
     protected function getArrayNode()

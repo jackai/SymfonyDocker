@@ -14,37 +14,31 @@ namespace Symfony\Bridge\Twig\Extension;
 use Symfony\Bridge\Twig\TokenParser\DumpTokenParser;
 use Symfony\Component\VarDumper\Cloner\ClonerInterface;
 use Symfony\Component\VarDumper\Dumper\HtmlDumper;
-use Twig\Environment;
-use Twig\Extension\AbstractExtension;
-use Twig\Template;
-use Twig\TwigFunction;
 
 /**
  * Provides integration of the dump() function with Twig.
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class DumpExtension extends AbstractExtension
+class DumpExtension extends \Twig_Extension
 {
     private $cloner;
-    private $dumper;
 
-    public function __construct(ClonerInterface $cloner, HtmlDumper $dumper = null)
+    public function __construct(ClonerInterface $cloner)
     {
         $this->cloner = $cloner;
-        $this->dumper = $dumper;
     }
 
     public function getFunctions()
     {
-        return [
-            new TwigFunction('dump', [$this, 'dump'], ['is_safe' => ['html'], 'needs_context' => true, 'needs_environment' => true]),
-        ];
+        return array(
+            new \Twig_SimpleFunction('dump', array($this, 'dump'), array('is_safe' => array('html'), 'needs_context' => true, 'needs_environment' => true)),
+        );
     }
 
     public function getTokenParsers()
     {
-        return [new DumpTokenParser()];
+        return array(new DumpTokenParser());
     }
 
     public function getName()
@@ -52,34 +46,34 @@ class DumpExtension extends AbstractExtension
         return 'dump';
     }
 
-    public function dump(Environment $env, $context)
+    public function dump(\Twig_Environment $env, $context)
     {
         if (!$env->isDebug()) {
-            return null;
+            return;
         }
 
-        if (2 === \func_num_args()) {
-            $vars = [];
+        if (2 === func_num_args()) {
+            $vars = array();
             foreach ($context as $key => $value) {
-                if (!$value instanceof Template) {
+                if (!$value instanceof \Twig_Template) {
                     $vars[$key] = $value;
                 }
             }
 
-            $vars = [$vars];
+            $vars = array($vars);
         } else {
-            $vars = \func_get_args();
+            $vars = func_get_args();
             unset($vars[0], $vars[1]);
         }
 
         $dump = fopen('php://memory', 'r+b');
-        $this->dumper = $this->dumper ?: new HtmlDumper();
-        $this->dumper->setCharset($env->getCharset());
+        $dumper = new HtmlDumper($dump);
 
         foreach ($vars as $value) {
-            $this->dumper->dump($this->cloner->cloneVar($value), $dump);
+            $dumper->dump($this->cloner->cloneVar($value));
         }
+        rewind($dump);
 
-        return stream_get_contents($dump, -1, 0);
+        return stream_get_contents($dump);
     }
 }

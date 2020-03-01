@@ -18,19 +18,6 @@ require_once __DIR__.'/../../bootstrap.php';
 
 @trigger_error('root deprecation', E_USER_DEPRECATED);
 
-eval(<<<'EOPHP'
-namespace PHPUnit\Util;
-
-class Test
-{
-    public static function getGroups()
-    {
-        return array();
-    }
-}
-EOPHP
-);
-
 class PHPUnit_Util_Test
 {
     public static function getGroups()
@@ -59,29 +46,24 @@ $foo = new FooTestCase();
 $foo->testLegacyFoo();
 $foo->testNonLegacyBar();
 
-register_shutdown_function(function () {
-    exit('I get precedence over any exit statements inside the deprecation error handler.');
-});
-
 ?>
 --EXPECTF--
 Unsilenced deprecation notices (3)
 
-  2x: unsilenced foo deprecation
+unsilenced foo deprecation: 2x
     2x in FooTestCase::testLegacyFoo
 
-  1x: unsilenced bar deprecation
+unsilenced bar deprecation: 1x
     1x in FooTestCase::testNonLegacyBar
 
 Remaining deprecation notices (1)
 
-  1x: silenced bar deprecation
+silenced bar deprecation: 1x
     1x in FooTestCase::testNonLegacyBar
 
 Legacy deprecation notices (1)
 
 Other deprecation notices (1)
 
-  1x: root deprecation
+root deprecation: 1x
 
-I get precedence over any exit statements inside the deprecation error handler.

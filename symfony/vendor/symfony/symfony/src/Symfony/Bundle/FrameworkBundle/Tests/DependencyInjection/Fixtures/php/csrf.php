@@ -1,9 +1,9 @@
 <?php
 
-$container->loadFromExtension('framework', [
+$container->loadFromExtension('framework', array(
     'csrf_protection' => true,
     'form' => true,
-    'session' => [
+    'session' => array(
         'handler_id' => null,
-    ],
-]);
+    ),
+));

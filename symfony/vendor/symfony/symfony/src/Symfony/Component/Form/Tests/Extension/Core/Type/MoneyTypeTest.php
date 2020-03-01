@@ -11,38 +11,26 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
+use Symfony\Component\Form\Test\TypeTestCase as TestCase;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 
-class MoneyTypeTest extends BaseTypeTest
+class MoneyTypeTest extends TestCase
 {
-    const TESTED_TYPE = 'Symfony\Component\Form\Extension\Core\Type\MoneyType';
-
-    private $defaultLocale;
-
     protected function setUp()
     {
         // we test against different locales, so we need the full
         // implementation
-        IntlTestHelper::requireFullIntl($this, false);
+        IntlTestHelper::requireFullIntl($this);
 
         parent::setUp();
-
-        $this->defaultLocale = \Locale::getDefault();
-    }
-
-    protected function tearDown()
-    {
-        parent::tearDown();
-
-        \Locale::setDefault($this->defaultLocale);
     }
 
     public function testPassMoneyPatternToView()
     {
         \Locale::setDefault('de_DE');
 
-        $view = $this->factory->create(static::TESTED_TYPE)
-            ->createView();
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\MoneyType');
+        $view = $form->createView();
 
         $this->assertSame('{{ widget }} €', $view->vars['money_pattern']);
     }
@@ -51,10 +39,9 @@ class MoneyTypeTest extends BaseTypeTest
     {
         \Locale::setDefault('en_US');
 
-        $view = $this->factory->create(static::TESTED_TYPE, null, ['currency' => 'JPY'])
-            ->createView();
-
-        $this->assertSame('¥ {{ widget }}', $view->vars['money_pattern']);
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\MoneyType', null, array('currency' => 'JPY'));
+        $view = $form->createView();
+        $this->assertTrue((bool) strstr($view->vars['money_pattern'], '¥'));
     }
 
     // https://github.com/symfony/symfony/issues/5458
@@ -62,35 +49,12 @@ class MoneyTypeTest extends BaseTypeTest
     {
         \Locale::setDefault('de_DE');
 
-        $view1 = $this->factory->create(static::TESTED_TYPE, null, ['currency' => 'GBP'])->createView();
-        $view2 = $this->factory->create(static::TESTED_TYPE, null, ['currency' => 'EUR'])->createView();
+        $form1 = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\MoneyType', null, array('currency' => 'GBP'));
+        $form2 = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\MoneyType', null, array('currency' => 'EUR'));
+        $view1 = $form1->createView();
+        $view2 = $form2->createView();
 
         $this->assertSame('{{ widget }} £', $view1->vars['money_pattern']);
         $this->assertSame('{{ widget }} €', $view2->vars['money_pattern']);
-    }
-
-    public function testSubmitNull($expected = null, $norm = null, $view = null)
-    {
-        parent::testSubmitNull($expected, $norm, '');
-    }
-
-    public function testMoneyPatternWithoutCurrency()
-    {
-        $view = $this->factory->create(static::TESTED_TYPE, null, ['currency' => false])
-            ->createView();
-
-        $this->assertSame('{{ widget }}', $view->vars['money_pattern']);
-    }
-
-    public function testSubmitNullUsesDefaultEmptyData($emptyData = '10.00', $expectedData = 10.0)
-    {
-        $form = $this->factory->create(static::TESTED_TYPE, null, [
-            'empty_data' => $emptyData,
-        ]);
-        $form->submit(null);
-
-        $this->assertSame($emptyData, $form->getViewData());
-        $this->assertSame($expectedData, $form->getNormData());
-        $this->assertSame($expectedData, $form->getData());
     }
 }

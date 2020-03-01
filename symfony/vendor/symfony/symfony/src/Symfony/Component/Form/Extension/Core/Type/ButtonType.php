@@ -26,7 +26,6 @@ class ButtonType extends BaseType implements ButtonTypeInterface
      */
     public function getParent()
     {
-        return null;
     }
 
     /**
@@ -44,6 +43,8 @@ class ButtonType extends BaseType implements ButtonTypeInterface
     {
         parent::configureOptions($resolver);
 
-        $resolver->setDefault('auto_initialize', false);
+        $resolver->setDefaults(array(
+            'auto_initialize' => false,
+        ));
     }
 }

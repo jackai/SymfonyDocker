@@ -1,30 +1,28 @@
 <?php
 
-$container->loadFromExtension('framework', [
+$container->loadFromExtension('framework', array(
     'secret' => 's3cr3t',
     'default_locale' => 'fr',
     'csrf_protection' => true,
-    'form' => [
-        'csrf_protection' => [
+    'form' => array(
+        'csrf_protection' => array(
             'field_name' => '_csrf',
-        ],
-    ],
+        ),
+    ),
     'http_method_override' => false,
-    'esi' => [
+    'trusted_proxies' => array('127.0.0.1', '10.0.0.1'),
+    'esi' => array(
         'enabled' => true,
-    ],
-    'ssi' => [
-        'enabled' => true,
-    ],
-    'profiler' => [
+    ),
+    'profiler' => array(
         'only_exceptions' => true,
         'enabled' => false,
-    ],
-    'router' => [
-        'resource' => '%kernel.project_dir%/config/routing.xml',
+    ),
+    'router' => array(
+        'resource' => '%kernel.root_dir%/config/routing.xml',
         'type' => 'xml',
-    ],
-    'session' => [
+    ),
+    'session' => array(
         'storage_id' => 'session.storage.native',
         'handler_id' => 'session.handler.native_file',
         'name' => '_SYMFONY',
@@ -38,47 +36,47 @@ $container->loadFromExtension('framework', [
         'gc_divisor' => 108,
         'gc_probability' => 1,
         'save_path' => '/path/to/sessions',
-    ],
-    'templating' => [
+    ),
+    'templating' => array(
         'cache' => '/path/to/cache',
-        'engines' => ['php', 'twig'],
-        'loader' => ['loader.foo', 'loader.bar'],
-        'form' => [
-            'resources' => ['theme1', 'theme2'],
-        ],
+        'engines' => array('php', 'twig'),
+        'loader' => array('loader.foo', 'loader.bar'),
+        'form' => array(
+            'resources' => array('theme1', 'theme2'),
+        ),
         'hinclude_default_template' => 'global_hinclude_template',
-    ],
-    'assets' => [
+    ),
+    'assets' => array(
         'version' => 'v1',
-    ],
-    'translator' => [
+    ),
+    'translator' => array(
         'enabled' => true,
         'fallback' => 'fr',
-        'paths' => ['%kernel.project_dir%/Fixtures/translations'],
-    ],
-    'validation' => [
+        'paths' => array('%kernel.root_dir%/Fixtures/translations'),
+    ),
+    'validation' => array(
         'enabled' => true,
-    ],
-    'annotations' => [
+        'cache' => 'validator.mapping.cache.doctrine.apc',
+    ),
+    'annotations' => array(
         'cache' => 'file',
         'debug' => true,
         'file_cache_dir' => '%kernel.cache_dir%/annotations',
-    ],
-    'serializer' => [
+    ),
+    'serializer' => array(
         'enabled' => true,
         'enable_annotations' => true,
+        'cache' => 'serializer.mapping.cache.apc',
         'name_converter' => 'serializer.name_converter.camel_case_to_snake_case',
-        'circular_reference_handler' => 'my.circular.reference.handler',
-    ],
-    'property_info' => true,
+    ),
     'ide' => 'file%%link%%format',
-    'request' => [
-        'formats' => [
-            'csv' => [
+    'request' => array(
+        'formats' => array(
+            'csv' => array(
                 'text/csv',
                 'text/plain',
-            ],
+            ),
             'pdf' => 'application/pdf',
-        ],
-    ],
-]);
+        ),
+    ),
+));

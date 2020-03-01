@@ -11,13 +11,12 @@
 
 namespace Symfony\Component\Security\Http\Tests\Firewall;
 
-use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Firewall\RememberMeListener;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Http\SecurityEvents;
 
-class RememberMeListenerTest extends TestCase
+class RememberMeListenerTest extends \PHPUnit_Framework_TestCase
 {
     public function testOnCoreSecurityDoesNotTryToPopulateNonEmptyTokenStorage()
     {
@@ -26,7 +25,7 @@ class RememberMeListenerTest extends TestCase
         $tokenStorage
             ->expects($this->once())
             ->method('getToken')
-            ->willReturn($this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock())
+            ->will($this->returnValue($this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')))
         ;
 
         $tokenStorage
@@ -44,20 +43,20 @@ class RememberMeListenerTest extends TestCase
         $tokenStorage
             ->expects($this->once())
             ->method('getToken')
-            ->willReturn(null)
+            ->will($this->returnValue(null))
         ;
 
         $service
             ->expects($this->once())
             ->method('autoLogin')
-            ->willReturn(null)
+            ->will($this->returnValue(null))
         ;
 
         $event = $this->getGetResponseEvent();
         $event
             ->expects($this->once())
             ->method('getRequest')
-            ->willReturn(new Request())
+            ->will($this->returnValue(new Request()))
         ;
 
         $this->assertNull($listener->handle($event));
@@ -66,59 +65,59 @@ class RememberMeListenerTest extends TestCase
     public function testOnCoreSecurityIgnoresAuthenticationExceptionThrownByAuthenticationManagerImplementation()
     {
         list($listener, $tokenStorage, $service, $manager) = $this->getListener();
-        $request = new Request();
-        $exception = new AuthenticationException('Authentication failed.');
 
         $tokenStorage
             ->expects($this->once())
             ->method('getToken')
-            ->willReturn(null)
+            ->will($this->returnValue(null))
         ;
 
         $service
             ->expects($this->once())
             ->method('autoLogin')
-            ->willReturn($this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock())
+            ->will($this->returnValue($this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')))
         ;
 
         $service
             ->expects($this->once())
             ->method('loginFail')
-            ->with($request, $exception)
         ;
 
+        $exception = new AuthenticationException('Authentication failed.');
         $manager
             ->expects($this->once())
             ->method('authenticate')
-            ->willThrowException($exception)
+            ->will($this->throwException($exception))
         ;
 
         $event = $this->getGetResponseEvent();
         $event
             ->expects($this->once())
             ->method('getRequest')
-            ->willReturn($request)
+            ->will($this->returnValue(new Request()))
         ;
 
         $listener->handle($event);
     }
 
+    /**
+     * @expectedException Symfony\Component\Security\Core\Exception\AuthenticationException
+     * @expectedExceptionMessage Authentication failed.
+     */
     public function testOnCoreSecurityIgnoresAuthenticationOptionallyRethrowsExceptionThrownAuthenticationManagerImplementation()
     {
-        $this->expectException('Symfony\Component\Security\Core\Exception\AuthenticationException');
-        $this->expectExceptionMessage('Authentication failed.');
         list($listener, $tokenStorage, $service, $manager) = $this->getListener(false, false);
 
         $tokenStorage
             ->expects($this->once())
             ->method('getToken')
-            ->willReturn(null)
+            ->will($this->returnValue(null))
         ;
 
         $service
             ->expects($this->once())
             ->method('autoLogin')
-            ->willReturn($this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock())
+            ->will($this->returnValue($this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')))
         ;
 
         $service
@@ -130,51 +129,14 @@ class RememberMeListenerTest extends TestCase
         $manager
             ->expects($this->once())
             ->method('authenticate')
-            ->willThrowException($exception)
+            ->will($this->throwException($exception))
         ;
 
         $event = $this->getGetResponseEvent();
         $event
             ->expects($this->once())
             ->method('getRequest')
-            ->willReturn(new Request())
-        ;
-
-        $listener->handle($event);
-    }
-
-    public function testOnCoreSecurityAuthenticationExceptionDuringAutoLoginTriggersLoginFail()
-    {
-        list($listener, $tokenStorage, $service, $manager) = $this->getListener();
-
-        $tokenStorage
-            ->expects($this->once())
-            ->method('getToken')
-            ->willReturn(null)
-        ;
-
-        $exception = new AuthenticationException('Authentication failed.');
-        $service
-            ->expects($this->once())
-            ->method('autoLogin')
-            ->willThrowException($exception)
-        ;
-
-        $service
-            ->expects($this->once())
-            ->method('loginFail')
-        ;
-
-        $manager
-            ->expects($this->never())
-            ->method('authenticate')
-        ;
-
-        $event = $this->getGetResponseEvent();
-        $event
-            ->expects($this->once())
-            ->method('getRequest')
-            ->willReturn(new Request())
+            ->will($this->returnValue(new Request()))
         ;
 
         $listener->handle($event);
@@ -187,14 +149,14 @@ class RememberMeListenerTest extends TestCase
         $tokenStorage
             ->expects($this->once())
             ->method('getToken')
-            ->willReturn(null)
+            ->will($this->returnValue(null))
         ;
 
-        $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
+        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
         $service
             ->expects($this->once())
             ->method('autoLogin')
-            ->willReturn($token)
+            ->will($this->returnValue($token))
         ;
 
         $tokenStorage
@@ -206,14 +168,14 @@ class RememberMeListenerTest extends TestCase
         $manager
             ->expects($this->once())
             ->method('authenticate')
-            ->willReturn($token)
+            ->will($this->returnValue($token))
         ;
 
         $event = $this->getGetResponseEvent();
         $event
             ->expects($this->once())
             ->method('getRequest')
-            ->willReturn(new Request())
+            ->will($this->returnValue(new Request()))
         ;
 
         $listener->handle($event);
@@ -221,19 +183,19 @@ class RememberMeListenerTest extends TestCase
 
     public function testSessionStrategy()
     {
-        list($listener, $tokenStorage, $service, $manager, , , $sessionStrategy) = $this->getListener(false, true, true);
+        list($listener, $tokenStorage, $service, $manager, , $dispatcher, $sessionStrategy) = $this->getListener(false, true, true);
 
         $tokenStorage
             ->expects($this->once())
             ->method('getToken')
-            ->willReturn(null)
+            ->will($this->returnValue(null))
         ;
 
-        $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
+        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
         $service
             ->expects($this->once())
             ->method('autoLogin')
-            ->willReturn($token)
+            ->will($this->returnValue($token))
         ;
 
         $tokenStorage
@@ -245,40 +207,40 @@ class RememberMeListenerTest extends TestCase
         $manager
             ->expects($this->once())
             ->method('authenticate')
-            ->willReturn($token)
+            ->will($this->returnValue($token))
         ;
 
-        $session = $this->getMockBuilder('\Symfony\Component\HttpFoundation\Session\SessionInterface')->getMock();
+        $session = $this->getMock('\Symfony\Component\HttpFoundation\Session\SessionInterface');
         $session
             ->expects($this->once())
             ->method('isStarted')
-            ->willReturn(true)
+            ->will($this->returnValue(true))
         ;
 
-        $request = $this->getMockBuilder('\Symfony\Component\HttpFoundation\Request')->getMock();
+        $request = $this->getMock('\Symfony\Component\HttpFoundation\Request');
         $request
             ->expects($this->once())
             ->method('hasSession')
-            ->willReturn(true)
+            ->will($this->returnValue(true))
         ;
 
         $request
             ->expects($this->once())
             ->method('getSession')
-            ->willReturn($session)
+            ->will($this->returnValue($session))
         ;
 
         $event = $this->getGetResponseEvent();
         $event
             ->expects($this->once())
             ->method('getRequest')
-            ->willReturn($request)
+            ->will($this->returnValue($request))
         ;
 
         $sessionStrategy
             ->expects($this->once())
             ->method('onAuthentication')
-            ->willReturn(null)
+            ->will($this->returnValue(null))
         ;
 
         $listener->handle($event);
@@ -286,19 +248,19 @@ class RememberMeListenerTest extends TestCase
 
     public function testSessionIsMigratedByDefault()
     {
-        list($listener, $tokenStorage, $service, $manager) = $this->getListener(false, true, false);
+        list($listener, $tokenStorage, $service, $manager, , $dispatcher, $sessionStrategy) = $this->getListener(false, true, false);
 
         $tokenStorage
             ->expects($this->once())
             ->method('getToken')
-            ->willReturn(null)
+            ->will($this->returnValue(null))
         ;
 
-        $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
+        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
         $service
             ->expects($this->once())
             ->method('autoLogin')
-            ->willReturn($token)
+            ->will($this->returnValue($token))
         ;
 
         $tokenStorage
@@ -310,38 +272,38 @@ class RememberMeListenerTest extends TestCase
         $manager
             ->expects($this->once())
             ->method('authenticate')
-            ->willReturn($token)
+            ->will($this->returnValue($token))
         ;
 
-        $session = $this->getMockBuilder('\Symfony\Component\HttpFoundation\Session\SessionInterface')->getMock();
+        $session = $this->getMock('\Symfony\Component\HttpFoundation\Session\SessionInterface');
         $session
             ->expects($this->once())
             ->method('isStarted')
-            ->willReturn(true)
+            ->will($this->returnValue(true))
         ;
         $session
             ->expects($this->once())
             ->method('migrate')
         ;
 
-        $request = $this->getMockBuilder('\Symfony\Component\HttpFoundation\Request')->getMock();
+        $request = $this->getMock('\Symfony\Component\HttpFoundation\Request');
         $request
             ->expects($this->any())
             ->method('hasSession')
-            ->willReturn(true)
+            ->will($this->returnValue(true))
         ;
 
         $request
             ->expects($this->any())
             ->method('getSession')
-            ->willReturn($session)
+            ->will($this->returnValue($session))
         ;
 
         $event = $this->getGetResponseEvent();
         $event
             ->expects($this->once())
             ->method('getRequest')
-            ->willReturn($request)
+            ->will($this->returnValue($request))
         ;
 
         $listener->handle($event);
@@ -354,14 +316,14 @@ class RememberMeListenerTest extends TestCase
         $tokenStorage
             ->expects($this->once())
             ->method('getToken')
-            ->willReturn(null)
+            ->will($this->returnValue(null))
         ;
 
-        $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')->getMock();
+        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
         $service
             ->expects($this->once())
             ->method('autoLogin')
-            ->willReturn($token)
+            ->will($this->returnValue($token))
         ;
 
         $tokenStorage
@@ -373,7 +335,7 @@ class RememberMeListenerTest extends TestCase
         $manager
             ->expects($this->once())
             ->method('authenticate')
-            ->willReturn($token)
+            ->will($this->returnValue($token))
         ;
 
         $event = $this->getGetResponseEvent();
@@ -381,7 +343,7 @@ class RememberMeListenerTest extends TestCase
         $event
             ->expects($this->once())
             ->method('getRequest')
-            ->willReturn($request)
+            ->will($this->returnValue($request))
         ;
 
         $dispatcher
@@ -398,12 +360,12 @@ class RememberMeListenerTest extends TestCase
 
     protected function getGetResponseEvent()
     {
-        return $this->getMockBuilder('Symfony\Component\HttpKernel\Event\GetResponseEvent')->disableOriginalConstructor()->getMock();
+        return $this->getMock('Symfony\Component\HttpKernel\Event\GetResponseEvent', array(), array(), '', false);
     }
 
     protected function getFilterResponseEvent()
     {
-        return $this->getMockBuilder('Symfony\Component\HttpKernel\Event\FilterResponseEvent')->disableOriginalConstructor()->getMock();
+        return $this->getMock('Symfony\Component\HttpKernel\Event\FilterResponseEvent', array(), array(), '', false);
     }
 
     protected function getListener($withDispatcher = false, $catchExceptions = true, $withSessionStrategy = false)
@@ -418,36 +380,36 @@ class RememberMeListenerTest extends TestCase
             $sessionStrategy = ($withSessionStrategy ? $this->getSessionStrategy() : null)
         );
 
-        return [$listener, $tokenStorage, $service, $manager, $logger, $dispatcher, $sessionStrategy];
+        return array($listener, $tokenStorage, $service, $manager, $logger, $dispatcher, $sessionStrategy);
     }
 
     protected function getLogger()
     {
-        return $this->getMockBuilder('Psr\Log\LoggerInterface')->getMock();
+        return $this->getMock('Psr\Log\LoggerInterface');
     }
 
     protected function getManager()
     {
-        return $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface')->getMock();
+        return $this->getMock('Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface');
     }
 
     protected function getService()
     {
-        return $this->getMockBuilder('Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface')->getMock();
+        return $this->getMock('Symfony\Component\Security\Http\RememberMe\RememberMeServicesInterface');
     }
 
     protected function getTokenStorage()
     {
-        return $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface')->getMock();
+        return $this->getMock('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface');
     }
 
     protected function getDispatcher()
     {
-        return $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock();
+        return $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
     }
 
     private function getSessionStrategy()
     {
-        return $this->getMockBuilder('\Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterface')->getMock();
+        return $this->getMock('\Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterface');
     }
 }

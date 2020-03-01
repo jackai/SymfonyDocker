@@ -13,9 +13,8 @@ namespace Symfony\Component\Validator\Tests\Constraints;
 
 use Symfony\Component\Validator\Constraints\Blank;
 use Symfony\Component\Validator\Constraints\BlankValidator;
-use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-class BlankValidatorTest extends ConstraintValidatorTestCase
+class BlankValidatorTest extends AbstractConstraintValidatorTest
 {
     protected function createValidator()
     {
@@ -41,9 +40,9 @@ class BlankValidatorTest extends ConstraintValidatorTestCase
      */
     public function testInvalidValues($value, $valueAsString)
     {
-        $constraint = new Blank([
+        $constraint = new Blank(array(
             'message' => 'myMessage',
-        ]);
+        ));
 
         $this->validator->validate($value, $constraint);
 
@@ -55,11 +54,11 @@ class BlankValidatorTest extends ConstraintValidatorTestCase
 
     public function getInvalidValues()
     {
-        return [
-            ['foobar', '"foobar"'],
-            [0, '0'],
-            [false, 'false'],
-            [1234, '1234'],
-        ];
+        return array(
+            array('foobar', '"foobar"'),
+            array(0, '0'),
+            array(false, 'false'),
+            array(1234, '1234'),
+        );
     }
 }

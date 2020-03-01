@@ -12,11 +12,10 @@
 namespace Symfony\Component\Intl\Data\Generator;
 
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Intl\Data\Bundle\Compiler\BundleCompilerInterface;
-use Symfony\Component\Intl\Data\Bundle\Reader\BundleEntryReader;
-use Symfony\Component\Intl\Data\Bundle\Reader\BundleEntryReaderInterface;
-use Symfony\Component\Intl\Data\Bundle\Reader\IntlBundleReader;
+use Symfony\Component\Intl\Data\Bundle\Reader\BundleReaderInterface;
 use Symfony\Component\Intl\Data\Util\LocaleScanner;
+use Symfony\Component\Intl\Data\Bundle\Compiler\GenrbCompiler;
+use Symfony\Component\Intl\Data\Bundle\Reader\IntlBundleReader;
 
 /**
  * The rule for compiling the currency bundle.
@@ -27,20 +26,30 @@ use Symfony\Component\Intl\Data\Util\LocaleScanner;
  */
 abstract class AbstractDataGenerator
 {
+    /**
+     * @var GenrbCompiler
+     */
     private $compiler;
+
+    /**
+     * @var string
+     */
     private $dirName;
 
-    public function __construct(BundleCompilerInterface $compiler, $dirName)
+    public function __construct(GenrbCompiler $compiler, $dirName)
     {
         $this->compiler = $compiler;
-        $this->dirName = (string) $dirName;
+        $this->dirName = $dirName;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function generateData(GeneratorConfig $config)
     {
         $filesystem = new Filesystem();
         $localeScanner = new LocaleScanner();
-        $reader = new BundleEntryReader(new IntlBundleReader());
+        $reader = new IntlBundleReader();
 
         $writers = $config->getBundleWriters();
         $tempDir = sys_get_temp_dir().'/icu-data-'.$this->dirName;
@@ -91,39 +100,44 @@ abstract class AbstractDataGenerator
     }
 
     /**
-     * @param string $sourceDir
+     * @param LocaleScanner $scanner
+     * @param string        $sourceDir
      *
      * @return string[]
      */
     abstract protected function scanLocales(LocaleScanner $scanner, $sourceDir);
 
     /**
-     * @param string $sourceDir
-     * @param string $tempDir
+     * @param GenrbCompiler $compiler
+     * @param string        $sourceDir
+     * @param string        $tempDir
      */
-    abstract protected function compileTemporaryBundles(BundleCompilerInterface $compiler, $sourceDir, $tempDir);
+    abstract protected function compileTemporaryBundles(GenrbCompiler $compiler, $sourceDir, $tempDir);
 
     abstract protected function preGenerate();
 
     /**
-     * @param string $tempDir
-     * @param string $displayLocale
+     * @param BundleReaderInterface $reader
+     * @param string                $tempDir
+     * @param string                $displayLocale
      *
      * @return array|null
      */
-    abstract protected function generateDataForLocale(BundleEntryReaderInterface $reader, $tempDir, $displayLocale);
+    abstract protected function generateDataForLocale(BundleReaderInterface $reader, $tempDir, $displayLocale);
 
     /**
-     * @param string $tempDir
+     * @param BundleReaderInterface $reader
+     * @param string                $tempDir
      *
      * @return array|null
      */
-    abstract protected function generateDataForRoot(BundleEntryReaderInterface $reader, $tempDir);
+    abstract protected function generateDataForRoot(BundleReaderInterface $reader, $tempDir);
 
     /**
-     * @param string $tempDir
+     * @param BundleReaderInterface $reader
+     * @param string                $tempDir
      *
      * @return array|null
      */
-    abstract protected function generateDataForMeta(BundleEntryReaderInterface $reader, $tempDir);
+    abstract protected function generateDataForMeta(BundleReaderInterface $reader, $tempDir);
 }

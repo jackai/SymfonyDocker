@@ -18,24 +18,43 @@ namespace Symfony\Component\Form\ChoiceList\View;
  */
 class ChoiceView
 {
+    /**
+     * The label displayed to humans.
+     *
+     * @var string
+     */
     public $label;
+
+    /**
+     * The view representation of the choice.
+     *
+     * @var string
+     */
     public $value;
+
+    /**
+     * The original choice value.
+     *
+     * @var mixed
+     */
     public $data;
 
     /**
      * Additional attributes for the HTML tag.
+     *
+     * @var array
      */
     public $attr;
 
     /**
      * Creates a new choice view.
      *
-     * @param mixed        $data  The original choice
-     * @param string       $value The view representation of the choice
-     * @param string|false $label The label displayed to humans; pass false to discard the label
-     * @param array        $attr  Additional attributes for the HTML tag
+     * @param mixed  $data  The original choice
+     * @param string $value The view representation of the choice
+     * @param string $label The label displayed to humans
+     * @param array  $attr  Additional attributes for the HTML tag
      */
-    public function __construct($data, $value, $label, array $attr = [])
+    public function __construct($data, $value, $label, array $attr = array())
     {
         $this->data = $data;
         $this->value = $value;

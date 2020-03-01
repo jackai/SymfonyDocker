@@ -11,12 +11,12 @@
 
 namespace Symfony\Component\Security\Http\Firewall;
 
-use Psr\Log\LoggerInterface;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
-use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 
 /**
  * AnonymousAuthenticationListener automatically adds a Token if none is
@@ -41,6 +41,8 @@ class AnonymousAuthenticationListener implements ListenerInterface
 
     /**
      * Handles anonymous authentication.
+     *
+     * @param GetResponseEvent $event A GetResponseEvent instance
      */
     public function handle(GetResponseEvent $event)
     {
@@ -49,7 +51,7 @@ class AnonymousAuthenticationListener implements ListenerInterface
         }
 
         try {
-            $token = new AnonymousToken($this->secret, 'anon.', []);
+            $token = new AnonymousToken($this->secret, 'anon.', array());
             if (null !== $this->authenticationManager) {
                 $token = $this->authenticationManager->authenticate($token);
             }
@@ -61,7 +63,7 @@ class AnonymousAuthenticationListener implements ListenerInterface
             }
         } catch (AuthenticationException $failed) {
             if (null !== $this->logger) {
-                $this->logger->info('Anonymous authentication failed.', ['exception' => $failed]);
+                $this->logger->info('Anonymous authentication failed.', array('exception' => $failed));
             }
         }
     }

@@ -9,16 +9,15 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\TwigBundle\Tests\Functional;
+namespace Symfony\Bundle\TwigBundle\Tests;
 
-use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
-use Symfony\Bundle\TwigBundle\Tests\TestCase;
-use Symfony\Bundle\TwigBundle\TwigBundle;
+use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\HttpKernel\Kernel;
+use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
+use Symfony\Bundle\TwigBundle\TwigBundle;
 
-class NoTemplatingEntryTest extends TestCase
+class NoTemplatingEntryTest extends \PHPUnit_Framework_TestCase
 {
     public function test()
     {
@@ -27,7 +26,7 @@ class NoTemplatingEntryTest extends TestCase
 
         $container = $kernel->getContainer();
         $content = $container->get('twig')->render('index.html.twig');
-        $this->assertStringContainsString('{ a: b }', $content);
+        $this->assertContains('{ a: b }', $content);
     }
 
     protected function setUp()
@@ -55,16 +54,15 @@ class NoTemplatingEntryKernel extends Kernel
 {
     public function registerBundles()
     {
-        return [new FrameworkBundle(), new TwigBundle()];
+        return array(new FrameworkBundle(), new TwigBundle());
     }
 
     public function registerContainerConfiguration(LoaderInterface $loader)
     {
         $loader->load(function ($container) {
-            $container->loadFromExtension('framework', [
+            $container->loadFromExtension('framework', array(
                 'secret' => '$ecret',
-                'form' => ['enabled' => false],
-            ]);
+            ));
         });
     }
 

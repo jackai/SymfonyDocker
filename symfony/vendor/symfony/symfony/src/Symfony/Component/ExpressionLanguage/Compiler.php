@@ -51,7 +51,9 @@ class Compiler
     /**
      * Compiles a node.
      *
-     * @return $this
+     * @param Node\Node $node The node to compile
+     *
+     * @return Compiler The current compiler instance
      */
     public function compile(Node\Node $node)
     {
@@ -78,7 +80,7 @@ class Compiler
      *
      * @param string $string The string
      *
-     * @return $this
+     * @return Compiler The current compiler instance
      */
     public function raw($string)
     {
@@ -92,7 +94,7 @@ class Compiler
      *
      * @param string $value The string
      *
-     * @return $this
+     * @return Compiler The current compiler instance
      */
     public function string($value)
     {
@@ -106,11 +108,11 @@ class Compiler
      *
      * @param mixed $value The value to convert
      *
-     * @return $this
+     * @return Compiler The current compiler instance
      */
     public function repr($value)
     {
-        if (\is_int($value) || \is_float($value)) {
+        if (is_int($value) || is_float($value)) {
             if (false !== $locale = setlocale(LC_NUMERIC, 0)) {
                 setlocale(LC_NUMERIC, 'C');
             }
@@ -122,10 +124,10 @@ class Compiler
             }
         } elseif (null === $value) {
             $this->raw('null');
-        } elseif (\is_bool($value)) {
+        } elseif (is_bool($value)) {
             $this->raw($value ? 'true' : 'false');
-        } elseif (\is_array($value)) {
-            $this->raw('[');
+        } elseif (is_array($value)) {
+            $this->raw('array(');
             $first = true;
             foreach ($value as $key => $value) {
                 if (!$first) {
@@ -136,7 +138,7 @@ class Compiler
                 $this->raw(' => ');
                 $this->repr($value);
             }
-            $this->raw(']');
+            $this->raw(')');
         } else {
             $this->string($value);
         }

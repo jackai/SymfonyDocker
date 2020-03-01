@@ -1,16 +1,13 @@
 <?php
 
 /*
- * This file is part of the Symfony package.
+ * This file is part of the Symfony framework.
  *
  * (c) Fabien Potencier <fabien@symfony.com>
  *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
  */
-
-namespace Tests\Fixtures;
-
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\HttpKernel\Kernel;
 
@@ -21,25 +18,17 @@ class TestKernel extends Kernel
 {
     public function registerBundles()
     {
-        return [
-            new \Symfony\Bundle\FrameworkBundle\FrameworkBundle(),
-            new \Symfony\Bundle\MonologBundle\MonologBundle(),
-            new \Sensio\Bundle\FrameworkExtraBundle\SensioFrameworkExtraBundle(),
-            new \Symfony\Bundle\TwigBundle\TwigBundle(),
-            new \Doctrine\Bundle\DoctrineBundle\DoctrineBundle(),
-            new \Symfony\Bundle\SecurityBundle\SecurityBundle(),
-            new \Tests\Fixtures\FooBundle\FooBundle(),
-            new \Tests\Fixtures\ActionArgumentsBundle\ActionArgumentsBundle(),
-        ];
+        return array(
+            new Symfony\Bundle\FrameworkBundle\FrameworkBundle(),
+            new Sensio\Bundle\FrameworkExtraBundle\SensioFrameworkExtraBundle(),
+            new Symfony\Bundle\TwigBundle\TwigBundle(),
+            new Tests\Fixtures\FooBundle\FooBundle(),
+        );
     }
 
     public function registerContainerConfiguration(LoaderInterface $loader)
     {
         $loader->load(__DIR__.'/config/config.yml');
-
-        if (\PHP_VERSION_ID >= 70100) {
-            $loader->load(__DIR__.'/config/nullable_type/config.yml');
-        }
     }
 
     public function getCacheDir()
@@ -47,5 +36,3 @@ class TestKernel extends Kernel
         return $this->rootDir.'/cache/'.$this->environment;
     }
 }
-
-class_alias('Tests\Fixtures\TestKernel', 'TestKernel');

@@ -11,43 +11,42 @@
 
 namespace Symfony\Component\Serializer\Tests\Annotation;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class GroupsTest extends TestCase
+class GroupsTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @expectedException \Symfony\Component\Serializer\Exception\InvalidArgumentException
+     */
     public function testEmptyGroupsParameter()
     {
-        $this->expectException('Symfony\Component\Serializer\Exception\InvalidArgumentException');
-        new Groups(['value' => []]);
+        new Groups(array('value' => array()));
     }
 
+    /**
+     * @expectedException \Symfony\Component\Serializer\Exception\InvalidArgumentException
+     */
     public function testNotAnArrayGroupsParameter()
     {
-        $this->expectException('Symfony\Component\Serializer\Exception\InvalidArgumentException');
-        new Groups(['value' => 12]);
+        new Groups(array('value' => 'coopTilleuls'));
     }
 
+    /**
+     * @expectedException \Symfony\Component\Serializer\Exception\InvalidArgumentException
+     */
     public function testInvalidGroupsParameter()
     {
-        $this->expectException('Symfony\Component\Serializer\Exception\InvalidArgumentException');
-        new Groups(['value' => ['a', 1, new \stdClass()]]);
+        new Groups(array('value' => array('a', 1, new \stdClass())));
     }
 
     public function testGroupsParameters()
     {
-        $validData = ['a', 'b'];
+        $validData = array('a', 'b');
 
-        $groups = new Groups(['value' => $validData]);
+        $groups = new Groups(array('value' => $validData));
         $this->assertEquals($validData, $groups->getGroups());
-    }
-
-    public function testSingleGroup()
-    {
-        $groups = new Groups(['value' => 'a']);
-        $this->assertEquals(['a'], $groups->getGroups());
     }
 }

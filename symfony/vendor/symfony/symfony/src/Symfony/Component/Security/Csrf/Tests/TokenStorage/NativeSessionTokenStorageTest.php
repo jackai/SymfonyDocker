@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Security\Csrf\Tests\TokenStorage;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Csrf\TokenStorage\NativeSessionTokenStorage;
 
 /**
@@ -20,7 +19,7 @@ use Symfony\Component\Security\Csrf\TokenStorage\NativeSessionTokenStorage;
  * @runTestsInSeparateProcesses
  * @preserveGlobalState disabled
  */
-class NativeSessionTokenStorageTest extends TestCase
+class NativeSessionTokenStorageTest extends \PHPUnit_Framework_TestCase
 {
     const SESSION_NAMESPACE = 'foobar';
 
@@ -29,9 +28,17 @@ class NativeSessionTokenStorageTest extends TestCase
      */
     private $storage;
 
+    public static function setUpBeforeClass()
+    {
+        ini_set('session.save_handler', 'files');
+        ini_set('session.save_path', sys_get_temp_dir());
+
+        parent::setUpBeforeClass();
+    }
+
     protected function setUp()
     {
-        $_SESSION = [];
+        $_SESSION = array();
 
         $this->storage = new NativeSessionTokenStorage(self::SESSION_NAMESPACE);
     }
@@ -40,7 +47,7 @@ class NativeSessionTokenStorageTest extends TestCase
     {
         $this->storage->setToken('token_id', 'TOKEN');
 
-        $this->assertSame([self::SESSION_NAMESPACE => ['token_id' => 'TOKEN']], $_SESSION);
+        $this->assertSame(array(self::SESSION_NAMESPACE => array('token_id' => 'TOKEN')), $_SESSION);
     }
 
     public function testStoreTokenInClosedSessionWithExistingSessionId()
@@ -52,7 +59,7 @@ class NativeSessionTokenStorageTest extends TestCase
         $this->storage->setToken('token_id', 'TOKEN');
 
         $this->assertSame(PHP_SESSION_ACTIVE, session_status());
-        $this->assertSame([self::SESSION_NAMESPACE => ['token_id' => 'TOKEN']], $_SESSION);
+        $this->assertSame(array(self::SESSION_NAMESPACE => array('token_id' => 'TOKEN')), $_SESSION);
     }
 
     public function testStoreTokenInActiveSession()
@@ -61,7 +68,7 @@ class NativeSessionTokenStorageTest extends TestCase
 
         $this->storage->setToken('token_id', 'TOKEN');
 
-        $this->assertSame([self::SESSION_NAMESPACE => ['token_id' => 'TOKEN']], $_SESSION);
+        $this->assertSame(array(self::SESSION_NAMESPACE => array('token_id' => 'TOKEN')), $_SESSION);
     }
 
     /**
@@ -86,9 +93,11 @@ class NativeSessionTokenStorageTest extends TestCase
         $this->assertSame('TOKEN', $this->storage->getToken('token_id'));
     }
 
+    /**
+     * @expectedException \Symfony\Component\Security\Csrf\Exception\TokenNotFoundException
+     */
     public function testGetNonExistingToken()
     {
-        $this->expectException('Symfony\Component\Security\Csrf\Exception\TokenNotFoundException');
         $this->storage->getToken('token_id');
     }
 
@@ -110,33 +119,5 @@ class NativeSessionTokenStorageTest extends TestCase
 
         $this->assertSame('TOKEN', $this->storage->removeToken('token_id'));
         $this->assertFalse($this->storage->hasToken('token_id'));
-    }
-
-    public function testClearRemovesAllTokensFromTheConfiguredNamespace()
-    {
-        $this->storage->setToken('foo', 'bar');
-        $this->storage->clear();
-
-        $this->assertFalse($this->storage->hasToken('foo'));
-        $this->assertArrayNotHasKey(self::SESSION_NAMESPACE, $_SESSION);
-    }
-
-    public function testClearDoesNotRemoveSessionValuesFromOtherNamespaces()
-    {
-        $_SESSION['foo']['bar'] = 'baz';
-        $this->storage->clear();
-
-        $this->assertArrayHasKey('foo', $_SESSION);
-        $this->assertArrayHasKey('bar', $_SESSION['foo']);
-        $this->assertSame('baz', $_SESSION['foo']['bar']);
-    }
-
-    public function testClearDoesNotRemoveNonNamespacedSessionValues()
-    {
-        $_SESSION['foo'] = 'baz';
-        $this->storage->clear();
-
-        $this->assertArrayHasKey('foo', $_SESSION);
-        $this->assertSame('baz', $_SESSION['foo']);
     }
 }

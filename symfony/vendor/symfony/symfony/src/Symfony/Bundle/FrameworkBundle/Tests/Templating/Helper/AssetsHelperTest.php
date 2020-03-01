@@ -11,13 +11,12 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Templating\Helper;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Templating\Helper\AssetsHelper;
 use Symfony\Component\Asset\Package;
 use Symfony\Component\Asset\Packages;
 use Symfony\Component\Asset\VersionStrategy\StaticVersionStrategy;
 
-class AssetsHelperTest extends TestCase
+class AssetsHelperTest extends \PHPUnit_Framework_TestCase
 {
     private $helper;
 
@@ -26,7 +25,7 @@ class AssetsHelperTest extends TestCase
         $fooPackage = new Package(new StaticVersionStrategy('42', '%s?v=%s'));
         $barPackage = new Package(new StaticVersionStrategy('22', '%s?%s'));
 
-        $packages = new Packages($fooPackage, ['bar' => $barPackage]);
+        $packages = new Packages($fooPackage, array('bar' => $barPackage));
 
         $this->helper = new AssetsHelper($packages);
     }

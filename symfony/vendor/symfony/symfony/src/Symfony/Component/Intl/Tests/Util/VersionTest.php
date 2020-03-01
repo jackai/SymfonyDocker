@@ -11,38 +11,37 @@
 
 namespace Symfony\Component\Intl\Tests\Util;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Intl\Util\Version;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class VersionTest extends TestCase
+class VersionTest extends \PHPUnit_Framework_TestCase
 {
     public function normalizeProvider()
     {
-        return [
-            [null, '1', '1'],
-            [null, '1.2', '1.2'],
-            [null, '1.2.3', '1.2.3'],
-            [null, '1.2.3.4', '1.2.3.4'],
-            [1, '1', '1'],
-            [1, '1.2', '1'],
-            [1, '1.2.3', '1'],
-            [1, '1.2.3.4', '1'],
-            [2, '1', '1'],
-            [2, '1.2', '1.2'],
-            [2, '1.2.3', '1.2'],
-            [2, '1.2.3.4', '1.2'],
-            [3, '1', '1'],
-            [3, '1.2', '1.2'],
-            [3, '1.2.3', '1.2.3'],
-            [3, '1.2.3.4', '1.2.3'],
-            [4, '1', '1'],
-            [4, '1.2', '1.2'],
-            [4, '1.2.3', '1.2.3'],
-            [4, '1.2.3.4', '1.2.3.4'],
-        ];
+        return array(
+            array(null, '1', '1'),
+            array(null, '1.2', '1.2'),
+            array(null, '1.2.3', '1.2.3'),
+            array(null, '1.2.3.4', '1.2.3.4'),
+            array(1, '1', '1'),
+            array(1, '1.2', '1'),
+            array(1, '1.2.3', '1'),
+            array(1, '1.2.3.4', '1'),
+            array(2, '1', '1'),
+            array(2, '1.2', '1.2'),
+            array(2, '1.2.3', '1.2'),
+            array(2, '1.2.3.4', '1.2'),
+            array(3, '1', '1'),
+            array(3, '1.2', '1.2'),
+            array(3, '1.2.3', '1.2.3'),
+            array(3, '1.2.3.4', '1.2.3'),
+            array(4, '1', '1'),
+            array(4, '1.2', '1.2'),
+            array(4, '1.2.3', '1.2.3'),
+            array(4, '1.2.3.4', '1.2.3.4'),
+        );
     }
 
     /**
@@ -55,27 +54,27 @@ class VersionTest extends TestCase
 
     public function compareProvider()
     {
-        return [
-            [null, '1', '==', '1', true],
-            [null, '1.0', '==', '1.1', false],
-            [null, '1.0.0', '==', '1.0.1', false],
-            [null, '1.0.0.0', '==', '1.0.0.1', false],
+        return array(
+            array(null, '1', '==', '1', true),
+            array(null, '1.0', '==', '1.1', false),
+            array(null, '1.0.0', '==', '1.0.1', false),
+            array(null, '1.0.0.0', '==', '1.0.0.1', false),
 
-            [1, '1', '==', '1', true],
-            [1, '1.0', '==', '1.1', true],
-            [1, '1.0.0', '==', '1.0.1', true],
-            [1, '1.0.0.0', '==', '1.0.0.1', true],
+            array(1, '1', '==', '1', true),
+            array(1, '1.0', '==', '1.1', true),
+            array(1, '1.0.0', '==', '1.0.1', true),
+            array(1, '1.0.0.0', '==', '1.0.0.1', true),
 
-            [2, '1', '==', '1', true],
-            [2, '1.0', '==', '1.1', false],
-            [2, '1.0.0', '==', '1.0.1', true],
-            [2, '1.0.0.0', '==', '1.0.0.1', true],
+            array(2, '1', '==', '1', true),
+            array(2, '1.0', '==', '1.1', false),
+            array(2, '1.0.0', '==', '1.0.1', true),
+            array(2, '1.0.0.0', '==', '1.0.0.1', true),
 
-            [3, '1', '==', '1', true],
-            [3, '1.0', '==', '1.1', false],
-            [3, '1.0.0', '==', '1.0.1', false],
-            [3, '1.0.0.0', '==', '1.0.0.1', true],
-        ];
+            array(3, '1', '==', '1', true),
+            array(3, '1.0', '==', '1.1', false),
+            array(3, '1.0.0', '==', '1.0.1', false),
+            array(3, '1.0.0.0', '==', '1.0.0.1', true),
+        );
     }
 
     /**

@@ -11,12 +11,12 @@
 
 namespace Symfony\Component\Form\Extension\Core\Type;
 
-use Symfony\Component\Form\Exception\LogicException;
-use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
-use Symfony\Component\Form\Extension\Core\EventListener\TrimListener;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\Form\Extension\Core\EventListener\TrimListener;
+use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
+use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyAccess;
@@ -24,6 +24,9 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 class FormType extends BaseType
 {
+    /**
+     * @var PropertyAccessorInterface
+     */
     private $propertyAccessor;
 
     public function __construct(PropertyAccessorInterface $propertyAccessor = null)
@@ -38,7 +41,7 @@ class FormType extends BaseType
     {
         parent::buildForm($builder, $options);
 
-        $isDataOptionSet = \array_key_exists('data', $options);
+        $isDataOptionSet = array_key_exists('data', $options);
 
         $builder
             ->setRequired($options['required'])
@@ -80,8 +83,7 @@ class FormType extends BaseType
             }
         }
 
-        $formConfig = $form->getConfig();
-        $view->vars = array_replace($view->vars, [
+        $view->vars = array_replace($view->vars, array(
             'errors' => $form->getErrors(),
             'valid' => $form->isSubmitted() ? $form->isValid() : true,
             'value' => $form->getViewData(),
@@ -89,11 +91,11 @@ class FormType extends BaseType
             'required' => $form->isRequired(),
             'size' => null,
             'label_attr' => $options['label_attr'],
-            'compound' => $formConfig->getCompound(),
-            'method' => $formConfig->getMethod(),
-            'action' => $formConfig->getAction(),
+            'compound' => $form->getConfig()->getCompound(),
+            'method' => $form->getConfig()->getMethod(),
+            'action' => $form->getConfig()->getAction(),
             'submitted' => $form->isSubmitted(),
-        ]);
+        ));
     }
 
     /**
@@ -122,7 +124,7 @@ class FormType extends BaseType
 
         // Derive "data_class" option from passed "data" object
         $dataClass = function (Options $options) {
-            return isset($options['data']) && \is_object($options['data']) ? \get_class($options['data']) : null;
+            return isset($options['data']) && is_object($options['data']) ? get_class($options['data']) : null;
         };
 
         // Derive "empty_data" closure from "data_class" option
@@ -136,14 +138,7 @@ class FormType extends BaseType
             }
 
             return function (FormInterface $form) {
-                return $form->getConfig()->getCompound() ? [] : '';
-            };
-        };
-
-        // Wrap "post_max_size_message" in a closure to translate it lazily
-        $uploadMaxSizeMessage = function (Options $options) {
-            return function () use ($options) {
-                return $options['post_max_size_message'];
+                return $form->getConfig()->getCompound() ? array() : '';
             };
         };
 
@@ -155,11 +150,11 @@ class FormType extends BaseType
 
         // If data is given, the form is locked to that data
         // (independent of its value)
-        $resolver->setDefined([
+        $resolver->setDefined(array(
             'data',
-        ]);
+        ));
 
-        $resolver->setDefaults([
+        $resolver->setDefaults(array(
             'data_class' => $dataClass,
             'empty_data' => $emptyData,
             'trim' => true,
@@ -168,21 +163,18 @@ class FormType extends BaseType
             'mapped' => true,
             'by_reference' => true,
             'error_bubbling' => $errorBubbling,
-            'label_attr' => [],
+            'label_attr' => array(),
             'inherit_data' => false,
             'compound' => true,
             'method' => 'POST',
             // According to RFC 2396 (http://www.ietf.org/rfc/rfc2396.txt)
             // section 4.2., empty URIs are considered same-document references
             'action' => '',
-            'attr' => [],
+            'attr' => array(),
             'post_max_size_message' => 'The uploaded file was too large. Please try to upload a smaller file.',
-            'upload_max_size_message' => $uploadMaxSizeMessage, // internal
-            'allow_file_upload' => false,
-        ]);
+        ));
 
         $resolver->setAllowedTypes('label_attr', 'array');
-        $resolver->setAllowedTypes('upload_max_size_message', ['callable']);
     }
 
     /**
@@ -190,7 +182,6 @@ class FormType extends BaseType
      */
     public function getParent()
     {
-        return null;
     }
 
     /**

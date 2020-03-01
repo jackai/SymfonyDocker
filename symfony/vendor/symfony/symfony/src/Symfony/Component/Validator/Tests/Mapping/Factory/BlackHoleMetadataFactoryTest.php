@@ -11,14 +11,15 @@
 
 namespace Symfony\Component\Validator\Tests\Mapping\Factory;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Mapping\Factory\BlackHoleMetadataFactory;
 
-class BlackHoleMetadataFactoryTest extends TestCase
+class BlackHoleMetadataFactoryTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @expectedException \LogicException
+     */
     public function testGetMetadataForThrowsALogicException()
     {
-        $this->expectException('LogicException');
         $metadataFactory = new BlackHoleMetadataFactory();
         $metadataFactory->getMetadataFor('foo');
     }

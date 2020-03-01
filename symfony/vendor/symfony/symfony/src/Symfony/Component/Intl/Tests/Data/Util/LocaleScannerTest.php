@@ -11,14 +11,13 @@
 
 namespace Symfony\Component\Intl\Tests\Data\Util;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Intl\Data\Util\LocaleScanner;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
-class LocaleScannerTest extends TestCase
+class LocaleScannerTest extends \PHPUnit_Framework_TestCase
 {
     private $directory;
 
@@ -63,14 +62,14 @@ class LocaleScannerTest extends TestCase
 
     public function testScanLocales()
     {
-        $sortedLocales = ['de', 'de_alias', 'en', 'en_alias', 'fr', 'fr_alias'];
+        $sortedLocales = array('de', 'de_alias', 'en', 'en_alias', 'fr', 'fr_alias');
 
         $this->assertSame($sortedLocales, $this->scanner->scanLocales($this->directory));
     }
 
     public function testScanAliases()
     {
-        $sortedAliases = ['de_alias' => 'de', 'en_alias' => 'en', 'fr_alias' => 'fr'];
+        $sortedAliases = array('de_alias' => 'de', 'en_alias' => 'en', 'fr_alias' => 'fr');
 
         $this->assertSame($sortedAliases, $this->scanner->scanAliases($this->directory));
     }

@@ -1,7 +1,7 @@
 <?php
 
-$container->loadFromExtension('framework', [
-    'request' => [
-        'formats' => [],
-    ],
-]);
+$container->loadFromExtension('framework', array(
+    'request' => array(
+        'formats' => array(),
+    ),
+));

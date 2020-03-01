@@ -1,5 +1,5 @@
 {
-    "Version": "36",
+    "Version": "2.1.13.24",
     "Names": {
         "AED": [
             "AED",
@@ -20,10 +20,6 @@
         "BIF": [
             "BIF",
             "Faransi ti Orílɛ́ède Bùùrúndì"
-        ],
-        "BRL": [
-            "R$",
-            "Owó ti Orílɛ̀-èdè Brazil"
         ],
         "BWP": [
             "BWP",
@@ -69,9 +65,13 @@
             "ETB",
             "Biri ti Orílɛ́ède Eutopia"
         ],
+        "EUR": [
+            "€",
+            "Uro"
+        ],
         "GBP": [
             "£",
-            "Pɔ́n-ùn ti Orilɛ̀-èdè Gɛ̀ɛ́sì"
+            "Pɔɔn ti Orílɛ́ède Bírítísì"
         ],
         "GHC": [
             "GHC",
@@ -123,10 +123,6 @@
         ],
         "MRO": [
             "MRO",
-            "Ouguiya ti Orílɛ́ède Maritania (1973–2017)"
-        ],
-        "MRU": [
-            "MRU",
             "Ouguiya ti Orílɛ́ède Maritania"
         ],
         "MUR": [
@@ -147,11 +143,7 @@
         ],
         "NGN": [
             "₦",
-            "Náìrà ti Orílɛ̀-èdè Nàìjíríà"
-        ],
-        "RUB": [
-            "₽",
-            "Owó ruble ti ilɛ̀ Rɔ́shíà"
+            "Naira ti Orílɛ́ède Nàìjíríà"
         ],
         "RWF": [
             "RWF",
@@ -177,17 +169,21 @@
             "SHP",
             "Pɔɔun ti Orílɛ́ède ̣Elena"
         ],
+        "SLL": [
+            "SLL",
+            "Lioni"
+        ],
         "SOS": [
             "SOS",
             "Sile ti Orílɛ́ède Somali"
         ],
         "STD": [
             "STD",
-            "Dobira ti Orílɛ́ède Sao tome Ati Pirisipe (1977–2017)"
-        ],
-        "STN": [
-            "STN",
             "Dobira ti Orílɛ́ède Sao tome Ati Pirisipe"
+        ],
+        "SZL": [
+            "SZL",
+            "Lilangeni"
         ],
         "TND": [
             "TND",
@@ -202,8 +198,8 @@
             "Siile ti Orílɛ́ède Uganda"
         ],
         "USD": [
-            "$",
-            "Dɔ́là"
+            "US$",
+            "Dɔla ti Orílɛ́ède Amerika"
         ],
         "XAF": [
             "FCFA",

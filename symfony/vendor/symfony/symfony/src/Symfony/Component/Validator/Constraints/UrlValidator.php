@@ -13,7 +13,6 @@ namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
-use Symfony\Component\Validator\Exception\InvalidOptionsException;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
@@ -23,20 +22,18 @@ class UrlValidator extends ConstraintValidator
 {
     const PATTERN = '~^
             (%s)://                                 # protocol
-            (([\_\.\pL\pN-]+:)?([\_\.\pL\pN-]+)@)?  # basic auth
+            (([\pL\pN-]+:)?([\pL\pN-]+)@)?          # basic auth
             (
-                ([\pL\pN\pS\-\_\.])+(\.?([\pL\pN]|xn\-\-[\pL\pN-]+)+\.?) # a domain name
-                    |                                                 # or
-                \d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}                    # an IP address
-                    |                                                 # or
+                ([\pL\pN\pS-\.])+(\.?([\pL]|xn\-\-[\pL\pN-]+)+\.?) # a domain name
+                    |                                              # or
+                \d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}                 # a IP address
+                    |                                              # or
                 \[
                     (?:(?:(?:(?:(?:(?:(?:[0-9a-f]{1,4})):){6})(?:(?:(?:(?:(?:[0-9a-f]{1,4})):(?:(?:[0-9a-f]{1,4})))|(?:(?:(?:(?:(?:25[0-5]|(?:[1-9]|1[0-9]|2[0-4])?[0-9]))\.){3}(?:(?:25[0-5]|(?:[1-9]|1[0-9]|2[0-4])?[0-9])))))))|(?:(?:::(?:(?:(?:[0-9a-f]{1,4})):){5})(?:(?:(?:(?:(?:[0-9a-f]{1,4})):(?:(?:[0-9a-f]{1,4})))|(?:(?:(?:(?:(?:25[0-5]|(?:[1-9]|1[0-9]|2[0-4])?[0-9]))\.){3}(?:(?:25[0-5]|(?:[1-9]|1[0-9]|2[0-4])?[0-9])))))))|(?:(?:(?:(?:(?:[0-9a-f]{1,4})))?::(?:(?:(?:[0-9a-f]{1,4})):){4})(?:(?:(?:(?:(?:[0-9a-f]{1,4})):(?:(?:[0-9a-f]{1,4})))|(?:(?:(?:(?:(?:25[0-5]|(?:[1-9]|1[0-9]|2[0-4])?[0-9]))\.){3}(?:(?:25[0-5]|(?:[1-9]|1[0-9]|2[0-4])?[0-9])))))))|(?:(?:(?:(?:(?:(?:[0-9a-f]{1,4})):){0,1}(?:(?:[0-9a-f]{1,4})))?::(?:(?:(?:[0-9a-f]{1,4})):){3})(?:(?:(?:(?:(?:[0-9a-f]{1,4})):(?:(?:[0-9a-f]{1,4})))|(?:(?:(?:(?:(?:25[0-5]|(?:[1-9]|1[0-9]|2[0-4])?[0-9]))\.){3}(?:(?:25[0-5]|(?:[1-9]|1[0-9]|2[0-4])?[0-9])))))))|(?:(?:(?:(?:(?:(?:[0-9a-f]{1,4})):){0,2}(?:(?:[0-9a-f]{1,4})))?::(?:(?:(?:[0-9a-f]{1,4})):){2})(?:(?:(?:(?:(?:[0-9a-f]{1,4})):(?:(?:[0-9a-f]{1,4})))|(?:(?:(?:(?:(?:25[0-5]|(?:[1-9]|1[0-9]|2[0-4])?[0-9]))\.){3}(?:(?:25[0-5]|(?:[1-9]|1[0-9]|2[0-4])?[0-9])))))))|(?:(?:(?:(?:(?:(?:[0-9a-f]{1,4})):){0,3}(?:(?:[0-9a-f]{1,4})))?::(?:(?:[0-9a-f]{1,4})):)(?:(?:(?:(?:(?:[0-9a-f]{1,4})):(?:(?:[0-9a-f]{1,4})))|(?:(?:(?:(?:(?:25[0-5]|(?:[1-9]|1[0-9]|2[0-4])?[0-9]))\.){3}(?:(?:25[0-5]|(?:[1-9]|1[0-9]|2[0-4])?[0-9])))))))|(?:(?:(?:(?:(?:(?:[0-9a-f]{1,4})):){0,4}(?:(?:[0-9a-f]{1,4})))?::)(?:(?:(?:(?:(?:[0-9a-f]{1,4})):(?:(?:[0-9a-f]{1,4})))|(?:(?:(?:(?:(?:25[0-5]|(?:[1-9]|1[0-9]|2[0-4])?[0-9]))\.){3}(?:(?:25[0-5]|(?:[1-9]|1[0-9]|2[0-4])?[0-9])))))))|(?:(?:(?:(?:(?:(?:[0-9a-f]{1,4})):){0,5}(?:(?:[0-9a-f]{1,4})))?::)(?:(?:[0-9a-f]{1,4})))|(?:(?:(?:(?:(?:(?:[0-9a-f]{1,4})):){0,6}(?:(?:[0-9a-f]{1,4})))?::))))
-                \]  # an IPv6 address
+                \]  # a IPv6 address
             )
             (:[0-9]+)?                              # a port (optional)
-            (?:/ (?:[\pL\pN\-._\~!$&\'()*+,;=:@]|%%[0-9A-Fa-f]{2})* )*      # a path
-            (?:\? (?:[\pL\pN\-._\~!$&\'()*+,;=:@/?]|%%[0-9A-Fa-f]{2})* )?   # a query (optional)
-            (?:\# (?:[\pL\pN\-._\~!$&\'()*+,;=:@/?]|%%[0-9A-Fa-f]{2})* )?   # a fragment (optional)
+            (/?|/\S+|\?\S*|\#\S*)                   # a /, nothing, a / with something, a query or a fragment
         $~ixu';
 
     /**
@@ -45,14 +42,14 @@ class UrlValidator extends ConstraintValidator
     public function validate($value, Constraint $constraint)
     {
         if (!$constraint instanceof Url) {
-            throw new UnexpectedTypeException($constraint, Url::class);
+            throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\Url');
         }
 
-        if (null === $value || '' === $value) {
+        if (null === $value) {
             return;
         }
 
-        if (!is_scalar($value) && !(\is_object($value) && method_exists($value, '__toString'))) {
+        if (!is_scalar($value) && !(is_object($value) && method_exists($value, '__toString'))) {
             throw new UnexpectedTypeException($value, 'string');
         }
 
@@ -73,32 +70,9 @@ class UrlValidator extends ConstraintValidator
         }
 
         if ($constraint->checkDNS) {
-            // backwards compatibility
-            if (true === $constraint->checkDNS) {
-                $constraint->checkDNS = Url::CHECK_DNS_TYPE_ANY;
-                @trigger_error(sprintf('Use of the boolean TRUE for the "checkDNS" option in %s is deprecated.  Use Url::CHECK_DNS_TYPE_ANY instead.', Url::class), E_USER_DEPRECATED);
-            }
-
-            if (!\in_array($constraint->checkDNS, [
-                Url::CHECK_DNS_TYPE_ANY,
-                Url::CHECK_DNS_TYPE_A,
-                Url::CHECK_DNS_TYPE_A6,
-                Url::CHECK_DNS_TYPE_AAAA,
-                Url::CHECK_DNS_TYPE_CNAME,
-                Url::CHECK_DNS_TYPE_MX,
-                Url::CHECK_DNS_TYPE_NAPTR,
-                Url::CHECK_DNS_TYPE_NS,
-                Url::CHECK_DNS_TYPE_PTR,
-                Url::CHECK_DNS_TYPE_SOA,
-                Url::CHECK_DNS_TYPE_SRV,
-                Url::CHECK_DNS_TYPE_TXT,
-            ], true)) {
-                throw new InvalidOptionsException(sprintf('Invalid value for option "checkDNS" in constraint %s', \get_class($constraint)), ['checkDNS']);
-            }
-
             $host = parse_url($value, PHP_URL_HOST);
 
-            if (!\is_string($host) || !checkdnsrr($host, $constraint->checkDNS)) {
+            if (!checkdnsrr($host, 'ANY')) {
                 $this->context->buildViolation($constraint->dnsMessage)
                     ->setParameter('{{ value }}', $this->formatValue($host))
                     ->setCode(Url::INVALID_URL_ERROR)

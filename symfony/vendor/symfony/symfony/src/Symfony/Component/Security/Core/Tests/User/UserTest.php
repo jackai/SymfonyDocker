@@ -11,24 +11,25 @@
 
 namespace Symfony\Component\Security\Core\Tests\User;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\User\User;
 
-class UserTest extends TestCase
+class UserTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @expectedException \InvalidArgumentException
+     */
     public function testConstructorException()
     {
-        $this->expectException('InvalidArgumentException');
         new User('', 'superpass');
     }
 
     public function testGetRoles()
     {
         $user = new User('fabien', 'superpass');
-        $this->assertEquals([], $user->getRoles());
+        $this->assertEquals(array(), $user->getRoles());
 
-        $user = new User('fabien', 'superpass', ['ROLE_ADMIN']);
-        $this->assertEquals(['ROLE_ADMIN'], $user->getRoles());
+        $user = new User('fabien', 'superpass', array('ROLE_ADMIN'));
+        $this->assertEquals(array('ROLE_ADMIN'), $user->getRoles());
     }
 
     public function testGetPassword()
@@ -54,7 +55,7 @@ class UserTest extends TestCase
         $user = new User('fabien', 'superpass');
         $this->assertTrue($user->isAccountNonExpired());
 
-        $user = new User('fabien', 'superpass', [], true, false);
+        $user = new User('fabien', 'superpass', array(), true, false);
         $this->assertFalse($user->isAccountNonExpired());
     }
 
@@ -63,7 +64,7 @@ class UserTest extends TestCase
         $user = new User('fabien', 'superpass');
         $this->assertTrue($user->isCredentialsNonExpired());
 
-        $user = new User('fabien', 'superpass', [], true, true, false);
+        $user = new User('fabien', 'superpass', array(), true, true, false);
         $this->assertFalse($user->isCredentialsNonExpired());
     }
 
@@ -72,7 +73,7 @@ class UserTest extends TestCase
         $user = new User('fabien', 'superpass');
         $this->assertTrue($user->isAccountNonLocked());
 
-        $user = new User('fabien', 'superpass', [], true, true, true, false);
+        $user = new User('fabien', 'superpass', array(), true, true, true, false);
         $this->assertFalse($user->isAccountNonLocked());
     }
 
@@ -81,7 +82,7 @@ class UserTest extends TestCase
         $user = new User('fabien', 'superpass');
         $this->assertTrue($user->isEnabled());
 
-        $user = new User('fabien', 'superpass', [], false);
+        $user = new User('fabien', 'superpass', array(), false);
         $this->assertFalse($user->isEnabled());
     }
 

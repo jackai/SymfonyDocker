@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Security\Http;
 
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestMatcherInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * AccessMap allows configuration of different access control rules for
@@ -22,16 +22,18 @@ use Symfony\Component\HttpFoundation\RequestMatcherInterface;
  */
 class AccessMap implements AccessMapInterface
 {
-    private $map = [];
+    private $map = array();
 
     /**
+     * Constructor.
+     *
      * @param RequestMatcherInterface $requestMatcher A RequestMatcherInterface instance
      * @param array                   $attributes     An array of attributes to pass to the access decision manager (like roles)
      * @param string|null             $channel        The channel to enforce (http, https, or null)
      */
-    public function add(RequestMatcherInterface $requestMatcher, array $attributes = [], $channel = null)
+    public function add(RequestMatcherInterface $requestMatcher, array $attributes = array(), $channel = null)
     {
-        $this->map[] = [$requestMatcher, $attributes, $channel];
+        $this->map[] = array($requestMatcher, $attributes, $channel);
     }
 
     /**
@@ -41,10 +43,10 @@ class AccessMap implements AccessMapInterface
     {
         foreach ($this->map as $elements) {
             if (null === $elements[0] || $elements[0]->matches($request)) {
-                return [$elements[1], $elements[2]];
+                return array($elements[1], $elements[2]);
             }
         }
 
-        return [null, null];
+        return array(null, null);
     }
 }

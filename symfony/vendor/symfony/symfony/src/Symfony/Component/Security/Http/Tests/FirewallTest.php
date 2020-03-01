@@ -11,35 +11,34 @@
 
 namespace Symfony\Component\Security\Http\Tests;
 
-use PHPUnit\Framework\TestCase;
+use Symfony\Component\Security\Http\Firewall;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\Security\Http\Firewall;
 
-class FirewallTest extends TestCase
+class FirewallTest extends \PHPUnit_Framework_TestCase
 {
     public function testOnKernelRequestRegistersExceptionListener()
     {
-        $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock();
+        $dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
 
-        $listener = $this->getMockBuilder('Symfony\Component\Security\Http\Firewall\ExceptionListener')->disableOriginalConstructor()->getMock();
+        $listener = $this->getMock('Symfony\Component\Security\Http\Firewall\ExceptionListener', array(), array(), '', false);
         $listener
             ->expects($this->once())
             ->method('register')
             ->with($this->equalTo($dispatcher))
         ;
 
-        $request = $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->disableOriginalConstructor()->disableOriginalClone()->getMock();
+        $request = $this->getMock('Symfony\Component\HttpFoundation\Request', array(), array(), '', false, false);
 
-        $map = $this->getMockBuilder('Symfony\Component\Security\Http\FirewallMapInterface')->getMock();
+        $map = $this->getMock('Symfony\Component\Security\Http\FirewallMapInterface');
         $map
             ->expects($this->once())
             ->method('getListeners')
             ->with($this->equalTo($request))
-            ->willReturn([[], $listener])
+            ->will($this->returnValue(array(array(), $listener)))
         ;
 
-        $event = new GetResponseEvent($this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock(), $request, HttpKernelInterface::MASTER_REQUEST);
+        $event = new GetResponseEvent($this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface'), $request, HttpKernelInterface::MASTER_REQUEST);
 
         $firewall = new Firewall($map, $dispatcher);
         $firewall->onKernelRequest($event);
@@ -47,59 +46,61 @@ class FirewallTest extends TestCase
 
     public function testOnKernelRequestStopsWhenThereIsAResponse()
     {
-        $first = $this->getMockBuilder('Symfony\Component\Security\Http\Firewall\ListenerInterface')->getMock();
+        $response = $this->getMock('Symfony\Component\HttpFoundation\Response');
+
+        $first = $this->getMock('Symfony\Component\Security\Http\Firewall\ListenerInterface');
         $first
             ->expects($this->once())
             ->method('handle')
         ;
 
-        $second = $this->getMockBuilder('Symfony\Component\Security\Http\Firewall\ListenerInterface')->getMock();
+        $second = $this->getMock('Symfony\Component\Security\Http\Firewall\ListenerInterface');
         $second
             ->expects($this->never())
             ->method('handle')
         ;
 
-        $map = $this->getMockBuilder('Symfony\Component\Security\Http\FirewallMapInterface')->getMock();
+        $map = $this->getMock('Symfony\Component\Security\Http\FirewallMapInterface');
         $map
             ->expects($this->once())
             ->method('getListeners')
-            ->willReturn([[$first, $second], null])
+            ->will($this->returnValue(array(array($first, $second), null)))
         ;
 
-        $event = $this->getMockBuilder('Symfony\Component\HttpKernel\Event\GetResponseEvent')
-            ->setMethods(['hasResponse'])
-            ->setConstructorArgs([
-                $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock(),
-                $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->disableOriginalConstructor()->disableOriginalClone()->getMock(),
+        $event = $this->getMock(
+            'Symfony\Component\HttpKernel\Event\GetResponseEvent',
+            array('hasResponse'),
+            array(
+                $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface'),
+                $this->getMock('Symfony\Component\HttpFoundation\Request', array(), array(), '', false, false),
                 HttpKernelInterface::MASTER_REQUEST,
-            ])
-            ->getMock()
-        ;
+            )
+        );
         $event
-            ->expects($this->at(0))
+            ->expects($this->once())
             ->method('hasResponse')
-            ->willReturn(true)
+            ->will($this->returnValue(true))
         ;
 
-        $firewall = new Firewall($map, $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock());
+        $firewall = new Firewall($map, $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface'));
         $firewall->onKernelRequest($event);
     }
 
     public function testOnKernelRequestWithSubRequest()
     {
-        $map = $this->getMockBuilder('Symfony\Component\Security\Http\FirewallMapInterface')->getMock();
+        $map = $this->getMock('Symfony\Component\Security\Http\FirewallMapInterface');
         $map
             ->expects($this->never())
             ->method('getListeners')
         ;
 
         $event = new GetResponseEvent(
-            $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock(),
-            $this->getMockBuilder('Symfony\Component\HttpFoundation\Request')->getMock(),
+            $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface'),
+            $this->getMock('Symfony\Component\HttpFoundation\Request'),
             HttpKernelInterface::SUB_REQUEST
         );
 
-        $firewall = new Firewall($map, $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')->getMock());
+        $firewall = new Firewall($map, $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface'));
         $firewall->onKernelRequest($event);
 
         $this->assertFalse($event->hasResponse());

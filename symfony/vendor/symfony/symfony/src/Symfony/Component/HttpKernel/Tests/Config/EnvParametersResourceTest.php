@@ -11,13 +11,9 @@
 
 namespace Symfony\Component\HttpKernel\Tests\Config;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Config\EnvParametersResource;
 
-/**
- * @group legacy
- */
-class EnvParametersResourceTest extends TestCase
+class EnvParametersResourceTest extends \PHPUnit_Framework_TestCase
 {
     protected $prefix = '__DUMMY_';
     protected $initialEnv;
@@ -25,10 +21,10 @@ class EnvParametersResourceTest extends TestCase
 
     protected function setUp()
     {
-        $this->initialEnv = [
+        $this->initialEnv = array(
             $this->prefix.'1' => 'foo',
             $this->prefix.'2' => 'bar',
-        ];
+        );
 
         foreach ($this->initialEnv as $key => $value) {
             $_SERVER[$key] = $value;
@@ -49,7 +45,7 @@ class EnvParametersResourceTest extends TestCase
     public function testGetResource()
     {
         $this->assertSame(
-            ['prefix' => $this->prefix, 'variables' => $this->initialEnv],
+            array('prefix' => $this->prefix, 'variables' => $this->initialEnv),
             $this->resource->getResource(),
             '->getResource() returns the resource'
         );
@@ -58,7 +54,7 @@ class EnvParametersResourceTest extends TestCase
     public function testToString()
     {
         $this->assertSame(
-            serialize(['prefix' => $this->prefix, 'variables' => $this->initialEnv]),
+            serialize(array('prefix' => $this->prefix, 'variables' => $this->initialEnv)),
             (string) $this->resource
         );
     }

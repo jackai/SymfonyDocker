@@ -28,13 +28,11 @@ interface FormRendererInterface
     /**
      * Sets the theme(s) to be used for rendering a view and its children.
      *
-     * @param FormView $view             The view to assign the theme(s) to
-     * @param mixed    $themes           The theme(s). The type of these themes
-     *                                   is open to the implementation.
-     * @param bool     $useDefaultThemes If true, will use default themes specified
-     *                                   in the renderer, will be added to the interface in 4.0
+     * @param FormView $view   The view to assign the theme(s) to
+     * @param mixed    $themes The theme(s). The type of these themes
+     *                         is open to the implementation.
      */
-    public function setTheme(FormView $view, $themes /*, $useDefaultThemes = true */);
+    public function setTheme(FormView $view, $themes);
 
     /**
      * Renders a named block of the form theme.
@@ -45,7 +43,7 @@ interface FormRendererInterface
      *
      * @return string The HTML markup
      */
-    public function renderBlock(FormView $view, $blockName, array $variables = []);
+    public function renderBlock(FormView $view, $blockName, array $variables = array());
 
     /**
      * Searches and renders a block for a given name suffix.
@@ -63,7 +61,7 @@ interface FormRendererInterface
      *
      * @return string The HTML markup
      */
-    public function searchAndRenderBlock(FormView $view, $blockNameSuffix, array $variables = []);
+    public function searchAndRenderBlock(FormView $view, $blockNameSuffix, array $variables = array());
 
     /**
      * Renders a CSRF token.
@@ -71,14 +69,18 @@ interface FormRendererInterface
      * Use this helper for CSRF protection without the overhead of creating a
      * form.
      *
-     *     <input type="hidden" name="token" value="<?php $renderer->renderCsrfToken('rm_user_'.$user->getId()) ?>">
+     * <code>
+     * <input type="hidden" name="token" value="<?php $renderer->renderCsrfToken('rm_user_'.$user->getId()) ?>">
+     * </code>
      *
      * Check the token in your action using the same token ID.
      *
-     *     // $csrfProvider being an instance of Symfony\Component\Security\Csrf\TokenGenerator\TokenGeneratorInterface
-     *     if (!$csrfProvider->isCsrfTokenValid('rm_user_'.$user->getId(), $token)) {
-     *         throw new \RuntimeException('CSRF attack detected.');
-     *     }
+     * <code>
+     * $csrfProvider = $this->get('security.csrf.token_generator');
+     * if (!$csrfProvider->isCsrfTokenValid('rm_user_'.$user->getId(), $token)) {
+     *     throw new \RuntimeException('CSRF attack detected.');
+     * }
+     * </code>
      *
      * @param string $tokenId The ID of the CSRF token
      *

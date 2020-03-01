@@ -27,12 +27,12 @@ class RepeatedTypeValidatorExtension extends AbstractTypeExtension
     {
         // Map errors to the first field
         $errorMapping = function (Options $options) {
-            return ['.' => $options['first_name']];
+            return array('.' => $options['first_name']);
         };
 
-        $resolver->setDefaults([
+        $resolver->setDefaults(array(
             'error_mapping' => $errorMapping,
-        ]);
+        ));
     }
 
     /**

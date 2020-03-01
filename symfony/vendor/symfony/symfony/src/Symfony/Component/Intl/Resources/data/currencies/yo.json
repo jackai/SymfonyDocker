@@ -1,5 +1,5 @@
 {
-    "Version": "36",
+    "Version": "2.1.6.69",
     "Names": {
         "AED": [
             "AED",
@@ -20,10 +20,6 @@
         "BIF": [
             "BIF",
             "Faransi ti Orílẹ́ède Bùùrúndì"
-        ],
-        "BRL": [
-            "R$",
-            "Owó ti Orílẹ̀-èdè Brazil"
         ],
         "BWP": [
             "BWP",
@@ -71,11 +67,11 @@
         ],
         "EUR": [
             "€",
-            "owó Yúrò"
+            "Uro"
         ],
         "GBP": [
             "£",
-            "Pọ́n-ùn ti Orilẹ̀-èdè Gẹ̀ẹ́sì"
+            "Pọọn ti Orílẹ́ède Bírítísì"
         ],
         "GHC": [
             "GHC",
@@ -127,10 +123,6 @@
         ],
         "MRO": [
             "MRO",
-            "Ouguiya ti Orílẹ́ède Maritania (1973–2017)"
-        ],
-        "MRU": [
-            "MRU",
             "Ouguiya ti Orílẹ́ède Maritania"
         ],
         "MUR": [
@@ -151,11 +143,7 @@
         ],
         "NGN": [
             "₦",
-            "Náìrà ti Orílẹ̀-èdè Nàìjíríà"
-        ],
-        "RUB": [
-            "₽",
-            "Owó ruble ti ilẹ̀ Rọ́ṣíà"
+            "Naira ti Orílẹ́ède Nàìjíríà"
         ],
         "RWF": [
             "RWF",
@@ -191,10 +179,6 @@
         ],
         "STD": [
             "STD",
-            "Dobira ti Orílẹ́ède Sao tome Ati Pirisipe (1977–2017)"
-        ],
-        "STN": [
-            "STN",
             "Dobira ti Orílẹ́ède Sao tome Ati Pirisipe"
         ],
         "SZL": [
@@ -214,8 +198,8 @@
             "Siile ti Orílẹ́ède Uganda"
         ],
         "USD": [
-            "$",
-            "Dọ́là"
+            "US$",
+            "Dọla ti Orílẹ́ède Amerika"
         ],
         "XAF": [
             "FCFA",

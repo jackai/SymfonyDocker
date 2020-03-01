@@ -22,17 +22,20 @@ use Symfony\Component\Form\ChoiceList\View\ChoiceListView;
  */
 class CachingFactoryDecorator implements ChoiceListFactoryInterface
 {
+    /**
+     * @var ChoiceListFactoryInterface
+     */
     private $decoratedFactory;
 
     /**
      * @var ChoiceListInterface[]
      */
-    private $lists = [];
+    private $lists = array();
 
     /**
      * @var ChoiceListView[]
      */
-    private $views = [];
+    private $views = array();
 
     /**
      * Generates a SHA-256 hash for the given value.
@@ -45,15 +48,15 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface
      *
      * @return string The SHA-256 hash
      *
-     * @internal
+     * @internal Should not be used by user-land code.
      */
     public static function generateHash($value, $namespace = '')
     {
-        if (\is_object($value)) {
+        if (is_object($value)) {
             $value = spl_object_hash($value);
-        } elseif (\is_array($value)) {
+        } elseif (is_array($value)) {
             array_walk_recursive($value, function (&$v) {
-                if (\is_object($v)) {
+                if (is_object($v)) {
                     $v = spl_object_hash($v);
                 }
             });
@@ -62,6 +65,35 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface
         return hash('sha256', $namespace.':'.serialize($value));
     }
 
+    /**
+     * Flattens an array into the given output variable.
+     *
+     * @param array $array  The array to flatten
+     * @param array $output The flattened output
+     *
+     * @internal Should not be used by user-land code
+     */
+    private static function flatten(array $array, &$output)
+    {
+        if (null === $output) {
+            $output = array();
+        }
+
+        foreach ($array as $key => $value) {
+            if (is_array($value)) {
+                self::flatten($value, $output);
+                continue;
+            }
+
+            $output[$key] = $value;
+        }
+    }
+
+    /**
+     * Decorates the given factory.
+     *
+     * @param ChoiceListFactoryInterface $decoratedFactory The decorated factory
+     */
     public function __construct(ChoiceListFactoryInterface $decoratedFactory)
     {
         $this->decoratedFactory = $decoratedFactory;
@@ -89,7 +121,12 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface
         // The value is not validated on purpose. The decorated factory may
         // decide which values to accept and which not.
 
-        $hash = self::generateHash([$choices, $value], 'fromChoices');
+        // We ignore the choice groups for caching. If two choice lists are
+        // requested with the same choices, but a different grouping, the same
+        // choice list is returned.
+        self::flatten($choices, $flatChoices);
+
+        $hash = self::generateHash(array($flatChoices, $value), 'fromChoices');
 
         if (!isset($this->lists[$hash])) {
             $this->lists[$hash] = $this->decoratedFactory->createListFromChoices($choices, $value);
@@ -103,7 +140,7 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface
      */
     public function createListFromLoader(ChoiceLoaderInterface $loader, $value = null)
     {
-        $hash = self::generateHash([$loader, $value], 'fromLoader');
+        $hash = self::generateHash(array($loader, $value), 'fromLoader');
 
         if (!isset($this->lists[$hash])) {
             $this->lists[$hash] = $this->decoratedFactory->createListFromLoader($loader, $value);
@@ -119,7 +156,7 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface
     {
         // The input is not validated on purpose. This way, the decorated
         // factory may decide which input to accept and which not.
-        $hash = self::generateHash([$list, $preferredChoices, $label, $index, $groupBy, $attr]);
+        $hash = self::generateHash(array($list, $preferredChoices, $label, $index, $groupBy, $attr));
 
         if (!isset($this->views[$hash])) {
             $this->views[$hash] = $this->decoratedFactory->createView(

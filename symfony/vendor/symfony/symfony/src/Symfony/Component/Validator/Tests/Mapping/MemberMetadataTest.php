@@ -11,14 +11,13 @@
 
 namespace Symfony\Component\Validator\Tests\Mapping;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Mapping\MemberMetadata;
 use Symfony\Component\Validator\Tests\Fixtures\ClassConstraint;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintB;
 
-class MemberMetadataTest extends TestCase
+class MemberMetadataTest extends \PHPUnit_Framework_TestCase
 {
     protected $metadata;
 
@@ -38,15 +37,15 @@ class MemberMetadataTest extends TestCase
 
     public function testAddConstraintRequiresClassConstraints()
     {
-        $this->expectException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
+        $this->setExpectedException('Symfony\Component\Validator\Exception\ConstraintDefinitionException');
 
         $this->metadata->addConstraint(new ClassConstraint());
     }
 
     public function testSerialize()
     {
-        $this->metadata->addConstraint(new ConstraintA(['property1' => 'A']));
-        $this->metadata->addConstraint(new ConstraintB(['groups' => 'TestGroup']));
+        $this->metadata->addConstraint(new ConstraintA(array('property1' => 'A')));
+        $this->metadata->addConstraint(new ConstraintB(array('groups' => 'TestGroup')));
 
         $metadata = unserialize(serialize($this->metadata));
 
@@ -55,7 +54,7 @@ class MemberMetadataTest extends TestCase
 
     public function testSerializeCollectionCascaded()
     {
-        $this->metadata->addConstraint(new Valid(['traverse' => true]));
+        $this->metadata->addConstraint(new Valid(array('traverse' => true)));
 
         $metadata = unserialize(serialize($this->metadata));
 
@@ -64,7 +63,7 @@ class MemberMetadataTest extends TestCase
 
     public function testSerializeCollectionNotCascaded()
     {
-        $this->metadata->addConstraint(new Valid(['traverse' => false]));
+        $this->metadata->addConstraint(new Valid(array('traverse' => false)));
 
         $metadata = unserialize(serialize($this->metadata));
 

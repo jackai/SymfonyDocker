@@ -1,8 +1,7 @@
 {
-    "Version": "36",
+    "Version": "2.1.7.39",
     "Names": {
-        "MK": "Masedoniya y’Amajyaruguru",
-        "RW": "U Rwanda",
-        "TO": "Tonga"
+        "RW": "Rwanda",
+        "TO": "Igitonga"
     }
 }

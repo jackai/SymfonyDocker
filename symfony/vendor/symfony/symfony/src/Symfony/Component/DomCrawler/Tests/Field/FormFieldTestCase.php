@@ -11,11 +11,9 @@
 
 namespace Symfony\Component\DomCrawler\Tests\Field;
 
-use PHPUnit\Framework\TestCase;
-
-class FormFieldTestCase extends TestCase
+class FormFieldTestCase extends \PHPUnit_Framework_TestCase
 {
-    protected function createNode($tag, $value, $attributes = [])
+    protected function createNode($tag, $value, $attributes = array())
     {
         $document = new \DOMDocument();
         $node = $document->createElement($tag, $value);

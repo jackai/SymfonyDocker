@@ -24,12 +24,12 @@ class ChoiceSubType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults(['expanded' => true]);
+        $resolver->setDefaults(array('expanded' => true, 'choices_as_values' => true));
         $resolver->setNormalizer('choices', function () {
-            return [
+            return array(
                 'attr1' => 'Attribute 1',
                 'attr2' => 'Attribute 2',
-            ];
+            );
         });
     }
 

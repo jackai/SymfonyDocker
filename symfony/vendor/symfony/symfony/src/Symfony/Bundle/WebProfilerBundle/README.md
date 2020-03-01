@@ -1,12 +1,6 @@
 WebProfilerBundle
 =================
 
-The Web profiler bundle is a **development tool** that gives detailed
-information about the execution of any request.
-
-**Never** enable it on production servers as it will lead to major security
-vulnerabilities in your project.
-
 Resources
 ---------
 

@@ -11,15 +11,13 @@
 
 namespace Symfony\Bundle\WebProfilerBundle\EventListener;
 
-use Symfony\Bundle\WebProfilerBundle\Csp\ContentSecurityPolicyHandler;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Twig\Environment;
 
 /**
  * WebDebugToolbarListener injects the Web Debug Toolbar.
@@ -42,9 +40,8 @@ class WebDebugToolbarListener implements EventSubscriberInterface
     protected $mode;
     protected $position;
     protected $excludedAjaxPaths;
-    private $cspHandler;
 
-    public function __construct(Environment $twig, $interceptRedirects = false, $mode = self::ENABLED, $position = 'bottom', UrlGeneratorInterface $urlGenerator = null, $excludedAjaxPaths = '^/bundles|^/_wdt', ContentSecurityPolicyHandler $cspHandler = null)
+    public function __construct(\Twig_Environment $twig, $interceptRedirects = false, $mode = self::ENABLED, $position = 'bottom', UrlGeneratorInterface $urlGenerator = null, $excludedAjaxPaths = '^/bundles|^/_wdt')
     {
         $this->twig = $twig;
         $this->urlGenerator = $urlGenerator;
@@ -52,7 +49,6 @@ class WebDebugToolbarListener implements EventSubscriberInterface
         $this->mode = (int) $mode;
         $this->position = $position;
         $this->excludedAjaxPaths = $excludedAjaxPaths;
-        $this->cspHandler = $cspHandler;
     }
 
     public function isEnabled()
@@ -69,10 +65,10 @@ class WebDebugToolbarListener implements EventSubscriberInterface
             try {
                 $response->headers->set(
                     'X-Debug-Token-Link',
-                    $this->urlGenerator->generate('_profiler', ['token' => $response->headers->get('X-Debug-Token')], UrlGeneratorInterface::ABSOLUTE_URL)
+                    $this->urlGenerator->generate('_profiler', array('token' => $response->headers->get('X-Debug-Token')), UrlGeneratorInterface::ABSOLUTE_URL)
                 );
             } catch (\Exception $e) {
-                $response->headers->set('X-Debug-Error', \get_class($e).': '.preg_replace('/\s+/', ' ', $e->getMessage()));
+                $response->headers->set('X-Debug-Error', get_class($e).': '.$e->getMessage());
             }
         }
 
@@ -80,21 +76,19 @@ class WebDebugToolbarListener implements EventSubscriberInterface
             return;
         }
 
-        $nonces = $this->cspHandler ? $this->cspHandler->updateResponseHeaders($request, $response) : [];
-
         // do not capture redirects or modify XML HTTP Requests
         if ($request->isXmlHttpRequest()) {
             return;
         }
 
-        if ($response->headers->has('X-Debug-Token') && $response->isRedirect() && $this->interceptRedirects && 'html' === $request->getRequestFormat()) {
+        if ($response->headers->has('X-Debug-Token') && $response->isRedirect() && $this->interceptRedirects) {
             $session = $request->getSession();
             if (null !== $session && $session->isStarted() && $session->getFlashBag() instanceof AutoExpireFlashBag) {
                 // keep current flashes for one more request if using AutoExpireFlashBag
                 $session->getFlashBag()->setAll($session->getFlashBag()->peekAll());
             }
 
-            $response->setContent($this->twig->render('@WebProfiler/Profiler/toolbar_redirect.html.twig', ['location' => $response->headers->get('Location')]));
+            $response->setContent($this->twig->render('@WebProfiler/Profiler/toolbar_redirect.html.twig', array('location' => $response->headers->get('Location'))));
             $response->setStatusCode(200);
             $response->headers->remove('Location');
         }
@@ -109,13 +103,15 @@ class WebDebugToolbarListener implements EventSubscriberInterface
             return;
         }
 
-        $this->injectToolbar($response, $request, $nonces);
+        $this->injectToolbar($response, $request);
     }
 
     /**
      * Injects the web debug toolbar into the given Response.
+     *
+     * @param Response $response A Response instance
      */
-    protected function injectToolbar(Response $response, Request $request, array $nonces)
+    protected function injectToolbar(Response $response, Request $request)
     {
         $content = $response->getContent();
         $pos = strripos($content, '</body>');
@@ -123,14 +119,12 @@ class WebDebugToolbarListener implements EventSubscriberInterface
         if (false !== $pos) {
             $toolbar = "\n".str_replace("\n", '', $this->twig->render(
                 '@WebProfiler/Profiler/toolbar_js.html.twig',
-                [
+                array(
                     'position' => $this->position,
                     'excluded_ajax_paths' => $this->excludedAjaxPaths,
                     'token' => $response->headers->get('X-Debug-Token'),
                     'request' => $request,
-                    'csp_script_nonce' => isset($nonces['csp_script_nonce']) ? $nonces['csp_script_nonce'] : null,
-                    'csp_style_nonce' => isset($nonces['csp_style_nonce']) ? $nonces['csp_style_nonce'] : null,
-                ]
+                )
             ))."\n";
             $content = substr($content, 0, $pos).$toolbar.substr($content, $pos);
             $response->setContent($content);
@@ -139,8 +133,8 @@ class WebDebugToolbarListener implements EventSubscriberInterface
 
     public static function getSubscribedEvents()
     {
-        return [
-            KernelEvents::RESPONSE => ['onKernelResponse', -128],
-        ];
+        return array(
+            KernelEvents::RESPONSE => array('onKernelResponse', -128),
+        );
     }
 }

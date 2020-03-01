@@ -18,13 +18,20 @@ use Symfony\Component\PropertyAccess\Exception\OutOfBoundsException;
  */
 class PropertyPathBuilder
 {
-    private $elements = [];
-    private $isIndex = [];
+    /**
+     * @var array
+     */
+    private $elements = array();
+
+    /**
+     * @var array
+     */
+    private $isIndex = array();
 
     /**
      * Creates a new property path builder.
      *
-     * @param PropertyPathInterface|string|null $path The path to initially store
+     * @param null|PropertyPathInterface|string $path The path to initially store
      *                                                in the builder. Optional.
      */
     public function __construct($path = null)
@@ -39,13 +46,13 @@ class PropertyPathBuilder
      *
      * @param PropertyPathInterface|string $path   The path to append
      * @param int                          $offset The offset where the appended
-     *                                             piece starts in $path
+     *                                             piece starts in $path.
      * @param int                          $length The length of the appended piece
-     *                                             If 0, the full path is appended
+     *                                             If 0, the full path is appended.
      */
     public function append($path, $offset = 0, $length = 0)
     {
-        if (\is_string($path)) {
+        if (is_string($path)) {
             $path = new PropertyPath($path);
         }
 
@@ -107,15 +114,15 @@ class PropertyPathBuilder
      * @param int                          $length     The length of the piece to replace
      * @param PropertyPathInterface|string $path       The path to insert
      * @param int                          $pathOffset The offset where the inserted piece
-     *                                                 starts in $path
+     *                                                 starts in $path.
      * @param int                          $pathLength The length of the inserted piece
-     *                                                 If 0, the full path is inserted
+     *                                                 If 0, the full path is inserted.
      *
      * @throws OutOfBoundsException If the offset is invalid
      */
     public function replace($offset, $length, $path, $pathOffset = 0, $pathLength = 0)
     {
-        if (\is_string($path)) {
+        if (is_string($path)) {
             $path = new PropertyPath($path);
         }
 
@@ -187,13 +194,13 @@ class PropertyPathBuilder
      */
     public function getLength()
     {
-        return \count($this->elements);
+        return count($this->elements);
     }
 
     /**
      * Returns the current property path.
      *
-     * @return PropertyPathInterface|null The constructed property path
+     * @return PropertyPathInterface The constructed property path
      */
     public function getPropertyPath()
     {
@@ -240,7 +247,7 @@ class PropertyPathBuilder
             return;
         }
 
-        $length = \count($this->elements);
+        $length = count($this->elements);
 
         if ($cutLength > $insertionLength) {
             // More elements should be removed than inserted
@@ -257,8 +264,9 @@ class PropertyPathBuilder
             }
 
             // All remaining elements should be removed
-            $this->elements = \array_slice($this->elements, 0, $i);
-            $this->isIndex = \array_slice($this->isIndex, 0, $i);
+            for (; $i < $length; ++$i) {
+                unset($this->elements[$i], $this->isIndex[$i]);
+            }
         } else {
             $diff = $insertionLength - $cutLength;
 

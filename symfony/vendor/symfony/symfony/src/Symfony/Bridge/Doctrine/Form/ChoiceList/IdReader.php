@@ -11,10 +11,8 @@
 
 namespace Symfony\Bridge\Doctrine\Form\ChoiceList;
 
-use Doctrine\Common\Persistence\Mapping\ClassMetadata as LegacyClassMetadata;
-use Doctrine\Common\Persistence\ObjectManager as LegacyObjectManager;
-use Doctrine\Persistence\Mapping\ClassMetadata;
-use Doctrine\Persistence\ObjectManager;
+use Doctrine\Common\Persistence\Mapping\ClassMetadata;
+use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\Form\Exception\RuntimeException;
 
 /**
@@ -22,14 +20,33 @@ use Symfony\Component\Form\Exception\RuntimeException;
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  *
- * @internal
+ * @internal This class is meant for internal use only.
  */
 class IdReader
 {
+    /**
+     * @var ObjectManager
+     */
     private $om;
+
+    /**
+     * @var ClassMetadata
+     */
     private $classMetadata;
+
+    /**
+     * @var bool
+     */
     private $singleId;
+
+    /**
+     * @var bool
+     */
     private $intId;
+
+    /**
+     * @var string
+     */
     private $idField;
 
     /**
@@ -37,19 +54,15 @@ class IdReader
      */
     private $associationIdReader;
 
-    /**
-     * @param ObjectManager|LegacyObjectManager $om
-     * @param ClassMetadata|LegacyClassMetadata $classMetadata
-     */
-    public function __construct($om, $classMetadata)
+    public function __construct(ObjectManager $om, ClassMetadata $classMetadata)
     {
         $ids = $classMetadata->getIdentifierFieldNames();
         $idType = $classMetadata->getTypeOfField(current($ids));
 
         $this->om = $om;
         $this->classMetadata = $classMetadata;
-        $this->singleId = 1 === \count($ids);
-        $this->intId = $this->singleId && \in_array($idType, ['integer', 'smallint', 'bigint']);
+        $this->singleId = 1 === count($ids);
+        $this->intId = $this->singleId && in_array($idType, array('integer', 'smallint', 'bigint'));
         $this->idField = current($ids);
 
         // single field association are resolved, since the schema column could be an int
@@ -66,8 +79,8 @@ class IdReader
     /**
      * Returns whether the class has a single-column ID.
      *
-     * @return bool returns `true` if the class has a single-column ID and
-     *              `false` otherwise
+     * @return bool Returns `true` if the class has a single-column ID and
+     *              `false` otherwise.
      */
     public function isSingleId()
     {
@@ -77,8 +90,8 @@ class IdReader
     /**
      * Returns whether the class has a single-column integer ID.
      *
-     * @return bool returns `true` if the class has a single-column integer ID
-     *              and `false` otherwise
+     * @return bool Returns `true` if the class has a single-column integer ID
+     *              and `false` otherwise.
      */
     public function isIntId()
     {
@@ -97,11 +110,14 @@ class IdReader
     public function getIdValue($object)
     {
         if (!$object) {
-            return null;
+            return;
         }
 
         if (!$this->om->contains($object)) {
-            throw new RuntimeException(sprintf('Entity of type "%s" passed to the choice field must be managed. Maybe you forget to persist it in the entity manager?', \get_class($object)));
+            throw new RuntimeException(
+                'Entities passed to the choice field must be managed. Maybe '.
+                'persist them in the entity manager?'
+            );
         }
 
         $this->om->initializeObject($object);

@@ -12,9 +12,9 @@
 namespace Symfony\Component\Security\Core\Authentication\RememberMe;
 
 /**
- * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ * This class is only used by PersistentTokenRememberMeServices internally.
  *
- * @internal
+ * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 final class PersistentToken implements PersistentTokenInterface
 {
@@ -25,10 +25,13 @@ final class PersistentToken implements PersistentTokenInterface
     private $lastUsed;
 
     /**
-     * @param string $class
-     * @param string $username
-     * @param string $series
-     * @param string $tokenValue
+     * Constructor.
+     *
+     * @param string    $class
+     * @param string    $username
+     * @param string    $series
+     * @param string    $tokenValue
+     * @param \DateTime $lastUsed
      *
      * @throws \InvalidArgumentException
      */

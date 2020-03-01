@@ -19,6 +19,8 @@ namespace Symfony\Component\Serializer\Mapping;
 class AttributeMetadata implements AttributeMetadataInterface
 {
     /**
+     * @var string
+     *
      * @internal This property is public in order to reduce the size of the
      *           class' serialized representation. Do not access it. Use
      *           {@link getName()} instead.
@@ -26,20 +28,13 @@ class AttributeMetadata implements AttributeMetadataInterface
     public $name;
 
     /**
+     * @var array
+     *
      * @internal This property is public in order to reduce the size of the
      *           class' serialized representation. Do not access it. Use
      *           {@link getGroups()} instead.
      */
-    public $groups = [];
-
-    /**
-     * @var int|null
-     *
-     * @internal This property is public in order to reduce the size of the
-     *           class' serialized representation. Do not access it. Use
-     *           {@link getMaxDepth()} instead.
-     */
-    public $maxDepth;
+    public $groups = array();
 
     /**
      * Constructs a metadata for the given attribute.
@@ -64,7 +59,7 @@ class AttributeMetadata implements AttributeMetadataInterface
      */
     public function addGroup($group)
     {
-        if (!\in_array($group, $this->groups)) {
+        if (!in_array($group, $this->groups)) {
             $this->groups[] = $group;
         }
     }
@@ -80,31 +75,10 @@ class AttributeMetadata implements AttributeMetadataInterface
     /**
      * {@inheritdoc}
      */
-    public function setMaxDepth($maxDepth)
-    {
-        $this->maxDepth = $maxDepth;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getMaxDepth()
-    {
-        return $this->maxDepth;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function merge(AttributeMetadataInterface $attributeMetadata)
     {
         foreach ($attributeMetadata->getGroups() as $group) {
             $this->addGroup($group);
-        }
-
-        // Overwrite only if not defined
-        if (null === $this->maxDepth) {
-            $this->maxDepth = $attributeMetadata->getMaxDepth();
         }
     }
 
@@ -115,6 +89,6 @@ class AttributeMetadata implements AttributeMetadataInterface
      */
     public function __sleep()
     {
-        return ['name', 'groups', 'maxDepth'];
+        return array('name', 'groups');
     }
 }

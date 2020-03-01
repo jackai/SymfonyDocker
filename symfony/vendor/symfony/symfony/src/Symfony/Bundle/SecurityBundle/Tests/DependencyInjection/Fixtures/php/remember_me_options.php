@@ -1,19 +1,18 @@
 <?php
 
-$container->loadFromExtension('security', [
-    'providers' => [
-        'default' => ['id' => 'foo'],
-    ],
+$container->loadFromExtension('security', array(
+    'providers' => array(
+        'default' => array('id' => 'foo'),
+    ),
 
-    'firewalls' => [
-        'main' => [
+    'firewalls' => array(
+        'main' => array(
             'form_login' => true,
-            'remember_me' => [
+            'remember_me' => array(
                 'secret' => 'TheSecret',
                 'catch_exceptions' => false,
                 'token_provider' => 'token_provider_id',
-            ],
-            'logout_on_user_change' => true,
-        ],
-    ],
-]);
+            ),
+        ),
+    ),
+));

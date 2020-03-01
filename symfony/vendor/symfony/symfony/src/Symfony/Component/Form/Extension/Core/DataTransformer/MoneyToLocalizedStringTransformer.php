@@ -23,12 +23,6 @@ class MoneyToLocalizedStringTransformer extends NumberToLocalizedStringTransform
 {
     private $divisor;
 
-    /**
-     * @param int|null  $scale
-     * @param bool|null $grouping
-     * @param int|null  $roundingMode
-     * @param int|null  $divisor
-     */
     public function __construct($scale = 2, $grouping = true, $roundingMode = self::ROUND_HALF_UP, $divisor = 1)
     {
         if (null === $grouping) {
@@ -55,15 +49,16 @@ class MoneyToLocalizedStringTransformer extends NumberToLocalizedStringTransform
      *
      * @return string Localized money string
      *
-     * @throws TransformationFailedException if the given value is not numeric or
-     *                                       if the value can not be transformed
+     * @throws TransformationFailedException If the given value is not numeric or
+     *                                       if the value can not be transformed.
      */
     public function transform($value)
     {
-        if (null !== $value && 1 !== $this->divisor) {
+        if (null !== $value) {
             if (!is_numeric($value)) {
                 throw new TransformationFailedException('Expected a numeric.');
             }
+
             $value /= $this->divisor;
         }
 
@@ -77,14 +72,15 @@ class MoneyToLocalizedStringTransformer extends NumberToLocalizedStringTransform
      *
      * @return int|float Normalized number
      *
-     * @throws TransformationFailedException if the given value is not a string
-     *                                       or if the value can not be transformed
+     * @throws TransformationFailedException If the given value is not a string
+     *                                       or if the value can not be transformed.
      */
     public function reverseTransform($value)
     {
         $value = parent::reverseTransform($value);
-        if (null !== $value && 1 !== $this->divisor) {
-            $value = (float) (string) ($value * $this->divisor);
+
+        if (null !== $value) {
+            $value *= $this->divisor;
         }
 
         return $value;

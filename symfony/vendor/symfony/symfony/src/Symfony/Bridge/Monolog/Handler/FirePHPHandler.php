@@ -12,8 +12,8 @@
 namespace Symfony\Bridge\Monolog\Handler;
 
 use Monolog\Handler\FirePHPHandler as BaseFirePHPHandler;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * FirePHPHandler.
@@ -22,7 +22,10 @@ use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
  */
 class FirePHPHandler extends BaseFirePHPHandler
 {
-    private $headers = [];
+    /**
+     * @var array
+     */
+    private $headers = array();
 
     /**
      * @var Response
@@ -38,11 +41,10 @@ class FirePHPHandler extends BaseFirePHPHandler
             return;
         }
 
-        $request = $event->getRequest();
-        if (!preg_match('{\bFirePHP/\d+\.\d+\b}', $request->headers->get('User-Agent'))
-            && !$request->headers->has('X-FirePHP-Version')) {
-            self::$sendHeaders = false;
-            $this->headers = [];
+        if (!preg_match('{\bFirePHP/\d+\.\d+\b}', $event->getRequest()->headers->get('User-Agent'))
+            && !$event->getRequest()->headers->has('X-FirePHP-Version')) {
+            $this->sendHeaders = false;
+            $this->headers = array();
 
             return;
         }
@@ -51,7 +53,7 @@ class FirePHPHandler extends BaseFirePHPHandler
         foreach ($this->headers as $header => $content) {
             $this->response->headers->set($header, $content);
         }
-        $this->headers = [];
+        $this->headers = array();
     }
 
     /**
@@ -59,7 +61,7 @@ class FirePHPHandler extends BaseFirePHPHandler
      */
     protected function sendHeader($header, $content)
     {
-        if (!self::$sendHeaders) {
+        if (!$this->sendHeaders) {
             return;
         }
 

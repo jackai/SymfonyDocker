@@ -20,7 +20,10 @@ namespace Symfony\Component\Intl\DateFormatter\DateFormat;
  */
 class MonthTransformer extends Transformer
 {
-    protected static $months = [
+    /**
+     * @var array
+     */
+    protected static $months = array(
         'January',
         'February',
         'March',
@@ -33,26 +36,35 @@ class MonthTransformer extends Transformer
         'October',
         'November',
         'December',
-    ];
+    );
 
     /**
      * Short months names (first 3 letters).
+     *
+     * @var array
      */
-    protected static $shortMonths = [];
+    protected static $shortMonths = array();
 
     /**
      * Flipped $months array, $name => $index.
+     *
+     * @var array
      */
-    protected static $flippedMonths = [];
+    protected static $flippedMonths = array();
 
     /**
      * Flipped $shortMonths array, $name => $index.
+     *
+     * @var array
      */
-    protected static $flippedShortMonths = [];
+    protected static $flippedShortMonths = array();
 
+    /**
+     * Constructor.
+     */
     public function __construct()
     {
-        if (0 === \count(self::$shortMonths)) {
+        if (0 === count(self::$shortMonths)) {
             self::$shortMonths = array_map(function ($month) {
                 return substr($month, 0, 3);
             }, self::$months);
@@ -67,12 +79,12 @@ class MonthTransformer extends Transformer
      */
     public function format(\DateTime $dateTime, $length)
     {
-        $matchLengthMap = [
+        $matchLengthMap = array(
             1 => 'n',
             2 => 'm',
             3 => 'M',
             4 => 'F',
-        ];
+        );
 
         if (isset($matchLengthMap[$length])) {
             return $dateTime->format($matchLengthMap[$length]);
@@ -104,7 +116,7 @@ class MonthTransformer extends Transformer
                 $regExp = '[JFMASOND]';
                 break;
             default:
-                $regExp = '\d{1,'.$length.'}';
+                $regExp = '\d{'.$length.'}';
                 break;
         }
 
@@ -129,8 +141,8 @@ class MonthTransformer extends Transformer
             $matched = (int) $matched;
         }
 
-        return [
+        return array(
             'month' => $matched,
-        ];
+        );
     }
 }

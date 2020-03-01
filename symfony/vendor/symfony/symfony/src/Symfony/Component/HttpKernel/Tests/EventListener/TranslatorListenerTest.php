@@ -11,14 +11,13 @@
 
 namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\EventListener\TranslatorListener;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
-class TranslatorListenerTest extends TestCase
+class TranslatorListenerTest extends \PHPUnit_Framework_TestCase
 {
     private $listener;
     private $translator;
@@ -26,8 +25,8 @@ class TranslatorListenerTest extends TestCase
 
     protected function setUp()
     {
-        $this->translator = $this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')->getMock();
-        $this->requestStack = $this->getMockBuilder('Symfony\Component\HttpFoundation\RequestStack')->getMock();
+        $this->translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
+        $this->requestStack = $this->getMock('Symfony\Component\HttpFoundation\RequestStack');
         $this->listener = new TranslatorListener($this->translator, $this->requestStack);
     }
 
@@ -47,7 +46,7 @@ class TranslatorListenerTest extends TestCase
         $this->translator
             ->expects($this->at(0))
             ->method('setLocale')
-            ->willThrowException(new \InvalidArgumentException());
+            ->will($this->throwException(new \InvalidArgumentException()));
         $this->translator
             ->expects($this->at(1))
             ->method('setLocale')
@@ -84,7 +83,7 @@ class TranslatorListenerTest extends TestCase
         $this->translator
             ->expects($this->at(0))
             ->method('setLocale')
-            ->willThrowException(new \InvalidArgumentException());
+            ->will($this->throwException(new \InvalidArgumentException()));
         $this->translator
             ->expects($this->at(1))
             ->method('setLocale')
@@ -97,7 +96,7 @@ class TranslatorListenerTest extends TestCase
 
     private function createHttpKernel()
     {
-        return $this->getMockBuilder('Symfony\Component\HttpKernel\HttpKernelInterface')->getMock();
+        return $this->getMock('Symfony\Component\HttpKernel\HttpKernelInterface');
     }
 
     private function createRequest($locale)
@@ -113,6 +112,6 @@ class TranslatorListenerTest extends TestCase
         $this->requestStack
             ->expects($this->any())
             ->method('getParentRequest')
-            ->willReturn($request);
+            ->will($this->returnValue($request));
     }
 }

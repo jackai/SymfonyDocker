@@ -25,7 +25,7 @@ class Profile
     /**
      * @var DataCollectorInterface[]
      */
-    private $collectors = [];
+    private $collectors = array();
 
     private $ip;
     private $method;
@@ -41,9 +41,11 @@ class Profile
     /**
      * @var Profile[]
      */
-    private $children = [];
+    private $children = array();
 
     /**
+     * Constructor.
+     *
      * @param string $token The token
      */
     public function __construct($token)
@@ -73,8 +75,10 @@ class Profile
 
     /**
      * Sets the parent token.
+     *
+     * @param Profile $parent The parent Profile
      */
-    public function setParent(self $parent)
+    public function setParent(Profile $parent)
     {
         $this->parent = $parent;
     }
@@ -82,7 +86,7 @@ class Profile
     /**
      * Returns the parent profile.
      *
-     * @return self
+     * @return Profile The parent profile
      */
     public function getParent()
     {
@@ -92,7 +96,7 @@ class Profile
     /**
      * Returns the parent token.
      *
-     * @return string|null The parent token
+     * @return null|string The parent token
      */
     public function getParentToken()
     {
@@ -102,7 +106,7 @@ class Profile
     /**
      * Returns the IP.
      *
-     * @return string|null The IP
+     * @return string The IP
      */
     public function getIp()
     {
@@ -122,7 +126,7 @@ class Profile
     /**
      * Returns the request method.
      *
-     * @return string|null The request method
+     * @return string The request method
      */
     public function getMethod()
     {
@@ -137,16 +141,13 @@ class Profile
     /**
      * Returns the URL.
      *
-     * @return string|null The URL
+     * @return string The URL
      */
     public function getUrl()
     {
         return $this->url;
     }
 
-    /**
-     * @param string $url
-     */
     public function setUrl($url)
     {
         $this->url = $url;
@@ -155,7 +156,7 @@ class Profile
     /**
      * Returns the time.
      *
-     * @return int The time
+     * @return string The time
      */
     public function getTime()
     {
@@ -166,9 +167,6 @@ class Profile
         return $this->time;
     }
 
-    /**
-     * @param int $time The time
-     */
     public function setTime($time)
     {
         $this->time = $time;
@@ -183,7 +181,7 @@ class Profile
     }
 
     /**
-     * @return int|null
+     * @return int
      */
     public function getStatusCode()
     {
@@ -193,7 +191,7 @@ class Profile
     /**
      * Finds children profilers.
      *
-     * @return self[]
+     * @return Profile[] An array of Profile
      */
     public function getChildren()
     {
@@ -203,11 +201,11 @@ class Profile
     /**
      * Sets children profiler.
      *
-     * @param Profile[] $children
+     * @param Profile[] $children An array of Profile
      */
     public function setChildren(array $children)
     {
-        $this->children = [];
+        $this->children = array();
         foreach ($children as $child) {
             $this->addChild($child);
         }
@@ -215,8 +213,10 @@ class Profile
 
     /**
      * Adds the child token.
+     *
+     * @param Profile $child The child Profile
      */
-    public function addChild(self $child)
+    public function addChild(Profile $child)
     {
         $this->children[] = $child;
         $child->setParent($this);
@@ -257,7 +257,7 @@ class Profile
      */
     public function setCollectors(array $collectors)
     {
-        $this->collectors = [];
+        $this->collectors = array();
         foreach ($collectors as $collector) {
             $this->addCollector($collector);
         }
@@ -265,6 +265,8 @@ class Profile
 
     /**
      * Adds a Collector.
+     *
+     * @param DataCollectorInterface $collector A DataCollectorInterface instance
      */
     public function addCollector(DataCollectorInterface $collector)
     {
@@ -285,6 +287,6 @@ class Profile
 
     public function __sleep()
     {
-        return ['token', 'parent', 'children', 'collectors', 'ip', 'method', 'url', 'time', 'statusCode'];
+        return array('token', 'parent', 'children', 'collectors', 'ip', 'method', 'url', 'time');
     }
 }

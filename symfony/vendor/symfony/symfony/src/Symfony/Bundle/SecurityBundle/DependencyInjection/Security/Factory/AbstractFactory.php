@@ -12,7 +12,7 @@
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory;
 
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
-use Symfony\Component\DependencyInjection\ChildDefinition;
+use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
@@ -26,26 +26,26 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 abstract class AbstractFactory implements SecurityFactoryInterface
 {
-    protected $options = [
+    protected $options = array(
         'check_path' => '/login_check',
         'use_forward' => false,
-        'require_previous_session' => false,
-    ];
+        'require_previous_session' => true,
+    );
 
-    protected $defaultSuccessHandlerOptions = [
+    protected $defaultSuccessHandlerOptions = array(
         'always_use_default_target_path' => false,
         'default_target_path' => '/',
         'login_path' => '/login',
         'target_path_parameter' => '_target_path',
         'use_referer' => false,
-    ];
+    );
 
-    protected $defaultFailureHandlerOptions = [
+    protected $defaultFailureHandlerOptions = array(
         'failure_path' => null,
         'failure_forward' => false,
         'login_path' => '/login',
         'failure_path_parameter' => '_failure_path',
-    ];
+    );
 
     public function create(ContainerBuilder $container, $id, $config, $userProviderId, $defaultEntryPointId)
     {
@@ -59,14 +59,14 @@ abstract class AbstractFactory implements SecurityFactoryInterface
         if ($this->isRememberMeAware($config)) {
             $container
                 ->getDefinition($listenerId)
-                ->addTag('security.remember_me_aware', ['id' => $id, 'provider' => $userProviderId])
+                ->addTag('security.remember_me_aware', array('id' => $id, 'provider' => $userProviderId))
             ;
         }
 
         // create entry point if applicable (optional)
         $entryPointId = $this->createEntryPoint($container, $id, $config, $defaultEntryPointId);
 
-        return [$authProviderId, $listenerId, $entryPointId];
+        return array($authProviderId, $listenerId, $entryPointId);
     }
 
     public function addConfiguration(NodeDefinition $node)
@@ -81,7 +81,7 @@ abstract class AbstractFactory implements SecurityFactoryInterface
         ;
 
         foreach (array_merge($this->options, $this->defaultSuccessHandlerOptions, $this->defaultFailureHandlerOptions) as $name => $default) {
-            if (\is_bool($default)) {
+            if (is_bool($default)) {
                 $builder->booleanNode($name)->defaultValue($default);
             } else {
                 $builder->scalarNode($name)->defaultValue($default);
@@ -98,9 +98,10 @@ abstract class AbstractFactory implements SecurityFactoryInterface
      * Subclasses must return the id of a service which implements the
      * AuthenticationProviderInterface.
      *
-     * @param string $id             The unique id of the firewall
-     * @param array  $config         The options array for this listener
-     * @param string $userProviderId The id of the user provider
+     * @param ContainerBuilder $container
+     * @param string           $id             The unique id of the firewall
+     * @param array            $config         The options array for this listener
+     * @param string           $userProviderId The id of the user provider
      *
      * @return string never null, the id of the authentication provider
      */
@@ -130,9 +131,9 @@ abstract class AbstractFactory implements SecurityFactoryInterface
      * @param ContainerBuilder $container
      * @param string           $id
      * @param array            $config
-     * @param string|null      $defaultEntryPointId
+     * @param string           $defaultEntryPointId
      *
-     * @return string|null the entry point id
+     * @return string the entry point id
      */
     protected function createEntryPoint($container, $id, $config, $defaultEntryPointId)
     {
@@ -142,6 +143,8 @@ abstract class AbstractFactory implements SecurityFactoryInterface
     /**
      * Subclasses may disable remember-me features for the listener, by
      * always returning false from this method.
+     *
+     * @param array $config
      *
      * @return bool Whether a possibly configured RememberMeServices should be set for this listener
      */
@@ -153,7 +156,7 @@ abstract class AbstractFactory implements SecurityFactoryInterface
     protected function createListener($container, $id, $config, $userProvider)
     {
         $listenerId = $this->getListenerId();
-        $listener = new ChildDefinition($listenerId);
+        $listener = new DefinitionDecorator($listenerId);
         $listener->replaceArgument(4, $id);
         $listener->replaceArgument(5, new Reference($this->createAuthenticationSuccessHandler($container, $id, $config)));
         $listener->replaceArgument(6, new Reference($this->createAuthenticationFailureHandler($container, $id, $config)));
@@ -171,14 +174,14 @@ abstract class AbstractFactory implements SecurityFactoryInterface
         $options = array_intersect_key($config, $this->defaultSuccessHandlerOptions);
 
         if (isset($config['success_handler'])) {
-            $successHandler = $container->setDefinition($successHandlerId, new ChildDefinition('security.authentication.custom_success_handler'));
+            $successHandler = $container->setDefinition($successHandlerId, new DefinitionDecorator('security.authentication.custom_success_handler'));
             $successHandler->replaceArgument(0, new Reference($config['success_handler']));
             $successHandler->replaceArgument(1, $options);
             $successHandler->replaceArgument(2, $id);
         } else {
-            $successHandler = $container->setDefinition($successHandlerId, new ChildDefinition('security.authentication.success_handler'));
-            $successHandler->addMethodCall('setOptions', [$options]);
-            $successHandler->addMethodCall('setProviderKey', [$id]);
+            $successHandler = $container->setDefinition($successHandlerId, new DefinitionDecorator('security.authentication.success_handler'));
+            $successHandler->addMethodCall('setOptions', array($options));
+            $successHandler->addMethodCall('setProviderKey', array($id));
         }
 
         return $successHandlerId;
@@ -190,12 +193,12 @@ abstract class AbstractFactory implements SecurityFactoryInterface
         $options = array_intersect_key($config, $this->defaultFailureHandlerOptions);
 
         if (isset($config['failure_handler'])) {
-            $failureHandler = $container->setDefinition($id, new ChildDefinition('security.authentication.custom_failure_handler'));
+            $failureHandler = $container->setDefinition($id, new DefinitionDecorator('security.authentication.custom_failure_handler'));
             $failureHandler->replaceArgument(0, new Reference($config['failure_handler']));
             $failureHandler->replaceArgument(1, $options);
         } else {
-            $failureHandler = $container->setDefinition($id, new ChildDefinition('security.authentication.failure_handler'));
-            $failureHandler->addMethodCall('setOptions', [$options]);
+            $failureHandler = $container->setDefinition($id, new DefinitionDecorator('security.authentication.failure_handler'));
+            $failureHandler->addMethodCall('setOptions', array($options));
         }
 
         return $id;
