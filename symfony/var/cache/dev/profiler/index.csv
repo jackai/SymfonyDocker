@@ -1,0 +1,16 @@
+ac9f3e,127.0.0.1,GET,http://localhost:8000/,1582469299,,200
+19219f,127.0.0.1,GET,http://localhost:8000/lucky/number,1582469314,,200
+c5bc10,127.0.0.1,GET,http://localhost:8000/lucky/number,1582469340,,200
+a3a6f0,127.0.0.1,GET,http://localhost:8000/lucky/number,1582469343,,200
+256500,127.0.0.1,GET,http://localhost:8000/lucky/number2,1582469358,b87bfc,200
+b87bfc,127.0.0.1,GET,http://localhost:8000/lucky/number2,1582469358,,404
+fa8fc6,127.0.0.1,GET,http://localhost:8000/lucky/number,1582469362,,200
+f1e753,127.0.0.1,GET,http://localhost:8000/lucky/number,1582469430,,200
+22cf76,127.0.0.1,GET,http://localhost:8000/lucky/number,1582469466,,200
+12cccd,127.0.0.1,GET,http://localhost:8000/lucky/number,1582469510,,200
+5bbdc2,172.21.0.1,GET,http://localhost/lucky/number,1582469647,,200
+1b45b9,172.21.0.1,GET,http://localhost/lucky/number,1582469651,,200
+d9da47,172.21.0.1,GET,http://localhost/lucky/number,1582469652,,200
+cae9ca,172.21.0.1,GET,http://localhost/lucky/number,1582469654,,200
+1adea4,172.21.0.1,GET,http://localhost/lucky/number,1582469690,,200
+0abd22,172.21.0.1,GET,http://localhost/lucky/number,1582469692,,200
